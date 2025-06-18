@@ -2,7 +2,7 @@
 
 Implemented using Crawlee + PlaywrightCrawler + TypeScript
 
-This is a general project that dependeing on input it will crawl one of the news sources.
+This is a general project that depending on input it will crawl one of the news sources.
 
 ## Setting news source input
 
