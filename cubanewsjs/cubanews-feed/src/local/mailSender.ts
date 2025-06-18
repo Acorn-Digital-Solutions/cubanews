@@ -11,6 +11,8 @@ import path from "path";
 import fs from "fs";
 import moment from "moment";
 import cubanewsApp from "@/app/cubanewsApp";
+import { fileURLToPath } from "url";
+import { getLlama, LlamaChatSession } from "node-llama-cpp";
 
 const from = "cubanews.icu@gmail.com";
 const db = cubanewsApp.getDatabase;
@@ -92,6 +94,33 @@ async function getEmailBody(): Promise<string> {
     .replace("${news}", body)
     .replace("${date}", today.format("LL"));
   return res;
+}
+
+export async function generateAISummary(): Promise<string> {
+  const feed = await getFeedItems();
+  if (feed.length === 0) {
+    return "No hay noticias para resumir.";
+  }
+
+  // Here you would typically call an AI service to generate a summary.
+  // For simplicity, we will just return a placeholder text.
+
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const llama = await getLlama();
+  const model = await llama.loadModel({
+    modelPath: path.join(
+      __dirname,
+      "models",
+      "Meta-Llama-3.1-8B-Instruct.Q4_K_M.gguf"
+    ),
+  });
+  const context = await model.createContext();
+  const session = new LlamaChatSession({
+    contextSequence: context.getSequence(),
+  });
+  const message = await session.prompt("Say hello to the user.");
+  console.log("AI response:", message);
+  return message;
 }
 
 export async function sendEmails() {

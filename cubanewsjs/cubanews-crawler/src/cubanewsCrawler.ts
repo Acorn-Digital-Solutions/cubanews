@@ -23,6 +23,7 @@ export abstract class CubanewsCrawler
 {
   protected newsSource: NewsSource;
   protected enqueueLinkOptions: EnqueueLinksOptions = {};
+
   constructor(newsSource: NewsSource) {
     super({
       requestHandler: (context) => {
@@ -47,6 +48,7 @@ export abstract class CubanewsCrawler
   protected extractContentSummary(content: string): string {
     return content.trim().replace(/\n/g, "").split(" ").slice(0, 50).join(" ");
   }
+  protected generateAiContentSummary(content: string): string {}
 
   protected async parseTitle(page: Page): Promise<string | null> {
     const title = await page.title();
