@@ -14,6 +14,7 @@ export type NewsItem = {
   tags: Array<string>;
   score: number;
   interactions: InteractionData;
+  aiSummary: string;
 };
 
 export type NewsFeed = {

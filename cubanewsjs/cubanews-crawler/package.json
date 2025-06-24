@@ -1,28 +1,28 @@
 {
-    "name": "cubanews-crawler",
-    "version": "0.0.1",
-    "type": "module",
-    "description": "This is an example of a Crawlee project.",
-    "dependencies": {
-        "apify": "^3.4.2",
-        "crawlee": "^3.13.7",
-        "moment": "^2.30.1",
-        "playwright": "*"
-    },
-    "devDependencies": {
-        "@apify/tsconfig": "^0.1.1",
-        "@types/node": "^24.0.3",
-        "tsx": "^4.20.3",
-        "typescript": "~5.8.3"
-    },
-    "scripts": {
-        "start": "npm run start:dev",
-        "start:prod": "node dist/main.js",
-        "start:dev": "tsx src/main.ts",
-        "build": "tsc",
-        "test": "echo \"Error: oops, the actor has no tests yet, sad!\" && exit 1",
-        "postinstall": "npx crawlee install-playwright-browsers"
-    },
-    "author": "It's not you it's me",
-    "license": "ISC"
+  "name": "cubanews-crawler",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "This is an example of a Crawlee project.",
+  "dependencies": {
+    "apify": "^3.4.2",
+    "crawlee": "^3.13.7",
+    "moment": "^2.30.1",
+    "playwright": "*"
+  },
+  "devDependencies": {
+    "@apify/tsconfig": "^0.1.1",
+    "@types/node": "^24.0.3",
+    "tsx": "^4.20.3",
+    "typescript": "~5.8.3"
+  },
+  "scripts": {
+    "start": "npm run start:dev",
+    "start:prod": "node dist/main.js",
+    "start:dev": "tsx src/main.ts",
+    "build": "tsc",
+    "test": "echo \"Error: oops, the actor has no tests yet, sad!\" && exit 1",
+    "postinstall": "npx crawlee install-playwright-browsers"
+  },
+  "author": "acorndigitalsolutions",
+  "license": "ISC"
 }
