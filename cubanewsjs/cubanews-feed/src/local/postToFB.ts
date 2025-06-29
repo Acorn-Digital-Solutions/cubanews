@@ -8,7 +8,7 @@ import { NewsItem } from "@/app/interfaces";
 moment.locale("es");
 
 async function getPageFeed() {
-  const accessToken = process.env.ACCESS_TOKEN;
+  const accessToken = process.env.PAGE_ACCESS_TOKEN;
   const pageId = process.env.PAGE_ID;
   if (accessToken) {
     FacebookAdsApi.init(accessToken);
@@ -25,7 +25,7 @@ async function postToCubanewsFacebookPage(
   postContent: string,
   link: string = ""
 ): Promise<string> {
-  const accessToken = process.env.ACCESS_TOKEN;
+  const accessToken = process.env.PAGE_ACCESS_TOKEN;
   const pageId = process.env.PAGE_ID;
   if (!accessToken) {
     console.error("No access token provided.");
@@ -63,7 +63,7 @@ function main(dryRun = false) {
         const postId = await postToCubanewsFacebookPage(
           postContent,
           newsItems[0].url
-        );
+        ).catch((reason) => console.error(reason));
         console.log("Created post: ", postId);
       }
     })
