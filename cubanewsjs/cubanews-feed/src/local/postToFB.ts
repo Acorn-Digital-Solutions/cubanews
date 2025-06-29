@@ -24,11 +24,12 @@ async function getPageFeed() {
 async function postToCubanewsFacebookPage(
   postContent: string,
   link: string = ""
-) {
+): Promise<string> {
   const accessToken = process.env.ACCESS_TOKEN;
   const pageId = process.env.PAGE_ID;
   if (!accessToken) {
-    return;
+    console.error("No access token provided.");
+    return "";
   }
   FacebookAdsApi.init(accessToken);
   const page = new Page(pageId);
@@ -37,40 +38,41 @@ async function postToCubanewsFacebookPage(
     link: link,
     access_token: accessToken,
   });
-  return result;
+  return result.id;
 }
 
-function main() {
+function main(dryRun = false) {
+  console.log("Initiating Post to FB");
+  console.log("Dry Run", dryRun);
+  const formattedDate = moment().format("dddd D [de] MMMM YYYY");
+  const capitalized =
+    formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
   cubanewsApp
-    .getFeedItems()
-    .then(async (newsItems: NewsItem[]) => {})
+    .getFBPostNewsItems()
+    .then(async (newsItems: NewsItem[]) => {
+      const postHeader = `Titulares, ${capitalized}`;
+      const postBody = newsItems
+        .map((item) => `${item.title} [${item.url}]\n`)
+        .join("\n");
+      const postFooter = "Ver más en https://cubanews.icu";
+      const postContent = `${postHeader}\n\n${postBody}\n${postFooter}`;
+      console.log(
+        `-----------------------\n${postContent}\n-----------------------`
+      );
+      if (!dryRun) {
+        const postId = await postToCubanewsFacebookPage(
+          postContent,
+          newsItems[0].url
+        );
+        console.log("Created post: ", postId);
+      }
+    })
     .catch((error: any) => {
       console.error("Failed to retrieve feed, Error: ", error);
     });
-
-  // getPageFeed().then((feed) => console.log("Page feed: ", feed));
-
-  // postToCubanewsFacebookPage("Post de prueba")
-  //   .then((result) => console.log("Posted successfully ", result))
-  //   .catch((error) => console.error(error));
-
-  // Format the date
-  const formattedDate = moment().format("dddd D [de] MMMM YYYY");
-  // Capitalize the first letter
-  const capitalized =
-    formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
-  const postContent = `Titulares, ${capitalized}
-
-https://www.cibercuba.com/noticias/2025-06-28-u1-e42839-s27061-nid305884-youtuber-cubano-uruguay-detalla-sus-gastos-mensuales \n
-
-https://diariodecuba.com/cuba/1751065499_61783.html \n
-
-Ver más en https://cubanews.icu`;
-
-  postToCubanewsFacebookPage(
-    postContent,
-    "https://diariodecuba.com/cuba/1751065499_61783.html"
-  );
 }
 
-main();
+const args = process.argv.slice(2); // skip node and script path
+const dryRun = args.includes("--dry-run");
+
+main(dryRun);
