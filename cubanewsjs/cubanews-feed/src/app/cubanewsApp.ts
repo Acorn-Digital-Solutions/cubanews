@@ -90,6 +90,23 @@ export class CubanewsApp {
     return items;
   }
 
+  async getFBPostNewsItems(): Promise<NewsItem[]> {
+    const latestFeedts = await this.database
+      .selectFrom("feed")
+      .select([sql`max(feed.feedts)`.as("feedts")])
+      .executeTakeFirst();
+    if (!latestFeedts?.feedts) {
+      return [];
+    }
+    const items = await xOfEachSource(
+      this.database,
+      latestFeedts.feedts as number,
+      1,
+      1
+    );
+    return items;
+  }
+
   async getRecipients(): Promise<string[]> {
     const query = sql<SubscriptionsTable>`select s.* from subscriptions s join 
       (select max(timestamp) as ts from subscriptions 
