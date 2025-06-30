@@ -7,9 +7,10 @@ import { NewsItem } from "@/app/interfaces";
 // Set the locale to Spanish
 moment.locale("es");
 
+const accessToken = process.env.PAGE_ACCESS_TOKEN;
+const pageId = process.env.PAGE_ID;
+
 async function getPageFeed() {
-  const accessToken = process.env.PAGE_ACCESS_TOKEN;
-  const pageId = process.env.PAGE_ID;
   if (accessToken) {
     FacebookAdsApi.init(accessToken);
     const page = new Page(pageId);
@@ -25,8 +26,6 @@ async function postToCubanewsFacebookPage(
   postContent: string,
   link: string = ""
 ): Promise<string> {
-  const accessToken = process.env.PAGE_ACCESS_TOKEN;
-  const pageId = process.env.PAGE_ID;
   if (!accessToken) {
     console.error("No access token provided.");
     return "";

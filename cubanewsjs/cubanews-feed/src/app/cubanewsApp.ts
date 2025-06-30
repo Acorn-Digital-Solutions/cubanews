@@ -23,6 +23,7 @@ export class CubanewsApp {
   private database: Kysely<Database>;
   private cubanewsAiAssistant: CubanewsAiAssistant | null = null;
   private modelPath: string = "./src/local/models";
+  private dirname = path.dirname(fileURLToPath(import.meta.url));
 
   constructor() {
     console.log(
@@ -60,10 +61,9 @@ export class CubanewsApp {
     if (this.cubanewsAiAssistant) {
       return this.cubanewsAiAssistant;
     }
-    const __dirname = path.dirname(fileURLToPath(import.meta.url));
-    console.log(__dirname);
+    console.log(this.dirname);
     const modelPath = path.join(
-      __dirname,
+      this.dirname,
       "ai/models",
       "hf_mradermacher_Llama-3.2-3B-Instruct.Q8_0.gguf"
     );
@@ -138,10 +138,10 @@ export class CubanewsApp {
   async getEmailBody(): Promise<string> {
     const feed = await cubanewsApp.getFeedItems();
 
-    const templatePath = path.join(__dirname, "mail_template.html");
+    const templatePath = path.join(this.dirname, "mail_template.html");
     const emailTemplate = fs.readFileSync(templatePath, { encoding: "utf-8" });
 
-    const itemTemplatePath = path.join(__dirname, "news_item_template.html");
+    const itemTemplatePath = path.join(this.dirname, "news_item_template.html");
     const itemTemplate = fs.readFileSync(itemTemplatePath, {
       encoding: "utf-8",
     });
