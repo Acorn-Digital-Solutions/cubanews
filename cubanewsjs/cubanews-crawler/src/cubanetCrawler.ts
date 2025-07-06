@@ -53,7 +53,7 @@ export default class CubanetCrawler extends CubanewsCrawler {
   protected override async extractContent(page: Page): Promise<string | null> {
     const content = await page
       .locator(
-        "div.elementor-element.elementor-widget.elementor-widget-theme-post-content > div.elementor-widget-container"
+        "div.elementor-element.elementor-widget.elementor-widget-theme-post-content"
       )
       .first()
       .textContent();
