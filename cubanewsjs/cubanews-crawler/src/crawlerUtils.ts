@@ -16,10 +16,7 @@ export interface NewsSource {
 export const newsSources = [
   {
     name: NewsSourceName.ADNCUBA,
-    startUrls: new Set([
-      "https://adncuba.com/",
-      "https://adncuba.com/noticias-de-cuba/",
-    ]),
+    startUrls: new Set(["https://adncuba.com/es"]),
     datasetName: NewsSourceName.ADNCUBA + "-dataset",
   },
   {
