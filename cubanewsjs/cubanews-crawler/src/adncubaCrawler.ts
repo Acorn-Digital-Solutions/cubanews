@@ -14,18 +14,28 @@ const newsSource = getNewsSourceByName(NewsSourceName.ADNCUBA);
 const dateFormats = ["MMMM D, YYYY h:mma", "ddd, MM/DD/YYYY - HH:mm"];
 
 export default class AdnCubaCrawler extends CubanewsCrawler {
+  private httpStart = "http?(s)://";
   constructor() {
     super(newsSource);
+    const excludeRegexRoutes = [
+      "adncuba.com/tags/*",
+      "adncuba.com/es/taxonomy/*",
+      "adncuba.com/es/sur-de-la-florida",
+      "adncuba.com/es/node/*",
+      "adncuba.com/es/america-latina/colombia",
+      "adncuba.com/es/america-latina/mexico",
+      "adncuba.com/es/america-latina/venezuela",
+    ].map((r) => `${this.httpStart}${r}`);
     this.enqueueLinkOptions = {
-      globs: ["http?(s)://adncuba.com/*/*"],
-      exclude: ["http?(s)://adncuba.com/tags/*"],
+      globs: ["http?(s)://adncuba.com/es/*/*"],
+      exclude: excludeRegexRoutes,
       selector: "a",
     };
   }
 
   protected override isUrlValid(url: string): boolean {
     const sections = url.split("/");
-    return !url.startsWith("https://adncuba.com/tags/") && sections.length >= 5;
+    return !url.startsWith("https://adncuba.com/tags/") && sections.length >= 6;
   }
 
   protected override async extractDate(

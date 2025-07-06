@@ -82,6 +82,13 @@
       "localRoot": "${workspaceFolder}/cubanews-crawler"
     },
     {
+      "command": "cd cubanews-crawler; npm run start",
+      "name": "Run npm start",
+      "request": "launch",
+      "type": "node-terminal",
+      "localRoot": "${workspaceFolder}/cubanews-crawler"
+    },
+    {
       "type": "node",
       "request": "launch",
       "name": "Start Crawler",
