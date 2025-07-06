@@ -32,13 +32,14 @@ export default class ElToqueCrawler extends CubanewsCrawler {
       .locator("div.article-header")
       .first()
       .textContent();
-    const regex = /\d{1,2} \/ [A-Za-z]+ \/ \d{4}/g;
-    const matches = articleHeader?.match(regex);
+    const matches = articleHeader?.match(
+      /(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+\d{1,2},\s+\d{4}/i
+    );
     moment.locale("es");
     if (!matches || matches?.length === 0) {
       return null;
     }
-    const mDate = moment(matches[0], "D / MMMM / YYYY");
+    const mDate = moment(matches[0], "MMMM D, YYYY");
     if (mDate.isSameOrAfter(moment.now())) {
       console.warn(`Date is in the future: ${matches[0]}`);
       return moment(new Date());
