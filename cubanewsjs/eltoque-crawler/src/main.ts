@@ -5,7 +5,7 @@ import ElToqueCrawler from "../node_modules/cubanews-crawler/dist/eltoqueCrawler
 
 try {
   await Actor.init();
-  const dataset = await Actor.openDataset("cibercuba-dataset");
+  const dataset = await Actor.openDataset("eltoque-dataset");
   await dataset.drop();
   const crawler = new ElToqueCrawler();
   await crawler.runX();
