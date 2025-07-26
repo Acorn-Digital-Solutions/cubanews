@@ -34,7 +34,7 @@
     },
     {
       "command": "cd cubanews-crawler; npm start",
-      "name": "Run npm start",
+      "name": "Cubanews Crawler",
       "request": "launch",
       "type": "node-terminal",
       "localRoot": "${workspaceFolder}/cubanews-crawler"

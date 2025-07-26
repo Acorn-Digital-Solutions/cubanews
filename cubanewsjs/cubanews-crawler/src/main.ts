@@ -11,6 +11,7 @@ import CubanetCrawler from "./cubanetCrawler.js";
 
 try {
   await Actor.init();
+  const x = await Actor.getInput();
   const { source } = (await Actor.getInput()) as { source: NewsSourceName };
   const newsSource = getNewsSourceByName(source);
   if (newsSource) {
@@ -33,6 +34,9 @@ try {
         break;
       case NewsSourceName.CUBANET:
         crawler = new CubanetCrawler();
+        break;
+      case NewsSourceName.PERIODICO_CUBANO:
+        crawler = new DiarioDeCubaCrawler();
         break;
       default:
         throw new Error("Invalid news source");
