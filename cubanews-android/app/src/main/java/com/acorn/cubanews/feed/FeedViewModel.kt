@@ -1,10 +1,11 @@
 package com.acorn.cubanews.feed
 
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 enum class NewsSourceName(val value: String) {
     ADNCUBA("adncuba"),
@@ -13,7 +14,6 @@ enum class NewsSourceName(val value: String) {
     CIBERCUBA("cibercuba"),
     ELTOQUE("eltoque"),
     CUBANET("cubanet");
-
     override fun toString(): String = value
 }
 
@@ -25,51 +25,37 @@ data class InteractionData(
 )
 
 data class FeedItem(
-    val id: Int,
+    val id: Long,
     val title: String,
     val url: String,
     val source: NewsSourceName,
-    val updated: Int,
-    val isoDate: String,
-    val feedts: Int? = null,
+    val updated: Int = 0,
+    val isoDate: String = "",
+    val feedts: Long? = null,
     val content: String? = null,
     val tags: List<String> = emptyList(),
-    val score: Int,
-    val interactions: InteractionData,
-    val aiSummary: String
+    val score: Int = 0,
+    val interactions: InteractionData = InteractionData(feedid = 0),
+    val aiSummary: String? = null
 )
 
-class FeedViewModel : ViewModel() {
-    val pageSize = 10
+open class FeedViewModel(private val feedService: FeedService = FeedService()) : ViewModel() {
+    private val pageSize = 10
     private val _page = MutableStateFlow(0)
     val page: StateFlow<Int> = _page.asStateFlow()
     private val _uiState = MutableStateFlow<List<FeedItem>>(emptyList());
     val uiState: StateFlow<List<FeedItem>> = _uiState.asStateFlow()
 
     init {
-        fetchNextFeedBatch()
+        this.fetchNextFeedBatch()
     }
 
-    fun fetchNextFeedBatch() {
+    open fun fetchNextFeedBatch() {
         val currentPage = _page.value
-        val newFeedItems = List(10) { index ->
-            val id = currentPage * 10 + index
-            FeedItem(
-                id = id,
-                title = "Sample Title $id",
-                url = "https://example.com/item$id",
-                source = NewsSourceName.ADNCUBA,
-                updated = System.currentTimeMillis().toInt(),
-                isoDate = "2025-07-26T00:00:00Z",
-                feedts = null,
-                content = "Sample content for item $id",
-                tags = listOf("sample", "news"),
-                score = id * 10,
-                interactions = InteractionData(feedid = id),
-                aiSummary = "This is a summary for item $id."
-            )
+        viewModelScope.launch {
+            val newItems = feedService.fetchFeedBatch(currentPage, pageSize)
+            _uiState.value += newItems
+            _page.value = currentPage + 1
         }
-        _uiState.value += newFeedItems
-        _page.value = currentPage + 1
     }
 }

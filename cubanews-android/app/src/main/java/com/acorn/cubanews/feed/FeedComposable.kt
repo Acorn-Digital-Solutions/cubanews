@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
@@ -17,8 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun FeedComposable() {
-    val feedViewModel: FeedViewModel = viewModel()
+fun FeedComposable(feedViewModel: FeedViewModel) {
     val feedItems by remember { feedViewModel.uiState }.collectAsState()
     val listState = rememberLazyListState()
 

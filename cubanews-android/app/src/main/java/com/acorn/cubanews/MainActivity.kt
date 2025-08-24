@@ -24,12 +24,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.acorn.cubanews.feed.FeedComposable
+import com.acorn.cubanews.feed.FeedViewModel
 import com.acorn.cubanews.ui.theme.CubanewsTheme
 
 class MainActivity : ComponentActivity() {
@@ -112,7 +114,7 @@ fun Material3BottomNavApp() {
 @Composable
 fun HomeScreen() {
     Surface(modifier = Modifier.fillMaxSize()) {
-        FeedComposable()
+        FeedComposable(viewModel(FeedViewModel::class))
     }
 }
 
