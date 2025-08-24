@@ -43,7 +43,7 @@ open class FeedViewModel(private val feedService: FeedService = FeedService()) :
     private val pageSize = 10
     private val _page = MutableStateFlow(0)
     val page: StateFlow<Int> = _page.asStateFlow()
-    private val _uiState = MutableStateFlow<List<FeedItem>>(emptyList());
+    private val _uiState = MutableStateFlow<List<FeedItem>>(emptyList())
     val uiState: StateFlow<List<FeedItem>> = _uiState.asStateFlow()
 
     init {
