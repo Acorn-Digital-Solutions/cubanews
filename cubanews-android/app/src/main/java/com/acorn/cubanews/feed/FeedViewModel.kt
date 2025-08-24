@@ -2,6 +2,7 @@ package com.acorn.cubanews.feed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.acorn.cubanews.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,7 +38,18 @@ data class FeedItem(
     val score: Int = 0,
     val interactions: InteractionData = InteractionData(feedid = 0),
     val aiSummary: String? = null
-)
+) {
+    fun getImageName(): Int {
+        return when (source) {
+            NewsSourceName.ADNCUBA -> R.drawable.adncuba
+            NewsSourceName.CATORCEYMEDIO -> R.drawable.catorceymedio
+            NewsSourceName.DIARIODECUBA ->  R.drawable.ddc
+            NewsSourceName.CIBERCUBA -> R.drawable.cibercuba
+            NewsSourceName.ELTOQUE -> R.drawable.eltoque
+            NewsSourceName.CUBANET -> R.drawable.cubanet
+        }
+    }
+}
 
 open class FeedViewModel(private val feedService: FeedService = FeedService()) : ViewModel() {
     private val pageSize = 10
