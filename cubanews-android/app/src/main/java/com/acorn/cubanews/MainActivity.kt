@@ -52,13 +52,11 @@ class MainActivity : ComponentActivity() {
 
 sealed class Screen(val route: String, val icon: ImageVector, val label: String) {
     object Home : Screen("home", Icons.Filled.Home, "Home")
-    object Search : Screen("search", Icons.Filled.Search, "Search")
     object Profile : Screen("profile", Icons.Filled.Person, "Profile")
 }
 
 val bottomNavItems = listOf(
     Screen.Home,
-    Screen.Search,
     Screen.Profile
 )
 
@@ -119,7 +117,6 @@ fun Material3BottomNavApp() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) { HomeScreen() }
-            composable(Screen.Search.route) { SearchScreen() }
             composable(Screen.Profile.route) { ProfileScreen() }
         }
     }
@@ -129,13 +126,6 @@ fun Material3BottomNavApp() {
 fun HomeScreen() {
     Surface(modifier = Modifier.fillMaxSize()) {
         FeedComposable(viewModel(FeedViewModel::class))
-    }
-}
-
-@Composable
-fun SearchScreen() {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        CenteredText("Search something...")
     }
 }
 
