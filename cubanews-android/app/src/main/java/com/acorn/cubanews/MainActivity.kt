@@ -148,11 +148,11 @@ fun ProfileScreen() {
 
 @Composable
 fun CenteredText(text: String) {
-    androidx.compose.foundation.layout.Box(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        contentAlignment = androidx.compose.ui.Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Text(text, style = MaterialTheme.typography.headlineSmall)
     }
