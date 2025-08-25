@@ -18,7 +18,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.core.net.toUri
 
 @Composable
@@ -46,41 +51,74 @@ fun FeedComposable(feedViewModel: FeedViewModel) {
 @Composable
 fun FeedItemView(item: FeedItem) {
     val context = LocalContext.current
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(top = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .clickable {
                 val customTabsIntent = CustomTabsIntent.Builder().build()
                 customTabsIntent.launchUrl(context, item.url.toUri())
-            }
+            },
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Image(
-            painter = painterResource(id = item.getImageName()), // replace with your asset filename
-            contentDescription = "Icon",
+        Row(
             modifier = Modifier
-                .size(40.dp)
-                .padding(end = 8.dp)
-        )
-        Column {
-            Text(text = item.title, style = MaterialTheme.typography.titleMedium)
-            Text(
-                text = item.source.name,
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.Gray
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Image(
+                painter = painterResource(id = item.getImageName()),
+                contentDescription = "Thumbnail",
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(RoundedCornerShape(8.dp))
             )
-            Spacer(modifier = Modifier.height(8.dp))
-
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = item.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                // Article content/summary (if available)
+                val content = try {
+                    item.javaClass.getDeclaredField("content").get(item) as? String
+                } catch (e: Exception) {
+                    try { item.javaClass.getDeclaredField("description").get(item) as? String } catch (e: Exception) { null }
+                }
+                content?.let {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.DarkGray,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = item.source.name,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                    val isoDate = try { item.javaClass.getDeclaredField("isoDate").get(item)?.toString() } catch (e: Exception) { null }
+                    isoDate?.let {
+                        Text(
+                            text = " • $it",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Gray
+                        )
+                    }
+                }
+            }
         }
     }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp).padding(bottom = 8.dp)
-    ) {
-        item.content?.let {
-            Text(text = it, style = MaterialTheme.typography.bodyMedium)
-        }
-    }
+    Spacer(modifier = Modifier.height(4.dp))
+    HorizontalDivider(color = Color(0x11000000), thickness = 1.dp, modifier = Modifier.padding(horizontal = 24.dp))
 }
