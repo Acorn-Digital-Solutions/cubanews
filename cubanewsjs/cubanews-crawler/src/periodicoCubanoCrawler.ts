@@ -4,6 +4,9 @@ import { getNewsSourceByName, NewsSourceName } from "./crawlerUtils.js";
 import moment from "moment";
 
 export default class PeriodicoCubanoCrawler extends CubanewsCrawler {
+  protected override imageSelector(): string {
+    throw new Error("Method not implemented.");
+  }
   private httpStart = "https://www.periodicocubano.com/";
   private excludeRegexRoutes = [
     "noticias-de-los-estados-unidos/*",

@@ -5,6 +5,9 @@ import { NewsSourceName, getNewsSourceByName } from "./crawlerUtils.js";
 import moment from "moment";
 
 export default class ElToqueCrawler extends CubanewsCrawler {
+  protected override imageSelector(): string {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super(getNewsSourceByName(NewsSourceName.ELTOQUE));
     this.enqueueLinkOptions = {

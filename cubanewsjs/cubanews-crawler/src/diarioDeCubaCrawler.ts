@@ -6,6 +6,9 @@ import { Page } from "playwright";
 const newsSource = getNewsSourceByName(NewsSourceName.DIARIODECUBA);
 
 export default class DiarioDeCubaCrawler extends CubanewsCrawler {
+  protected override imageSelector(): string {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super(newsSource);
     this.enqueueLinkOptions = {

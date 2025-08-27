@@ -9,6 +9,8 @@ import moment from "moment";
 import { CubanewsCrawler } from "./cubanewsCrawler.js";
 import { NewsSourceName, getNewsSourceByName } from "./crawlerUtils.js";
 import { Page } from "playwright";
+import path from "path";
+import * as fs from "fs";
 
 const newsSource = getNewsSourceByName(NewsSourceName.ADNCUBA);
 const dateFormats = ["MMMM D, YYYY h:mma", "ddd, MM/DD/YYYY - HH:mm"];
@@ -78,5 +80,9 @@ export default class AdnCubaCrawler extends CubanewsCrawler {
         .join(" ");
     }
     return content;
+  }
+
+  protected override imageSelector(): string {
+    return "picture img";
   }
 }
