@@ -5,6 +5,7 @@ export enum NewsSourceName {
   CIBERCUBA = "cibercuba",
   ELTOQUE = "eltoque",
   CUBANET = "cubanet",
+  PERIODICO_CUBANO = "periodicocubano",
 }
 
 export interface NewsSource {
@@ -46,6 +47,15 @@ export const newsSources = [
       "https://www.cubanet.org/categoria/destacados/",
     ]),
     datasetName: NewsSourceName.CUBANET + "-dataset",
+  },
+  {
+    name: NewsSourceName.PERIODICO_CUBANO,
+    startUrls: new Set([
+      "https://www.periodicocubano.com/noticias-de-cuba/",
+      "https://www.periodicocubano.com/noticias/parole-humanitario/",
+      "https://www.periodicocubano.com/ley-de-nietos-y-bisnietos/",
+    ]),
+    datasetName: NewsSourceName.PERIODICO_CUBANO + "-dataset",
   },
 ];
 

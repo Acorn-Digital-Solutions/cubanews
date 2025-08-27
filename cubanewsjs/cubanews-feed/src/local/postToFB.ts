@@ -36,6 +36,7 @@ async function postToCubanewsFacebookPage(
     message: postContent,
     link: link,
     access_token: accessToken,
+    published: true,
   });
   return result.id;
 }
