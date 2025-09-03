@@ -13,6 +13,15 @@ import { Moment } from "moment";
 import moment from "moment";
 import path from "path";
 import * as fs from "fs";
+import {
+  connectStorageEmulator,
+  FirebaseStorage,
+  getStorage,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
+import { firebaseConfig } from "./firebaseConfig.js";
+import { initializeApp } from "firebase/app";
 
 export interface ICubanewsCrawler {
   runX(): Promise<void>;
@@ -26,7 +35,7 @@ export abstract class CubanewsCrawler
   protected newsSource: NewsSource;
   protected enqueueLinkOptions: EnqueueLinksOptions = {};
 
-  constructor(newsSource: NewsSource) {
+  constructor(newsSource: NewsSource, private storage?: FirebaseStorage) {
     super({
       requestHandler: (context) => {
         return this.requestHandlerX(context);
@@ -34,6 +43,11 @@ export abstract class CubanewsCrawler
       maxRequestsPerCrawl: 50,
     });
     this.newsSource = newsSource;
+    if (!storage) {
+      const firebaseApp = initializeApp(firebaseConfig);
+      this.storage = getStorage(firebaseApp);
+      connectStorageEmulator(this.storage, "localhost", 9199);
+    }
   }
 
   get datasetName(): string {
@@ -71,12 +85,33 @@ export abstract class CubanewsCrawler
     const buffer = await response.body();
     // Save to local disk
     const outPath = path.resolve(".", `image-${imageName}.webp`);
-    fs.writeFileSync(outPath, buffer);
-    return outPath;
+    // Upload image buffer to Firebase Storage
+
+    const storagePath = `images/${imageName}.webp`;
+    if (!this.storage) {
+      throw new Error("Firebase storage is not initialized.");
+    }
+    const storageRef = ref(this.storage, storagePath);
+
+    await uploadBytes(storageRef, buffer);
+
+    // Get public URL
+    let imageUrl: string;
+    // if (process.env.FIREBASE_EMULATOR === "true") {
+    imageUrl = `gs://cubanews-fbaad.firebasestorage.app/${storagePath}`;
+    // } else {
+    //   imageUrl = `https://firebasestorage.googleapis.com/v0/b/${
+    //   firebaseConfig.storageBucket
+    //   }/o/${encodeURIComponent(storagePath)}?alt=media`;
+    // }
+
+    return imageUrl;
   }
+
   protected extractContentSummary(content: string): string {
     return content.trim().replace(/\n/g, "").split(" ").slice(0, 50).join(" ");
   }
+
   protected generateAiContentSummary(content: string): string {
     return content;
   }

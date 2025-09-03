@@ -9,19 +9,15 @@ import CatorceYMedioCrawler from "./catorceYMedioCrawler.js";
 import ElToqueCrawler from "./eltoqueCrawler.js";
 import CubanetCrawler from "./cubanetCrawler.js";
 import { initializeApp } from "firebase/app";
-import { getStorage } from "firebase/storage";
-
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID,
-};
+import { getStorage, connectStorageEmulator } from "firebase/storage";
+import { firebaseConfig } from "./firebaseConfig.js";
 
 const firebaseApp = initializeApp(firebaseConfig);
 const storage = getStorage(firebaseApp);
+
+// if (process.env.USE_FIREBASE_EMULATOR === "true") {
+connectStorageEmulator(storage, "localhost", 9199); // default port for storage emulator
+// }
 
 try {
   await Actor.init();
