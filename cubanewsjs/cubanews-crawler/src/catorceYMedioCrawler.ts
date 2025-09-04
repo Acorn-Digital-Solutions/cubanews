@@ -51,6 +51,6 @@ export default class CatorceYMedioCrawler extends CubanewsCrawler {
   }
 
   protected override imageSelector(): string {
-    return "main picture img";
+    return "div.bbnx-opening.single-column-default-width > figure > picture > source:nth-child(1)";
   }
 }

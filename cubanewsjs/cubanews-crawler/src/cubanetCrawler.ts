@@ -6,8 +6,9 @@ import moment from "moment";
 
 export default class CubanetCrawler extends CubanewsCrawler {
   protected override imageSelector(): string {
-    throw new Error("Method not implemented.");
+    return "figure.wp-caption > img";
   }
+
   constructor() {
     super(getNewsSourceByName(NewsSourceName.CUBANET));
     this.enqueueLinkOptions = {

@@ -68,7 +68,10 @@ export abstract class CubanewsCrawler
     const imageName = Math.floor(Math.random() * 1000000) + 1;
     const imageSelector = this.imageSelector();
     const img = page.locator(imageSelector);
-    const imgUrl = await img.first().getAttribute("src");
+    let imgUrl = await img.first().getAttribute("src");
+    if (!imgUrl) {
+      imgUrl = await img.first().getAttribute("srcset");
+    }
     if (!imgUrl) {
       throw new Error("Image src not found");
     }
@@ -83,11 +86,8 @@ export abstract class CubanewsCrawler
       );
     }
     const buffer = await response.body();
-    // Save to local disk
-    const outPath = path.resolve(".", `image-${imageName}.webp`);
     // Upload image buffer to Firebase Storage
-
-    const storagePath = `images/${imageName}.webp`;
+    const storagePath = `images/${this.newsSource.name}/${imageName}.webp`;
     if (!this.storage) {
       throw new Error("Firebase storage is not initialized.");
     }
@@ -97,13 +97,13 @@ export abstract class CubanewsCrawler
 
     // Get public URL
     let imageUrl: string;
-    // if (process.env.FIREBASE_EMULATOR === "true") {
-    imageUrl = `gs://cubanews-fbaad.firebasestorage.app/${storagePath}`;
-    // } else {
-    //   imageUrl = `https://firebasestorage.googleapis.com/v0/b/${
-    //   firebaseConfig.storageBucket
-    //   }/o/${encodeURIComponent(storagePath)}?alt=media`;
-    // }
+    if (process.env.FIREBASE_EMULATOR === "true") {
+      imageUrl = `gs://cubanews-fbaad.firebasestorage.app/${storagePath}`;
+    } else {
+      imageUrl = `https://firebasestorage.googleapis.com/v0/b/${
+        firebaseConfig.storageBucket
+      }/o/${encodeURIComponent(storagePath)}?alt=media`;
+    }
 
     return imageUrl;
   }
@@ -152,9 +152,9 @@ export abstract class CubanewsCrawler
           return;
         }
         content = this.extractContentSummary(content);
-        const imagePath = await this.getMainImage(page);
-        console.log("Image Path: " + imagePath);
         if (this.newsSource) {
+          const imagePath = await this.getMainImage(page);
+          console.log("Image Path: " + imagePath);
           await this.saveData(
             {
               title,
@@ -176,8 +176,6 @@ export abstract class CubanewsCrawler
           log.warning(`Date is too old ${request.loadedUrl}`);
         }
       }
-      const imagePath = await this.getMainImage(page);
-      console.log("Image Path: " + imagePath);
     }
 
     // Extract links from the current page

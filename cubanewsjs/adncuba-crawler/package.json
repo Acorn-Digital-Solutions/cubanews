@@ -20,7 +20,7 @@
   "scripts": {
     "start": "NODE_ENV=production npm run start:dev",
     "start:prod": "node dist/main.js",
-    "start:dev": "tsx src/main.ts",
+    "start:dev": "FIREBASE_EMULATOR=true tsx src/main.ts",
     "build": "tsc",
     "test": "echo \"Error: oops, the actor has no tests yet, sad!\" && exit 1",
     "postinstall": "npx crawlee install-playwright-browsers"
