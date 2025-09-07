@@ -7,7 +7,7 @@ const newsSource = getNewsSourceByName(NewsSourceName.DIARIODECUBA);
 
 export default class DiarioDeCubaCrawler extends CubanewsCrawler {
   protected override imageSelector(): string {
-    throw new Error("Method not implemented.");
+    return "#main-wrapper > article > figure > img";
   }
   constructor() {
     super(newsSource);

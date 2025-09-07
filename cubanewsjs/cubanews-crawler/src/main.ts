@@ -8,16 +8,6 @@ import DiarioDeCubaCrawler from "./diarioDeCubaCrawler.js";
 import CatorceYMedioCrawler from "./catorceYMedioCrawler.js";
 import ElToqueCrawler from "./eltoqueCrawler.js";
 import CubanetCrawler from "./cubanetCrawler.js";
-import { initializeApp } from "firebase/app";
-import { getStorage, connectStorageEmulator } from "firebase/storage";
-import { firebaseConfig } from "./firebaseConfig.js";
-
-const firebaseApp = initializeApp(firebaseConfig);
-const storage = getStorage(firebaseApp);
-
-// if (process.env.USE_FIREBASE_EMULATOR === "true") {
-connectStorageEmulator(storage, "localhost", 9199); // default port for storage emulator
-// }
 
 try {
   await Actor.init();

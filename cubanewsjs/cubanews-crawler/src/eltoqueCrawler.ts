@@ -6,7 +6,7 @@ import moment from "moment";
 
 export default class ElToqueCrawler extends CubanewsCrawler {
   protected override imageSelector(): string {
-    throw new Error("Method not implemented.");
+    return "#super-page-wrapper > div > div > div > div.container-fluid > div:nth-child(1) > div > article > div.article-header > div.w-full > img";
   }
   constructor() {
     super(getNewsSourceByName(NewsSourceName.ELTOQUE));
@@ -21,8 +21,9 @@ export default class ElToqueCrawler extends CubanewsCrawler {
         "https://eltoque.com/newsletters",
         "https://eltoque.com/tasas-de-cambio-de-moneda-en-cuba-hoy*",
         "https://eltoque.com/especiales",
+        "https://eltoque.com/proyectos-anteriores",
       ],
-      selector: "div.container-fluid a",
+      selector: "a",
     };
   }
 

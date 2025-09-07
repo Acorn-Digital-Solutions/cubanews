@@ -3,6 +3,7 @@ import {
   Dataset,
   Dictionary,
   EnqueueLinksOptions,
+  Logger,
   PlaywrightCrawler,
   PlaywrightCrawlingContext,
 } from "crawlee";
@@ -11,8 +12,6 @@ import { Actor } from "apify";
 import { Page } from "playwright";
 import { Moment } from "moment";
 import moment from "moment";
-import path from "path";
-import * as fs from "fs";
 import {
   connectStorageEmulator,
   FirebaseStorage,
@@ -43,10 +42,18 @@ export abstract class CubanewsCrawler
       maxRequestsPerCrawl: 50,
     });
     this.newsSource = newsSource;
+
     if (!storage) {
       const firebaseApp = initializeApp(firebaseConfig);
       this.storage = getStorage(firebaseApp);
-      connectStorageEmulator(this.storage, "localhost", 9199);
+      if (process.env.FIREBASE_EMULATOR === "true") {
+        connectStorageEmulator(this.storage, "localhost", 9199);
+      }
+      this.log.info(
+        `Storage Bucket: ${
+          this.storage.app.options.storageBucket?.toString() ?? "<ERROR>"
+        }`
+      );
     }
   }
 
@@ -65,6 +72,7 @@ export abstract class CubanewsCrawler
 
   private async getMainImage(page: Page): Promise<string | null> {
     // Locate the <img> inside the <picture>
+    this.log.info("Fetching the main image. Start");
     const imageName = Math.floor(Math.random() * 1000000) + 1;
     const imageSelector = this.imageSelector();
     const img = page.locator(imageSelector);
@@ -77,7 +85,7 @@ export abstract class CubanewsCrawler
     }
     // Resolve relative URLs against the page’s base URL
     const url = new URL(imgUrl, page.url()).toString();
-    console.log("Image URL", url);
+    this.log.info("Image URL", { url: url });
     // Fetch image bytes
     const response = await page.request.get(url);
     if (!response.ok()) {
@@ -87,24 +95,28 @@ export abstract class CubanewsCrawler
     }
     const buffer = await response.body();
     // Upload image buffer to Firebase Storage
-    const storagePath = `images/${this.newsSource.name}/${imageName}.webp`;
+    const storagePath = `images/${this.newsSource.name}/${imageName}`;
     if (!this.storage) {
       throw new Error("Firebase storage is not initialized.");
     }
     const storageRef = ref(this.storage, storagePath);
 
-    await uploadBytes(storageRef, buffer);
+    const uploadResult = await uploadBytes(storageRef, buffer)
+      .then((result) => {
+        this.log.info(result.metadata.fullPath);
+        return result;
+      })
+      .catch((reason) => {
+        this.log.error(reason);
+        throw reason;
+      });
+    this.log.info(`Image uploaded to ${uploadResult.ref.fullPath}`);
+    this.log.info(uploadResult.ref.fullPath);
 
     // Get public URL
     let imageUrl: string;
-    if (process.env.FIREBASE_EMULATOR === "true") {
-      imageUrl = `gs://cubanews-fbaad.firebasestorage.app/${storagePath}`;
-    } else {
-      imageUrl = `https://firebasestorage.googleapis.com/v0/b/${
-        firebaseConfig.storageBucket
-      }/o/${encodeURIComponent(storagePath)}?alt=media`;
-    }
-
+    imageUrl = `gs://cubanews-fbaad.firebasestorage.app/${storagePath}`;
+    this.log.info("Fetching the main image. End");
     return imageUrl;
   }
 
@@ -153,8 +165,14 @@ export abstract class CubanewsCrawler
         }
         content = this.extractContentSummary(content);
         if (this.newsSource) {
-          const imagePath = await this.getMainImage(page);
-          console.log("Image Path: " + imagePath);
+          let imagePath = null;
+          try {
+            imagePath = await this.getMainImage(page);
+          } catch (e: any) {
+            this.log.error("Error downloading and uploading the main image", {
+              error: e,
+            });
+          }
           await this.saveData(
             {
               title,
