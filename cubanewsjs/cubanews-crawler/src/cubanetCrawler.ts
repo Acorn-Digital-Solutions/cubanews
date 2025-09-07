@@ -5,6 +5,10 @@ import { NewsSourceName, getNewsSourceByName } from "./crawlerUtils.js";
 import moment from "moment";
 
 export default class CubanetCrawler extends CubanewsCrawler {
+  protected override imageSelector(): string {
+    return "figure.wp-caption > img";
+  }
+
   constructor() {
     super(getNewsSourceByName(NewsSourceName.CUBANET));
     this.enqueueLinkOptions = {

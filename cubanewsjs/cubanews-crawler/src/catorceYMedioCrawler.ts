@@ -49,4 +49,8 @@ export default class CatorceYMedioCrawler extends CubanewsCrawler {
     const sections = url.split("/");
     return sections.length >= 5;
   }
+
+  protected override imageSelector(): string {
+    return "div.bbnx-opening.single-column-default-width > figure > picture > source:nth-child(1)";
+  }
 }

@@ -6,6 +6,9 @@ import { Page } from "playwright";
 const newsSource = getNewsSourceByName(NewsSourceName.DIARIODECUBA);
 
 export default class DiarioDeCubaCrawler extends CubanewsCrawler {
+  protected override imageSelector(): string {
+    return "#main-wrapper > article > figure > img";
+  }
   constructor() {
     super(newsSource);
     this.enqueueLinkOptions = {

@@ -4,6 +4,9 @@ import { getNewsSourceByName, NewsSourceName } from "./crawlerUtils.js";
 import moment from "moment";
 
 export default class PeriodicoCubanoCrawler extends CubanewsCrawler {
+  protected override imageSelector(): string {
+    return "a > img";
+  }
   private httpStart = "https://www.periodicocubano.com/";
   private excludeRegexRoutes = [
     "noticias-de-los-estados-unidos/*",
@@ -17,7 +20,7 @@ export default class PeriodicoCubanoCrawler extends CubanewsCrawler {
 
     this.enqueueLinkOptions = {
       globs: ["http?(s)://www.periodicocubano.com/*/"],
-      selector: "a",
+      selector: "#mvp-tab-col1 > ul > li > div > a",
       exclude: this.excludeRegexRoutes,
     };
   }

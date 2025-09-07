@@ -3,6 +3,7 @@ import {
   Dataset,
   Dictionary,
   EnqueueLinksOptions,
+  Logger,
   PlaywrightCrawler,
   PlaywrightCrawlingContext,
 } from "crawlee";
@@ -11,6 +12,15 @@ import { Actor } from "apify";
 import { Page } from "playwright";
 import { Moment } from "moment";
 import moment from "moment";
+import {
+  connectStorageEmulator,
+  FirebaseStorage,
+  getStorage,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
+import { firebaseConfig } from "./firebaseConfig.js";
+import { initializeApp } from "firebase/app";
 
 export interface ICubanewsCrawler {
   runX(): Promise<void>;
@@ -24,7 +34,7 @@ export abstract class CubanewsCrawler
   protected newsSource: NewsSource;
   protected enqueueLinkOptions: EnqueueLinksOptions = {};
 
-  constructor(newsSource: NewsSource) {
+  constructor(newsSource: NewsSource, private storage?: FirebaseStorage) {
     super({
       requestHandler: (context) => {
         return this.requestHandlerX(context);
@@ -32,6 +42,19 @@ export abstract class CubanewsCrawler
       maxRequestsPerCrawl: 50,
     });
     this.newsSource = newsSource;
+
+    if (!storage) {
+      const firebaseApp = initializeApp(firebaseConfig);
+      this.storage = getStorage(firebaseApp);
+      if (process.env.FIREBASE_EMULATOR === "true") {
+        connectStorageEmulator(this.storage, "localhost", 9199);
+      }
+      this.log.info(
+        `Storage Bucket: ${
+          this.storage.app.options.storageBucket?.toString() ?? "<ERROR>"
+        }`
+      );
+    }
   }
 
   get datasetName(): string {
@@ -45,9 +68,62 @@ export abstract class CubanewsCrawler
   protected abstract isUrlValid(url: string): boolean;
   protected abstract extractDate(page: Page): Promise<moment.Moment | null>;
   protected abstract extractContent(page: Page): Promise<string | null>;
+  protected abstract imageSelector(): string;
+
+  private async getMainImage(page: Page): Promise<string | null> {
+    // Locate the <img> inside the <picture>
+    this.log.info("Fetching the main image. Start");
+    const imageName = Math.floor(Math.random() * 1000000) + 1;
+    const imageSelector = this.imageSelector();
+    const img = page.locator(imageSelector);
+    let imgUrl = await img.first().getAttribute("src");
+    if (!imgUrl) {
+      imgUrl = await img.first().getAttribute("srcset");
+    }
+    if (!imgUrl) {
+      throw new Error("Image src not found");
+    }
+    // Resolve relative URLs against the page’s base URL
+    const url = new URL(imgUrl, page.url()).toString();
+    this.log.info("Image URL", { url: url });
+    // Fetch image bytes
+    const response = await page.request.get(url);
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to download image: ${response.status()} ${response.statusText()}`
+      );
+    }
+    const buffer = await response.body();
+    // Upload image buffer to Firebase Storage
+    const storagePath = `images/${this.newsSource.name}/${imageName}`;
+    if (!this.storage) {
+      throw new Error("Firebase storage is not initialized.");
+    }
+    const storageRef = ref(this.storage, storagePath);
+
+    const uploadResult = await uploadBytes(storageRef, buffer)
+      .then((result) => {
+        this.log.info(result.metadata.fullPath);
+        return result;
+      })
+      .catch((reason) => {
+        this.log.error(reason);
+        throw reason;
+      });
+    this.log.info(`Image uploaded to ${uploadResult.ref.fullPath}`);
+    this.log.info(uploadResult.ref.fullPath);
+
+    // Get public URL
+    let imageUrl: string;
+    imageUrl = `gs://cubanews-fbaad.firebasestorage.app/${storagePath}`;
+    this.log.info("Fetching the main image. End");
+    return imageUrl;
+  }
+
   protected extractContentSummary(content: string): string {
     return content.trim().replace(/\n/g, "").split(" ").slice(0, 50).join(" ");
   }
+
   protected generateAiContentSummary(content: string): string {
     return content;
   }
@@ -81,7 +157,6 @@ export abstract class CubanewsCrawler
     // The home page, login and such should be filtered out.
     if (request.loadedUrl && this.isUrlValid(request.loadedUrl)) {
       const momentDate = await this.extractDate(page);
-
       if (momentDate && this.isValidDate(momentDate)) {
         var content = await this.extractContent(page);
         if (!content || content?.length < 100) {
@@ -90,6 +165,14 @@ export abstract class CubanewsCrawler
         }
         content = this.extractContentSummary(content);
         if (this.newsSource) {
+          let imagePath = null;
+          try {
+            imagePath = await this.getMainImage(page);
+          } catch (e: any) {
+            this.log.error("Error downloading and uploading the main image", {
+              error: e,
+            });
+          }
           await this.saveData(
             {
               title,
@@ -98,6 +181,7 @@ export abstract class CubanewsCrawler
               isoDate: momentDate.toISOString(),
               content: content,
               source: this.newsSource.name,
+              image: imagePath,
             },
             this.datasetName,
             process.env.NODE_ENV !== "dev"

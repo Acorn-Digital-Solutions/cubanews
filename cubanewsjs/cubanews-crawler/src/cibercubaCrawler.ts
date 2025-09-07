@@ -7,6 +7,10 @@ const newsSource = getNewsSourceByName(NewsSourceName.CIBERCUBA);
 const dateFormats = ["dddd, DD MMMM, YYYY - HH:mm", "DD/MM/YYYY - h:mma (ZZ)"];
 
 export default class CibercubaCrawler extends CubanewsCrawler {
+  protected override imageSelector(): string {
+    return "div > article > div > div.col-md-8.col-sm-12.col-xs-12 > div.cibercuba-article-content > div.cibercuba-img-header > figure > amp-img > img.i-amphtml-fill-content.i-amphtml-replaced-content";
+  }
+
   constructor() {
     super(newsSource);
     this.enqueueLinkOptions = {
