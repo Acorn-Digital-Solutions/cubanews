@@ -1,3 +1,5 @@
+import "server-only";
+
 import { FacebookAdsApi, Page } from "facebook-nodejs-business-sdk";
 import moment from "moment";
 import "moment/locale/es"; // Import Spanish locale
