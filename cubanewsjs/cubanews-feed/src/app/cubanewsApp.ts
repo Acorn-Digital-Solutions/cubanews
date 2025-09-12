@@ -1,5 +1,3 @@
-// "use server";
-
 import { Database, SubscriptionsTable } from "@/app/api/dataschema";
 import { Kysely, PostgresDialect, sql } from "kysely";
 import { Pool } from "pg";
@@ -14,7 +12,6 @@ import {
 import path from "path";
 import fs from "fs";
 import moment from "moment";
-import { LlamaModel } from "node-llama-cpp";
 import { fileURLToPath } from "url";
 
 dotenv.config({
@@ -22,7 +19,6 @@ dotenv.config({
 });
 export class CubanewsApp {
   private database: Kysely<Database>;
-  private modelPath: string = "./src/local/models";
   private dirname = path.dirname(fileURLToPath(import.meta.url));
 
   constructor() {
@@ -56,21 +52,6 @@ export class CubanewsApp {
   public get getDatabase() {
     return this.database;
   }
-
-  // public async getAiAssistant(): Promise<CubanewsAiAssistant> {
-  //   if (this.cubanewsAiAssistant) {
-  //     return this.cubanewsAiAssistant;
-  //   }
-  //   console.log(this.dirname);
-  //   const modelPath = path.join(
-  //     this.dirname,
-  //     "ai/models",
-  //     "hf_mradermacher_Llama-3.2-3B-Instruct.Q8_0.gguf"
-  //   );
-  //   this.cubanewsAiAssistant = new CubanewsAiAssistant(modelPath);
-  //   await this.cubanewsAiAssistant.initialise();
-  //   return this.cubanewsAiAssistant;
-  // }
 
   async getFeedItems(): Promise<NewsItem[]> {
     const latestFeedts = await this.database
