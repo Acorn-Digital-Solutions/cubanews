@@ -37,6 +37,7 @@
     "pg": "^8.16.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "server-only": "^0.0.1",
     "sharp": "^0.34.2",
     "swr": "^2.3.3"
   },
@@ -48,6 +49,7 @@
     "@types/react-dom": "^18.2.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
+    "ignore-loader": "^0.1.2",
     "postcss": "^8",
     "tailwindcss": "^4.1.10",
     "tsx": "^4.20.3",

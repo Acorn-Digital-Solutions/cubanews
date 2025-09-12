@@ -1,3 +1,5 @@
+import "server-only";
+
 import { Database, FeedTable } from "@/app/api/dataschema";
 import { RefreshFeedResult } from "@/app/api/feed/route";
 import { NewsItem, NewsSourceName } from "@/app/interfaces";
