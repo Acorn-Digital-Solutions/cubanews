@@ -37,7 +37,8 @@ data class FeedItem(
     val tags: List<String> = emptyList(),
     val score: Int = 0,
     val interactions: InteractionData = InteractionData(feedid = 0),
-    val aiSummary: String? = null
+    val aiSummary: String? = null,
+    val imageUrl: String? = getImageName()
 ) {
     fun getImageName(): Int {
         return when (source) {
