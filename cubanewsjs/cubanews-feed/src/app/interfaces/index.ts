@@ -15,6 +15,7 @@ export type NewsItem = {
   score: number;
   interactions: InteractionData;
   aiSummary: string;
+  image: string;
 };
 
 export type NewsFeed = {
