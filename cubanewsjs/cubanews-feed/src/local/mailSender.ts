@@ -1,5 +1,3 @@
-import "server-only";
-
 import * as nodemailer from "nodemailer";
 import moment from "moment";
 import cubanewsApp from "@/app/cubanewsApp";
