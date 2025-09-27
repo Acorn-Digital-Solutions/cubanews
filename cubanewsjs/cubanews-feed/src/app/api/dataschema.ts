@@ -13,6 +13,7 @@ export interface FeedTable {
   isodate: string;
   tags: string;
   score: number;
+  imageurl: string;
 }
 
 export interface InteractionsTable {
