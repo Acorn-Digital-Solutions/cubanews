@@ -19,6 +19,7 @@ import Image from "next/image";
 import "moment/locale/es";
 import ThumbUp from "@mui/icons-material/ThumbUp";
 import { useEffect, useState } from "react";
+import { NewsItemImage } from "./NewsItemImage";
 
 moment.locale("es");
 
@@ -159,6 +160,7 @@ export default function NewsItemComponent({ item }: NewsItemProps) {
               {item.title}
             </Typography>
           </Link>
+          <NewsItemImage image={item.image}></NewsItemImage>
           <Typography level="body-sm">{item.content} ...</Typography>
         </CardContent>
         <CardOverflow variant="soft" sx={{ bgcolor: "background.level1" }}>
