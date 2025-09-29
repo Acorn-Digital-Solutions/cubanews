@@ -160,7 +160,8 @@ export default function NewsItemComponent({ item }: NewsItemProps) {
               {item.title}
             </Typography>
           </Link>
-          <NewsItemImage image={item.image}></NewsItemImage>
+          {/* <NewsItemImage image={item.image}></NewsItemImage> */}
+          <Typography>{item.image}</Typography>
           <Typography level="body-sm">{item.content} ...</Typography>
         </CardContent>
         <CardOverflow variant="soft" sx={{ bgcolor: "background.level1" }}>
