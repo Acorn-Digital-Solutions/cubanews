@@ -160,9 +160,12 @@ export default function NewsItemComponent({ item }: NewsItemProps) {
               {item.title}
             </Typography>
           </Link>
-          {/* <NewsItemImage image={item.image}></NewsItemImage> */}
-          <Typography>{item.image}</Typography>
-          <Typography level="body-sm">{item.content} ...</Typography>
+          <Stack direction="row" spacing={2} alignItems="flex-start">
+            <NewsItemImage image={item.image} />
+            <Typography level="body-sm" flex={1}>
+              {item.content} ...
+            </Typography>
+          </Stack>
         </CardContent>
         <CardOverflow variant="soft" sx={{ bgcolor: "background.level1" }}>
           <Divider inset="context" />
