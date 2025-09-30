@@ -29,6 +29,7 @@
     "apify-client": "^2.12.5",
     "dotenv": "^16.5.0",
     "facebook-nodejs-business-sdk": "^23.0.0",
+    "firebase": "^12.3.0",
     "kysely": "^0.27.0",
     "moment": "^2.30.1",
     "next": "latest",

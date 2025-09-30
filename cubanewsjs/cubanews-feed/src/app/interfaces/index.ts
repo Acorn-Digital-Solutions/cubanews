@@ -28,6 +28,10 @@ export type FeedResponseData = {
   content?: NewsFeed;
 };
 
+export type ImageResponseData = {
+  content?: ArrayBuffer;
+};
+
 export type InteractionData = {
   feedid: number;
   view: number;
