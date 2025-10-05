@@ -72,24 +72,24 @@ fun FeedItemView(item: FeedItem) {
                     .fillMaxWidth()
                     .padding(0.dp, 0.dp, 0.dp, 8.dp)
             ) {
-                if (item.imageBytes != null) {
+                if (item.imageBytes != null && item.imageLoadingState == ImageLoadingState.LOADED) {
                     val bitmap = BitmapFactory.decodeByteArray(item.imageBytes, 0, item.imageBytes.size)
                     Image(
                         painter = BitmapPainter(bitmap.asImageBitmap()),
                         contentDescription = "Main Image",
                         modifier = Modifier
-                            .size(100.dp)
+                            .size(120.dp)
                             .clip(RoundedCornerShape(8.dp))
                     )
-                } else {
+                } else if (item.image !== null) {
                     Box(
                         modifier = Modifier
                             .size(100.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFF000000)),
+                            .background(Color.White),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("No Image", color = Color.Gray)
+                        CircularProgressIndicator(color = Color.Black)
                     }
                 }
                 Spacer(modifier = Modifier.width(16.dp))
@@ -119,9 +119,9 @@ fun FeedItemView(item: FeedItem) {
                     }
                     Text(
                         text = item.title,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        maxLines = 2,
+                        maxLines = 3,
                         overflow = TextOverflow.Ellipsis
                     )
                 }

@@ -1,5 +1,6 @@
 package com.acorn.cubanews.feed
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.acorn.cubanews.R
@@ -25,6 +26,12 @@ data class InteractionData(
     val share: Int = 0
 )
 
+enum class ImageLoadingState {
+    LOADING,
+    LOADED,
+    FAILED,
+}
+
 data class FeedItem(
     val id: Long,
     val title: String,
@@ -39,7 +46,8 @@ data class FeedItem(
     val interactions: InteractionData = InteractionData(feedid = 0),
     val aiSummary: String? = null,
     val image: String? = null,
-    val imageBytes: ByteArray? = null
+    val imageBytes: ByteArray? = null,
+    val imageLoadingState: ImageLoadingState = ImageLoadingState.LOADING
 ) {
     fun getImageName(): Int {
         return when (source) {
@@ -104,7 +112,6 @@ open class FeedViewModel(private val feedService: FeedService = FeedService()) :
 
     init {
         this.fetchNextFeedBatch()
-
     }
 
     open fun fetchNextFeedBatch() {
@@ -122,12 +129,21 @@ open class FeedViewModel(private val feedService: FeedService = FeedService()) :
         if (imageUrl != null) {
             viewModelScope.launch {
                 val imageBytes = feedService.fetchImage(imageUrl)
+                Log.d("FeedViewModel", "Fetched image for item ${feedItem.id}, bytes size: ${imageBytes?.size}")
                 if (imageBytes == null) {
+                    val newItems = _uiState.value.map {
+                        if (it.id == feedItem.id) {
+                            it.copy(imageLoadingState = ImageLoadingState.FAILED)
+                        } else {
+                            it
+                        }
+                    }
+                    _uiState.value = newItems
                     return@launch
                 }
                 val newItems = _uiState.value.map {
                     if (it.id == feedItem.id) {
-                        it.copy(imageBytes = imageBytes)
+                        it.copy(imageBytes = imageBytes, imageLoadingState = ImageLoadingState.LOADED)
                     } else {
                         it
                     }

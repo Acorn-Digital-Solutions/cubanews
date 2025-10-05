@@ -36,6 +36,7 @@ import com.acorn.cubanews.feed.FeedViewModel
 import com.acorn.cubanews.ui.theme.CubanewsTheme
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
+import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +47,7 @@ class MainActivity : ComponentActivity() {
                 Material3BottomNavApp()
             }
         }
+        FirebaseApp.initializeApp(this)
     }
 }
 
