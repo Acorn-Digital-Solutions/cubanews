@@ -48,6 +48,7 @@ android {
 
 dependencies {
     implementation(libs.gson)
+    implementation("com.google.firebase:firebase-storage-ktx:20.2.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

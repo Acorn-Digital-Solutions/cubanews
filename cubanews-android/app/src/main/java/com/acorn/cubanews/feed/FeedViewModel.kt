@@ -38,7 +38,8 @@ data class FeedItem(
     val score: Int = 0,
     val interactions: InteractionData = InteractionData(feedid = 0),
     val aiSummary: String? = null,
-    val imageUrl: String? = getImageName()
+    val image: String? = null,
+    val imageBytes: ByteArray? = null
 ) {
     fun getImageName(): Int {
         return when (source) {
@@ -49,6 +50,48 @@ data class FeedItem(
             NewsSourceName.ELTOQUE -> R.drawable.eltoque
             NewsSourceName.CUBANET -> R.drawable.cubanet
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as FeedItem
+
+        if (id != other.id) return false
+        if (updated != other.updated) return false
+        if (feedts != other.feedts) return false
+        if (score != other.score) return false
+        if (title != other.title) return false
+        if (url != other.url) return false
+        if (source != other.source) return false
+        if (isoDate != other.isoDate) return false
+        if (content != other.content) return false
+        if (tags != other.tags) return false
+        if (interactions != other.interactions) return false
+        if (aiSummary != other.aiSummary) return false
+        if (image != other.image) return false
+        if (!imageBytes.contentEquals(other.imageBytes)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + updated
+        result = 31 * result + (feedts?.hashCode() ?: 0)
+        result = 31 * result + score
+        result = 31 * result + title.hashCode()
+        result = 31 * result + url.hashCode()
+        result = 31 * result + source.hashCode()
+        result = 31 * result + isoDate.hashCode()
+        result = 31 * result + (content?.hashCode() ?: 0)
+        result = 31 * result + tags.hashCode()
+        result = 31 * result + interactions.hashCode()
+        result = 31 * result + (aiSummary?.hashCode() ?: 0)
+        result = 31 * result + (image?.hashCode() ?: 0)
+        result = 31 * result + (imageBytes?.contentHashCode() ?: 0)
+        return result
     }
 }
 
@@ -61,6 +104,7 @@ open class FeedViewModel(private val feedService: FeedService = FeedService()) :
 
     init {
         this.fetchNextFeedBatch()
+
     }
 
     open fun fetchNextFeedBatch() {
@@ -69,6 +113,27 @@ open class FeedViewModel(private val feedService: FeedService = FeedService()) :
             val newItems = feedService.fetchFeedBatch(currentPage, pageSize)
             _uiState.value += newItems
             _page.value = currentPage + 1
+            newItems.forEach { fetchImage(it) }
+        }
+    }
+
+    open fun fetchImage(feedItem: FeedItem) {
+        val imageUrl = feedItem.image
+        if (imageUrl != null) {
+            viewModelScope.launch {
+                val imageBytes = feedService.fetchImage(imageUrl)
+                if (imageBytes == null) {
+                    return@launch
+                }
+                val newItems = _uiState.value.map {
+                    if (it.id == feedItem.id) {
+                        it.copy(imageBytes = imageBytes)
+                    } else {
+                        it
+                    }
+                }
+                _uiState.value = newItems
+            }
         }
     }
 }
