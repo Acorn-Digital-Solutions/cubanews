@@ -2,8 +2,10 @@ package com.acorn.cubanews.feed
 
 import android.util.Log
 import com.google.gson.Gson
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.tasks.await
 import java.net.HttpURLConnection
 import java.net.URL
 data class FeedResponseData(
@@ -61,4 +63,17 @@ class FeedService {
 //        return newFeedItems
     }
 
+    suspend fun fetchImage(url: String): ByteArray? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(url)
+                // Limit to 5MB per image
+                val maxDownloadSizeBytes = 5 * 1024 * 1024L
+                storageRef.getBytes(maxDownloadSizeBytes).await()
+            } catch (e: Exception) {
+                Log.e(tag, "Error downloading image from Firebase Storage", e)
+                null
+            }
+        }
+    }
 }
