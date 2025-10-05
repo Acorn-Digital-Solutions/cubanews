@@ -14,6 +14,7 @@ function dbItemToNewsItem(dbitem: any): NewsItem {
     content: dbitem.content,
     tags: dbitem.tags ? dbitem.tags.split(",") : [],
     score: dbitem.score,
+    image: dbitem.imageurl,
     interactions: {
       feedid: dbitem.feedid,
       view: 0,

@@ -19,6 +19,7 @@ import Image from "next/image";
 import "moment/locale/es";
 import ThumbUp from "@mui/icons-material/ThumbUp";
 import { useEffect, useState } from "react";
+import { NewsItemImage } from "./NewsItemImage";
 
 moment.locale("es");
 
@@ -51,7 +52,7 @@ function getPublicationLogo(item: NewsItem) {
       break;
   }
   return (
-    <Image width={20} height={100} alt="Publication Logo" src={imageLogoSrc} />
+    <Image width={20} height={20} alt="Publication Logo" src={imageLogoSrc} />
   );
 }
 
@@ -159,7 +160,12 @@ export default function NewsItemComponent({ item }: NewsItemProps) {
               {item.title}
             </Typography>
           </Link>
-          <Typography level="body-sm">{item.content} ...</Typography>
+          <Stack direction="row" spacing={2} alignItems="flex-start">
+            <NewsItemImage image={item.image} />
+            <Typography level="body-sm" flex={1}>
+              {item.content} ...
+            </Typography>
+          </Stack>
         </CardContent>
         <CardOverflow variant="soft" sx={{ bgcolor: "background.level1" }}>
           <Divider inset="context" />

@@ -1,5 +1,3 @@
-import "server-only";
-
 import { Database, FeedTable } from "@/app/api/dataschema";
 import { RefreshFeedResult } from "@/app/api/feed/route";
 import { NewsItem, NewsSourceName } from "@/app/interfaces";
@@ -27,6 +25,7 @@ export async function newsItemToFeedTable(
     updated: ni.updated,
     url: ni.url,
     score: score,
+    imageurl: ni.image,
   } as FeedTable;
 }
 
@@ -73,6 +72,7 @@ async function refreshFeedDataset(
   const values = await Promise.all(
     newsItems.map((x) => newsItemToFeedTable(x, feedRefreshDate) as any)
   );
+  console.info(values);
   const insertResult = await db
     .insertInto("feed")
     .values(values)
