@@ -73,7 +73,7 @@ fun FeedItemView(item: FeedItem) {
                     .padding(0.dp, 0.dp, 0.dp, 8.dp)
             ) {
                 if (item.imageBytes != null) {
-                    val bitmap = BitmapFactory.decodeByteArray(item.imageBytes, 0, item.imageBytes!!.size)
+                    val bitmap = BitmapFactory.decodeByteArray(item.imageBytes, 0, item.imageBytes.size)
                     Image(
                         painter = BitmapPainter(bitmap.asImageBitmap()),
                         contentDescription = "Main Image",
