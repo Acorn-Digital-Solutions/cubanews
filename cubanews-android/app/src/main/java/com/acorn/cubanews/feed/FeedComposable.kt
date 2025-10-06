@@ -1,10 +1,12 @@
 package com.acorn.cubanews.feed
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,14 +18,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import java.io.ByteArrayOutputStream
+import com.acorn.cubanews.R
 
 @Composable
 fun FeedComposable(feedViewModel: FeedViewModel) {
@@ -60,13 +69,37 @@ fun FeedItemView(item: FeedItem) {
             },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = if(isSystemInDarkTheme()) Color.DarkGray else MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(0.dp, 0.dp, 0.dp, 8.dp)) {
+                Image(
+                    painter = painterResource(id = item.getImageName()),
+                    contentDescription = "Thumbnail",
+                    modifier = Modifier
+                        .size(16.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = item.source.name,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isSystemInDarkTheme()) Color.White else Color.Gray,
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = item.isoDate.split("T").first(),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isSystemInDarkTheme()) Color.White else Color.Gray,
+                )
+            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -78,7 +111,7 @@ fun FeedItemView(item: FeedItem) {
                         painter = BitmapPainter(bitmap.asImageBitmap()),
                         contentDescription = "Main Image",
                         modifier = Modifier
-                            .size(120.dp)
+                            .fillMaxWidth(0.35f)
                             .clip(RoundedCornerShape(8.dp))
                     )
                 } else if (item.image !== null) {
@@ -94,33 +127,12 @@ fun FeedItemView(item: FeedItem) {
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(0.dp, 0.dp, 0.dp, 8.dp)) {
-                        Image(
-                            painter = painterResource(id = item.getImageName()),
-                            contentDescription = "Thumbnail",
-                            modifier = Modifier
-                                .size(16.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = item.source.name,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
-                        )
-                        Text(
-                            text = " • ${item.isoDate.split("T").first()}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
-                        )
-                    }
+
                     Text(
                         text = item.title,
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -130,4 +142,39 @@ fun FeedItemView(item: FeedItem) {
         }
     }
     Spacer(modifier = Modifier.height(4.dp))
+}
+
+
+class FeedItemPreviewProvider : PreviewParameterProvider<FeedItem> {
+    override val values: Sequence<FeedItem> = sequenceOf(
+        FeedItem(
+            title = "Sample News Title",
+            source = NewsSourceName.CATORCEYMEDIO,
+            isoDate = "2024-06-01T12:00:00Z",
+            url = "https://example.com/news",
+            imageBytes = null, // will be populated in preview
+            imageLoadingState = ImageLoadingState.LOADED,
+            image = null,
+            id = 1L,
+            updated = 0,
+            feedts = 0,
+            content = "Sample content for the news item.",
+            score = 1,
+        )
+    )
+}
+
+@Preview(showBackground = true, name = "FeedItem Preview with Image")
+@Composable
+fun FeedItemViewPreview() {
+    // Load image from drawable
+    val bitmap = ImageBitmap.imageResource(id = R.drawable.sample_image).asAndroidBitmap()
+    val stream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+    val imageBytes = stream.toByteArray()
+
+    // Get the base FeedItem and attach image bytes
+    val item = FeedItemPreviewProvider().values.first().copy(imageBytes = imageBytes)
+
+    FeedItemView(item = item)
 }
