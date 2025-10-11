@@ -1,5 +1,6 @@
 package com.acorn.cubanews.feed
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.browser.customtabs.CustomTabsIntent
@@ -8,11 +9,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,7 +79,7 @@ fun FeedItemView(item: FeedItem) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(10.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -101,9 +106,7 @@ fun FeedItemView(item: FeedItem) {
                 )
             }
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(0.dp, 0.dp, 0.dp, 8.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 if (item.imageBytes != null && item.imageLoadingState == ImageLoadingState.LOADED) {
                     val bitmap = BitmapFactory.decodeByteArray(item.imageBytes, 0, item.imageBytes.size)
@@ -138,7 +141,41 @@ fun FeedItemView(item: FeedItem) {
                     )
                 }
             }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(
+                    modifier = Modifier.width(30.dp).height(25.dp),
+                    onClick = {}
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ThumbUp,
+                        contentDescription = "Compartir noticia",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(16.dp).padding(0.dp)
+                    )
+                }
 
+                IconButton(
+                    modifier = Modifier.width(30.dp).height(25.dp),
+                    onClick = {
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, item.url)
+                        }
+                        val chooser = Intent.createChooser(shareIntent, "Compartir noticia")
+                        context.startActivity(chooser)}
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Compartir noticia",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
         }
     }
     Spacer(modifier = Modifier.height(4.dp))
