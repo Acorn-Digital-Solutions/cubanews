@@ -38,6 +38,7 @@ import com.acorn.cubanews.feed.FeedViewModel
 import com.acorn.cubanews.ui.theme.CubanewsTheme
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
+import com.acorn.cubanews.profile.ProfileComposable
 import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
@@ -136,18 +137,7 @@ fun HomeScreen() {
 @Composable
 fun ProfileScreen() {
     Surface(modifier = Modifier.fillMaxSize()) {
-        CenteredText("This is your profile")
+        ProfileComposable()
     }
 }
 
-@Composable
-fun CenteredText(text: String) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text, style = MaterialTheme.typography.headlineSmall)
-    }
-}
