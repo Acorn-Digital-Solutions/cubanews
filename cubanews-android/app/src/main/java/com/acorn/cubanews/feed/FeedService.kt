@@ -76,4 +76,55 @@ class FeedService {
             }
         }
     }
+
+    suspend fun fetchInteractions(feedId: Long): InteractionData? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val url = URL("https://www.cubanews.icu/api/interactions?feedid=$feedId")
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "GET"
+                connection.connectTimeout = 5000
+                connection.readTimeout = 5000
+
+                if (connection.responseCode == HttpURLConnection.HTTP_OK) {
+                    val json = connection.inputStream.bufferedReader().use { it.readText() }
+                    gson.fromJson(json, InteractionData::class.java)
+                } else {
+                    Log.e(tag, "Failed to fetch interactions: ${connection.responseCode}")
+                    null
+                }
+            } catch (e: Exception) {
+                Log.e(tag, "Error fetching interactions", e)
+                null
+            }
+        }
+    }
+
+    suspend fun like(itemId: Long): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val url = URL("https://www.cubanews.icu/api/interactions")
+                val requestBody = gson.toJson(mapOf("feedid" to itemId, "interaction" to InteractionType.LIKE))
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "POST"
+                connection.connectTimeout = 5000
+                connection.readTimeout = 5000
+                connection.doOutput = true
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.outputStream.use { os ->
+                    os.write(requestBody.toByteArray())
+                }
+                if (connection.responseCode == HttpURLConnection.HTTP_OK) {
+                    Log.d(tag, "Successfully liked item $itemId")
+                    true
+                } else {
+                    Log.e(tag, "Failed to like item: ${connection.responseCode}")
+                    false
+                }
+            } catch (e: Exception) {
+                Log.e(tag, "Error liking item", e)
+                false
+            }
+        }
+    }
 }

@@ -56,13 +56,13 @@ fun FeedComposable(feedViewModel: FeedViewModel) {
     LazyColumn(state = listState) {
         // Trigger fetching the first batch when this composable is first composed
         items(feedItems) { item ->
-            FeedItemView(item)
+            FeedItemView(item, likeCallback = { feedViewModel.like(item) } )
         }
     }
 }
 
 @Composable
-fun FeedItemView(item: FeedItem) {
+fun FeedItemView(item: FeedItem, likeCallback: (item: FeedItem) -> Unit) {
     val context = LocalContext.current
     Card(
         modifier = Modifier
@@ -144,17 +144,26 @@ fun FeedItemView(item: FeedItem) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
+
                 IconButton(
-                    modifier = Modifier.width(30.dp).height(25.dp),
-                    onClick = {}
+                    modifier = Modifier.width(40.dp).height(25.dp),
+                    onClick = {likeCallback(item)}
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ThumbUp,
-                        contentDescription = "Compartir noticia",
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
+                    Row {
+                        Icon(
+                            imageVector = Icons.Default.ThumbUp,
+                            contentDescription = "Interesante",
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${item.interactions.like}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = if (isSystemInDarkTheme()) Color.White else Color.Gray,
+                        )
+                    }
                 }
 
                 IconButton(
@@ -171,7 +180,6 @@ fun FeedItemView(item: FeedItem) {
                         imageVector = Icons.Default.Share,
                         contentDescription = "Compartir noticia",
                         tint = MaterialTheme.colorScheme.primary,
-
                     )
                 }
             }
@@ -212,5 +220,5 @@ fun FeedItemViewPreview() {
     // Get the base FeedItem and attach image bytes
     val item = FeedItemPreviewProvider().values.first().copy(imageBytes = imageBytes)
 
-    FeedItemView(item = item)
+    FeedItemView(item = item, likeCallback = {})
 }

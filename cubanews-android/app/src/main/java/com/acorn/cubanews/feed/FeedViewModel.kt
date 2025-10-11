@@ -26,6 +26,12 @@ data class InteractionData(
     val share: Int = 0
 )
 
+enum class InteractionType {
+    VIEW,
+    LIKE,
+    SHARE,
+}
+
 enum class ImageLoadingState {
     LOADING,
     LOADED,
@@ -144,6 +150,39 @@ open class FeedViewModel(private val feedService: FeedService = FeedService()) :
                 val newItems = _uiState.value.map {
                     if (it.id == feedItem.id) {
                         it.copy(imageBytes = imageBytes, imageLoadingState = ImageLoadingState.LOADED)
+                    } else {
+                        it
+                    }
+                }
+                _uiState.value = newItems
+            }
+        }
+    }
+
+    open fun fetchInteractions(feedItem: FeedItem) {
+        viewModelScope.launch {
+            val interactions = feedService.fetchInteractions(feedItem.id)
+            Log.d("FeedViewModel", "Fetched interactions for item ${feedItem.id}: $interactions")
+            if (interactions != null) {
+                val newItems = _uiState.value.map {
+                    if (it.id == feedItem.id) {
+                        it.copy(interactions = interactions)
+                    } else {
+                        it
+                    }
+                }
+                _uiState.value = newItems
+            }
+        }
+    }
+
+    open fun like(item: FeedItem) {
+        viewModelScope.launch {
+            val success = feedService.like(item.id)
+            if (success) {
+                val newItems = _uiState.value.map {
+                    if (it.id == item.id) {
+                        it.copy(interactions = it.interactions.copy(like = it.interactions.like + 1))
                     } else {
                         it
                     }
