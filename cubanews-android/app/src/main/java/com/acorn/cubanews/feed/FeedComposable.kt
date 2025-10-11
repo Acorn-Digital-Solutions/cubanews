@@ -133,16 +133,16 @@ fun FeedItemView(item: FeedItem) {
 
                     Text(
                         text = item.title,
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 3,
+                        maxLines = 4,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
             }
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
@@ -154,7 +154,6 @@ fun FeedItemView(item: FeedItem) {
                         imageVector = Icons.Default.ThumbUp,
                         contentDescription = "Compartir noticia",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(16.dp).padding(0.dp)
                     )
                 }
 
@@ -172,7 +171,7 @@ fun FeedItemView(item: FeedItem) {
                         imageVector = Icons.Default.Share,
                         contentDescription = "Compartir noticia",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(16.dp)
+
                     )
                 }
             }
