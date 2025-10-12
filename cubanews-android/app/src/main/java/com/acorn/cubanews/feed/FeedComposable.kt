@@ -17,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import java.io.ByteArrayOutputStream
 import com.acorn.cubanews.R
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 @Composable
 fun FeedComposable(feedViewModel: FeedViewModel) {
@@ -89,19 +91,20 @@ fun FeedItemView(item: FeedItem, likeCallback: (item: FeedItem) -> Unit) {
                     painter = painterResource(id = item.getImageName()),
                     contentDescription = "Thumbnail",
                     modifier = Modifier
-                        .size(16.dp)
+                        .size(20.dp)
                         .clip(RoundedCornerShape(8.dp))
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = item.source.name,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = if (isSystemInDarkTheme()) Color.White else Color.Gray,
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = item.isoDate.split("T").first(),
-                    style = MaterialTheme.typography.bodySmall,
+                    text = LocalDateTime.parse(item.isoDate, DateTimeFormatter.ISO_DATE_TIME)
+                        .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
+                    style = MaterialTheme.typography.bodyMedium,
                     color = if (isSystemInDarkTheme()) Color.White else Color.Gray,
                 )
             }
@@ -133,7 +136,7 @@ fun FeedItemView(item: FeedItem, likeCallback: (item: FeedItem) -> Unit) {
 
                     Text(
                         text = item.title,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 4,
@@ -144,27 +147,27 @@ fun FeedItemView(item: FeedItem, likeCallback: (item: FeedItem) -> Unit) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.End
             ) {
 
-                IconButton(
-                    modifier = Modifier.width(40.dp).height(25.dp),
-                    onClick = {likeCallback(item)}
-                ) {
-                    Row {
-                        Icon(
-                            imageVector = Icons.Default.ThumbUp,
-                            contentDescription = "Interesante",
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "${item.interactions.like}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = if (isSystemInDarkTheme()) Color.White else Color.Gray,
-                        )
-                    }
-                }
+//                IconButton(
+//                    modifier = Modifier.width(40.dp).height(25.dp),
+//                    onClick = {likeCallback(item)}
+//                ) {
+//                    Row {
+//                        Icon(
+//                            imageVector = Icons.Default.ThumbUp,
+//                            contentDescription = "Interesante",
+//                            tint = MaterialTheme.colorScheme.primary,
+//                        )
+//                        Spacer(modifier = Modifier.width(4.dp))
+//                        Text(
+//                            text = "${item.interactions.like}",
+//                            style = MaterialTheme.typography.bodyLarge,
+//                            color = if (isSystemInDarkTheme()) Color.White else Color.Gray,
+//                        )
+//                    }
+//                }
 
                 IconButton(
                     modifier = Modifier.width(30.dp).height(25.dp),
