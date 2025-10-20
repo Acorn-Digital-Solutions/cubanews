@@ -1,0 +1,673 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1FF5F5EC2EA40A7C001C9A75 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5EB2EA40A7C001C9A75 /* FirebaseAnalytics */; };
+		1FF5F5EE2EA40A7C001C9A75 /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5ED2EA40A7C001C9A75 /* FirebaseAnalyticsCore */; };
+		1FF5F5F02EA40A7C001C9A75 /* FirebaseAnalyticsIdentitySupport in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5EF2EA40A7C001C9A75 /* FirebaseAnalyticsIdentitySupport */; };
+		1FF5F5F22EA40A7C001C9A75 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5F12EA40A7C001C9A75 /* FirebaseAuth */; };
+		1FF5F5F42EA40A7C001C9A75 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5F32EA40A7C001C9A75 /* FirebaseCore */; };
+		1FF5F5F62EA40A7C001C9A75 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5F52EA40A7C001C9A75 /* FirebaseCrashlytics */; };
+		1FF5F5F82EA40A7C001C9A75 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5F72EA40A7C001C9A75 /* FirebaseFirestore */; };
+		1FF5F5FA2EA40A7C001C9A75 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5F92EA40A7C001C9A75 /* FirebaseStorage */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1FF5F5B52E9C245B001C9A75 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1FF5F59F2E9C245A001C9A75 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1FF5F5A62E9C245A001C9A75;
+			remoteInfo = "cubanews-ios";
+		};
+		1FF5F5BF2E9C245B001C9A75 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1FF5F59F2E9C245A001C9A75 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1FF5F5A62E9C245A001C9A75;
+			remoteInfo = "cubanews-ios";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		1FF5F5A72E9C245A001C9A75 /* cubanews-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "cubanews-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1FF5F5B42E9C245B001C9A75 /* cubanews-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "cubanews-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1FF5F5BE2E9C245B001C9A75 /* cubanews-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "cubanews-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		1FF5F5A92E9C245A001C9A75 /* cubanews-ios */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "cubanews-ios";
+			sourceTree = "<group>";
+		};
+		1FF5F5B72E9C245B001C9A75 /* cubanews-iosTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "cubanews-iosTests";
+			sourceTree = "<group>";
+		};
+		1FF5F5C12E9C245B001C9A75 /* cubanews-iosUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "cubanews-iosUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1FF5F5A42E9C245A001C9A75 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1FF5F5EC2EA40A7C001C9A75 /* FirebaseAnalytics in Frameworks */,
+				1FF5F5F42EA40A7C001C9A75 /* FirebaseCore in Frameworks */,
+				1FF5F5EE2EA40A7C001C9A75 /* FirebaseAnalyticsCore in Frameworks */,
+				1FF5F5F62EA40A7C001C9A75 /* FirebaseCrashlytics in Frameworks */,
+				1FF5F5F02EA40A7C001C9A75 /* FirebaseAnalyticsIdentitySupport in Frameworks */,
+				1FF5F5FA2EA40A7C001C9A75 /* FirebaseStorage in Frameworks */,
+				1FF5F5F22EA40A7C001C9A75 /* FirebaseAuth in Frameworks */,
+				1FF5F5F82EA40A7C001C9A75 /* FirebaseFirestore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1FF5F5B12E9C245B001C9A75 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1FF5F5BB2E9C245B001C9A75 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1FF5F59E2E9C245A001C9A75 = {
+			isa = PBXGroup;
+			children = (
+				1FF5F5A92E9C245A001C9A75 /* cubanews-ios */,
+				1FF5F5B72E9C245B001C9A75 /* cubanews-iosTests */,
+				1FF5F5C12E9C245B001C9A75 /* cubanews-iosUITests */,
+				1FF5F5A82E9C245A001C9A75 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1FF5F5A82E9C245A001C9A75 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1FF5F5A72E9C245A001C9A75 /* cubanews-ios.app */,
+				1FF5F5B42E9C245B001C9A75 /* cubanews-iosTests.xctest */,
+				1FF5F5BE2E9C245B001C9A75 /* cubanews-iosUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1FF5F5A62E9C245A001C9A75 /* cubanews-ios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1FF5F5C82E9C245B001C9A75 /* Build configuration list for PBXNativeTarget "cubanews-ios" */;
+			buildPhases = (
+				1FF5F5A32E9C245A001C9A75 /* Sources */,
+				1FF5F5A42E9C245A001C9A75 /* Frameworks */,
+				1FF5F5A52E9C245A001C9A75 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				1FF5F5A92E9C245A001C9A75 /* cubanews-ios */,
+			);
+			name = "cubanews-ios";
+			packageProductDependencies = (
+				1FF5F5EB2EA40A7C001C9A75 /* FirebaseAnalytics */,
+				1FF5F5ED2EA40A7C001C9A75 /* FirebaseAnalyticsCore */,
+				1FF5F5EF2EA40A7C001C9A75 /* FirebaseAnalyticsIdentitySupport */,
+				1FF5F5F12EA40A7C001C9A75 /* FirebaseAuth */,
+				1FF5F5F32EA40A7C001C9A75 /* FirebaseCore */,
+				1FF5F5F52EA40A7C001C9A75 /* FirebaseCrashlytics */,
+				1FF5F5F72EA40A7C001C9A75 /* FirebaseFirestore */,
+				1FF5F5F92EA40A7C001C9A75 /* FirebaseStorage */,
+			);
+			productName = "cubanews-ios";
+			productReference = 1FF5F5A72E9C245A001C9A75 /* cubanews-ios.app */;
+			productType = "com.apple.product-type.application";
+		};
+		1FF5F5B32E9C245B001C9A75 /* cubanews-iosTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1FF5F5CB2E9C245B001C9A75 /* Build configuration list for PBXNativeTarget "cubanews-iosTests" */;
+			buildPhases = (
+				1FF5F5B02E9C245B001C9A75 /* Sources */,
+				1FF5F5B12E9C245B001C9A75 /* Frameworks */,
+				1FF5F5B22E9C245B001C9A75 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1FF5F5B62E9C245B001C9A75 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				1FF5F5B72E9C245B001C9A75 /* cubanews-iosTests */,
+			);
+			name = "cubanews-iosTests";
+			packageProductDependencies = (
+			);
+			productName = "cubanews-iosTests";
+			productReference = 1FF5F5B42E9C245B001C9A75 /* cubanews-iosTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		1FF5F5BD2E9C245B001C9A75 /* cubanews-iosUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1FF5F5CE2E9C245B001C9A75 /* Build configuration list for PBXNativeTarget "cubanews-iosUITests" */;
+			buildPhases = (
+				1FF5F5BA2E9C245B001C9A75 /* Sources */,
+				1FF5F5BB2E9C245B001C9A75 /* Frameworks */,
+				1FF5F5BC2E9C245B001C9A75 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1FF5F5C02E9C245B001C9A75 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				1FF5F5C12E9C245B001C9A75 /* cubanews-iosUITests */,
+			);
+			name = "cubanews-iosUITests";
+			packageProductDependencies = (
+			);
+			productName = "cubanews-iosUITests";
+			productReference = 1FF5F5BE2E9C245B001C9A75 /* cubanews-iosUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1FF5F59F2E9C245A001C9A75 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					1FF5F5A62E9C245A001C9A75 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+					1FF5F5B32E9C245B001C9A75 = {
+						CreatedOnToolsVersion = 26.0.1;
+						TestTargetID = 1FF5F5A62E9C245A001C9A75;
+					};
+					1FF5F5BD2E9C245B001C9A75 = {
+						CreatedOnToolsVersion = 26.0.1;
+						TestTargetID = 1FF5F5A62E9C245A001C9A75;
+					};
+				};
+			};
+			buildConfigurationList = 1FF5F5A22E9C245A001C9A75 /* Build configuration list for PBXProject "cubanews-ios" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1FF5F59E2E9C245A001C9A75;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 1FF5F5A82E9C245A001C9A75 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1FF5F5A62E9C245A001C9A75 /* cubanews-ios */,
+				1FF5F5B32E9C245B001C9A75 /* cubanews-iosTests */,
+				1FF5F5BD2E9C245B001C9A75 /* cubanews-iosUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1FF5F5A52E9C245A001C9A75 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1FF5F5B22E9C245B001C9A75 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1FF5F5BC2E9C245B001C9A75 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1FF5F5A32E9C245A001C9A75 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1FF5F5B02E9C245B001C9A75 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1FF5F5BA2E9C245B001C9A75 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1FF5F5B62E9C245B001C9A75 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1FF5F5A62E9C245A001C9A75 /* cubanews-ios */;
+			targetProxy = 1FF5F5B52E9C245B001C9A75 /* PBXContainerItemProxy */;
+		};
+		1FF5F5C02E9C245B001C9A75 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1FF5F5A62E9C245A001C9A75 /* cubanews-ios */;
+			targetProxy = 1FF5F5BF2E9C245B001C9A75 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1FF5F5C62E9C245B001C9A75 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 2PUZ732K47;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		1FF5F5C72E9C245B001C9A75 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 2PUZ732K47;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1FF5F5C92E9C245B001C9A75 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2PUZ732K47;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Cubanews;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.acorn.cubanews;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1FF5F5CA2E9C245B001C9A75 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2PUZ732K47;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Cubanews;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.acorn.cubanews;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		1FF5F5CC2E9C245B001C9A75 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2PUZ732K47;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.acorn.cubanews-iosTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/cubanews-ios.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/cubanews-ios";
+			};
+			name = Debug;
+		};
+		1FF5F5CD2E9C245B001C9A75 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2PUZ732K47;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.acorn.cubanews-iosTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/cubanews-ios.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/cubanews-ios";
+			};
+			name = Release;
+		};
+		1FF5F5CF2E9C245B001C9A75 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2PUZ732K47;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.acorn.cubanews-iosUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "cubanews-ios";
+			};
+			name = Debug;
+		};
+		1FF5F5D02E9C245B001C9A75 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2PUZ732K47;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.acorn.cubanews-iosUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "cubanews-ios";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1FF5F5A22E9C245A001C9A75 /* Build configuration list for PBXProject "cubanews-ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1FF5F5C62E9C245B001C9A75 /* Debug */,
+				1FF5F5C72E9C245B001C9A75 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1FF5F5C82E9C245B001C9A75 /* Build configuration list for PBXNativeTarget "cubanews-ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1FF5F5C92E9C245B001C9A75 /* Debug */,
+				1FF5F5CA2E9C245B001C9A75 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1FF5F5CB2E9C245B001C9A75 /* Build configuration list for PBXNativeTarget "cubanews-iosTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1FF5F5CC2E9C245B001C9A75 /* Debug */,
+				1FF5F5CD2E9C245B001C9A75 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1FF5F5CE2E9C245B001C9A75 /* Build configuration list for PBXNativeTarget "cubanews-iosUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1FF5F5CF2E9C245B001C9A75 /* Debug */,
+				1FF5F5D02E9C245B001C9A75 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.4.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1FF5F5EB2EA40A7C001C9A75 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		1FF5F5ED2EA40A7C001C9A75 /* FirebaseAnalyticsCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsCore;
+		};
+		1FF5F5EF2EA40A7C001C9A75 /* FirebaseAnalyticsIdentitySupport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsIdentitySupport;
+		};
+		1FF5F5F12EA40A7C001C9A75 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		1FF5F5F32EA40A7C001C9A75 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		1FF5F5F52EA40A7C001C9A75 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		1FF5F5F72EA40A7C001C9A75 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		1FF5F5F92EA40A7C001C9A75 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 1FF5F59F2E9C245A001C9A75 /* Project object */;
+}
