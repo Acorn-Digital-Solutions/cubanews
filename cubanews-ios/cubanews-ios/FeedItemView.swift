@@ -7,9 +7,22 @@
 
 
 import SwiftUI
+import UIKit
+
+struct ShareSheet: UIViewControllerRepresentable {
+    var items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        return UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
 
 struct FeedItemView: View {
     let item: FeedItem
+    @Environment(\.openURL) var openURL
+    @State private var showingShareSheet = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -26,27 +39,59 @@ struct FeedItemView: View {
             }
 
             // Image (if exists)
-            if let imageData = item.imageBytes, let uiImage = UIImage(data: imageData) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
+            if item.imageLoadingState == .LOADING {
+                ProgressView()
                     .frame(height: 120)
-                    .clipped()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.systemGray5))
                     .cornerRadius(8)
+            } else if let imageData = item.imageBytes, let uiImage = UIImage(data: imageData) {
+                Button(action: {
+                    if let url = URL(string: item.url) {
+                        openURL(url)
+                    }
+                }) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 120)
+                        .clipped()
+                        .cornerRadius(8)
+                }
+                .buttonStyle(PlainButtonStyle())
             }
 
             // Title
-            Text(item.title)
-                .font(.body)
-                .fontWeight(.semibold)
-                .foregroundColor(.primary)
-                .fixedSize(horizontal: false, vertical: true)
+            Button(action: {
+                if let url = URL(string: item.url) {
+                    openURL(url)
+                }
+            }) {
+                Text(item.title)
+                    .font(.body)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .buttonStyle(PlainButtonStyle())
 
             // Share button
             HStack {
                 Spacer()
-                Image(systemName: "square.and.arrow.up")
-                    .foregroundColor(.secondary)
+                Button(action: {
+                    showingShareSheet = true
+                }) {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+                .sheet(isPresented: $showingShareSheet) {
+                    if let url = URL(string: item.url) {
+                        ShareSheet(items: [url])
+                    } else {
+                        ShareSheet(items: [item.title])
+                    }
+                }
             }
         }
         .padding()
