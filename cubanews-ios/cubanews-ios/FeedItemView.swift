@@ -28,6 +28,11 @@ struct FeedItemView: View {
         VStack(alignment: .leading, spacing: 8) {
             // Header: Source and Date
             HStack {
+                let sourceImage = UIImage(named: item.source.rawValue.lowercased()) ?? UIImage(systemName: "newspaper")
+                Image(uiImage: sourceImage!)
+                    .resizable()
+                    .frame(width: 16, height: 16)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
                 Text(item.source.rawValue.uppercased())
                     .font(.caption)
                     .fontWeight(.bold)
