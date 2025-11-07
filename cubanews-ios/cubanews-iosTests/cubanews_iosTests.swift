@@ -136,5 +136,49 @@ struct cubanews_iosTests {
         let viewModel2 = FeedItemViewModel(unsavedItem)
         #expect(viewModel2.isSaved == false)
     }
+    
+    @Test func testToggleSavedFunctionality() async throws {
+        // Test that toggling saved state works correctly
+        let testItem = FeedItem(
+            id: 77777,
+            title: "Toggle Test Item",
+            url: "https://example.com/toggle",
+            source: .ADNCUBA,
+            saved: false
+        )
+        
+        // Create a cache store with a test database
+        let testDB = "test_feed_cache_\(UUID().uuidString).sqlite"
+        guard let store = FeedCacheStore(fileName: testDB) else {
+            throw NSError(domain: "TestError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create test cache store"])
+        }
+        
+        // Insert the test item
+        store.upsertMany([testItem])
+        
+        // Create view model and verify initial state
+        let viewModel = FeedItemViewModel(testItem)
+        #expect(viewModel.isSaved == false)
+        
+        // Toggle to save
+        viewModel.toggleSaved()
+        #expect(viewModel.isSaved == true)
+        
+        // Verify it's saved in database
+        let savedItems = store.loadSaved()
+        #expect(savedItems.count == 1)
+        #expect(savedItems[0].id == testItem.id)
+        
+        // Toggle to unsave
+        viewModel.toggleSaved()
+        #expect(viewModel.isSaved == false)
+        
+        // Verify it's no longer in saved list
+        let savedItemsAfterToggle = store.loadSaved()
+        #expect(savedItemsAfterToggle.count == 0)
+        
+        // Clean up
+        try? FileManager.default.removeItem(at: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(testDB))
+    }
 
 }

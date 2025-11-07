@@ -21,9 +21,9 @@ class FeedItemViewModel: ObservableObject {
         self.isSaved = item.saved
     }
     
-    func saveToFavorites() {
-        isSaved = true
-        cacheStore?.updateSaved(for: item.id, saved: true)
+    func toggleSaved() {
+        isSaved.toggle()
+        cacheStore?.updateSaved(for: item.id, saved: isSaved)
     }
 }
 
@@ -122,14 +122,15 @@ struct FeedItemView: View {
             .buttonStyle(PlainButtonStyle())
 
             // Save and Share buttons
-            HStack {
+            HStack(spacing: 20) {
                 Spacer()
 
                 // Save button
                 Button(action: {
-                    viewModel.saveToFavorites()
+                    viewModel.toggleSaved()
                 }) {
                     Image(systemName: viewModel.isSaved ? "bookmark.fill" : "bookmark")
+                        .font(.system(size: 20))
                         .foregroundColor(viewModel.isSaved ? .accentColor : .secondary)
                 }
                 .buttonStyle(.plain)
@@ -139,6 +140,7 @@ struct FeedItemView: View {
                     showingShareSheet = true
                 }) {
                     Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 20))
                         .foregroundColor(.secondary)
                 }
                 .buttonStyle(.plain)
