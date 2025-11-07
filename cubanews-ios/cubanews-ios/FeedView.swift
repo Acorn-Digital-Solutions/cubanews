@@ -127,6 +127,7 @@ struct FeedView: View {
             content
                 .background(Color(.systemBackground))
                 .navigationTitle("Cubanews")
+                .navigationBarTitleDisplayMode(.inline)
                 .task {
                     await viewModel.fetchFeedItems(reset: true)
                 }
