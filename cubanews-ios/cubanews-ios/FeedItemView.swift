@@ -14,14 +14,19 @@ class FeedItemViewModel: ObservableObject {
     
     let item: FeedItem
     private let cacheStore = FeedCacheStore()
+    @Published var isSaved: Bool = false
     
     init(_ item: FeedItem) {
         self.item = item
+        self.isSaved = item.saved
     }
     
     func saveToFavorites() {
+        isSaved = true
+        cacheStore?.updateSaved(for: item.id, saved: true)
     }
 }
+
 
 struct ShareSheet: UIViewControllerRepresentable {
     var items: [Any]
@@ -37,7 +42,12 @@ struct FeedItemView: View {
     let item: FeedItem
     @Environment(\.openURL) var openURL
     @State private var showingShareSheet = false
-    @State private var isSaved: Bool = false
+    @StateObject private var viewModel: FeedItemViewModel
+    
+    init(item: FeedItem) {
+        self.item = item
+        _viewModel = StateObject(wrappedValue: FeedItemViewModel(item))
+    }
 
     private static let iso8601DateFormatter: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
@@ -117,13 +127,10 @@ struct FeedItemView: View {
 
                 // Save button
                 Button(action: {
-                    // Optimistically update local UI state
-                    isSaved = true
-                    // Notify parent to persist in cache
-                    
+                    viewModel.saveToFavorites()
                 }) {
-                    Image(systemName: isSaved ? "bookmark.fill" : "bookmark")
-                        .foregroundColor(isSaved ? .accentColor : .secondary)
+                    Image(systemName: viewModel.isSaved ? "bookmark.fill" : "bookmark")
+                        .foregroundColor(viewModel.isSaved ? .accentColor : .secondary)
                 }
                 .buttonStyle(.plain)
 
@@ -143,10 +150,6 @@ struct FeedItemView: View {
                     }
                 }
             }
-        }
-        .onAppear {
-            // If `FeedItem` has a saved flag, initialize local state here.
-            // Example: isSaved = item.isSaved
         }
         .padding()
         .background(Color(.systemGray5).opacity(0.3))

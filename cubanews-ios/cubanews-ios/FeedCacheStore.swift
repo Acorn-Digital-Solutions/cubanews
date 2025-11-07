@@ -167,7 +167,7 @@ final class FeedCacheStore {
             image=excluded.image,
             image_bytes=COALESCE(excluded.image_bytes, feed_items.image_bytes),
             image_state=excluded.image_state,
-            saved=excluded.saved;
+            saved=COALESCE(feed_items.saved, excluded.saved);
         """
         var stmt: OpaquePointer?
         if sqlite3_prepare_v2(db, sql, -1, &stmt, nil) != SQLITE_OK {
@@ -235,8 +235,8 @@ final class FeedCacheStore {
         }
         // image state as raw string
         sqlite3_bind_text(stmt, 15, item.imageLoadingState.rawValue, -1, SQLITE_TRANSIENT)
-        // saved as 0/1; if the model doesn't have it yet, default to 0
-        let savedValue: Int32 = 0
+        // saved as 0/1
+        let savedValue: Int32 = item.saved ? 1 : 0
         sqlite3_bind_int(stmt, 16, savedValue)
     }
 
