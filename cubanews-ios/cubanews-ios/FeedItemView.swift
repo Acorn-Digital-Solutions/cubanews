@@ -10,25 +10,6 @@ import SwiftUI
 import UIKit
 import Combine
 
-class FeedItemViewModel: ObservableObject {
-    
-    let item: FeedItem
-    private let cacheStore: FeedCacheStore?
-    @Published var isSaved: Bool = false
-    
-    init(_ item: FeedItem) {
-        self.item = item
-        self.isSaved = item.saved
-        self.cacheStore = FeedCacheStore()
-    }
-    
-    func toggleSaved() {
-        isSaved.toggle()
-        cacheStore?.updateSaved(for: item.id, saved: isSaved)
-    }
-}
-
-
 struct ShareSheet: UIViewControllerRepresentable {
     var items: [Any]
 
@@ -42,13 +23,8 @@ struct ShareSheet: UIViewControllerRepresentable {
 struct FeedItemView: View {
     let item: FeedItem
     @Environment(\.openURL) var openURL
+    @EnvironmentObject var savedItemsManager: SavedItemsManager
     @State private var showingShareSheet = false
-    @StateObject private var viewModel: FeedItemViewModel
-    
-    init(item: FeedItem) {
-        self.item = item
-        _viewModel = StateObject(wrappedValue: FeedItemViewModel(item))
-    }
 
     private static let iso8601DateFormatter: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
@@ -128,11 +104,11 @@ struct FeedItemView: View {
 
                 // Save button
                 Button(action: {
-                    viewModel.toggleSaved()
+                    savedItemsManager.toggleSaved(for: item.id)
                 }) {
-                    Image(systemName: viewModel.isSaved ? "bookmark.fill" : "bookmark")
+                    Image(systemName: savedItemsManager.isSaved(item.id) ? "bookmark.fill" : "bookmark")
                         .font(.system(size: 20))
-                        .foregroundColor(viewModel.isSaved ? .accentColor : .secondary)
+                        .foregroundColor(savedItemsManager.isSaved(item.id) ? .accentColor : .secondary)
                 }
                 .buttonStyle(.plain)
 
