@@ -19,6 +19,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,23 +78,28 @@ fun Material3BottomNavApp() {
     val navController = rememberNavController()
     val currentDestination = navController
         .currentBackStackEntryAsState().value?.destination
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = if (isSystemInDarkTheme()) Color.Gray else MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(title = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(
-                        painter = painterResource(id = R.drawable.cubanflag),
-                        contentDescription = "Cuban flag",
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .size(32.dp)
-                            .clip(CircleShape)
-                    )
-                    Text("Cubanews", style = MaterialTheme.typography.titleLarge)
-                }
-            })
+            TopAppBar(
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.cubanflag),
+                            contentDescription = "Cuban flag",
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(32.dp)
+                                .clip(CircleShape)
+                        )
+                        Text("Cubanews", style = MaterialTheme.typography.titleLarge)
+                    }
+                },
+                scrollBehavior = scrollBehavior
+            )
         },
         bottomBar = {
             NavigationBar {
