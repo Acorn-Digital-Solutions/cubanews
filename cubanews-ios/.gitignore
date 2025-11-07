@@ -1,2 +1,4 @@
 *.xcbkptlist
+*/xcdebugger/Expressions.xcexplist
+
 
