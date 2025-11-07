@@ -13,12 +13,13 @@ import Combine
 class FeedItemViewModel: ObservableObject {
     
     let item: FeedItem
-    private let cacheStore = FeedCacheStore()
+    private let cacheStore: FeedCacheStore?
     @Published var isSaved: Bool = false
     
     init(_ item: FeedItem) {
         self.item = item
         self.isSaved = item.saved
+        self.cacheStore = FeedCacheStore()
     }
     
     func toggleSaved() {
