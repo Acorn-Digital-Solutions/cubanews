@@ -8,6 +8,20 @@
 
 import SwiftUI
 import UIKit
+import Combine
+
+class FeedItemViewModel: ObservableObject {
+    
+    let item: FeedItem
+    private let cacheStore = FeedCacheStore()
+    
+    init(_ item: FeedItem) {
+        self.item = item
+    }
+    
+    func saveToFavorites() {
+    }
+}
 
 struct ShareSheet: UIViewControllerRepresentable {
     var items: [Any]
@@ -23,6 +37,23 @@ struct FeedItemView: View {
     let item: FeedItem
     @Environment(\.openURL) var openURL
     @State private var showingShareSheet = false
+    @State private var isSaved: Bool = false
+
+    private static let iso8601DateFormatter: ISO8601DateFormatter = {
+        let f = ISO8601DateFormatter()
+        f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        f.timeZone = TimeZone(secondsFromGMT: 0)
+        return f
+    }()
+
+    private static let displayDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        f.timeStyle = .short
+        f.locale = .current
+        f.timeZone = .current
+        return f
+    }()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -38,7 +69,7 @@ struct FeedItemView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.secondary)
                 Spacer()
-                Text(DateFormatter.localizedString(from: ISO8601DateFormatter().date(from: item.isoDate) ?? Date(), dateStyle: .medium, timeStyle: .short))
+                Text(Self.displayDateFormatter.string(from: Self.iso8601DateFormatter.date(from: item.isoDate) ?? Date()))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -80,9 +111,23 @@ struct FeedItemView: View {
             }
             .buttonStyle(PlainButtonStyle())
 
-            // Share button
+            // Save and Share buttons
             HStack {
                 Spacer()
+
+                // Save button
+                Button(action: {
+                    // Optimistically update local UI state
+                    isSaved = true
+                    // Notify parent to persist in cache
+                    
+                }) {
+                    Image(systemName: isSaved ? "bookmark.fill" : "bookmark")
+                        .foregroundColor(isSaved ? .accentColor : .secondary)
+                }
+                .buttonStyle(.plain)
+
+                // Share button
                 Button(action: {
                     showingShareSheet = true
                 }) {
@@ -99,9 +144,14 @@ struct FeedItemView: View {
                 }
             }
         }
+        .onAppear {
+            // If `FeedItem` has a saved flag, initialize local state here.
+            // Example: isSaved = item.isSaved
+        }
         .padding()
         .background(Color(.systemGray5).opacity(0.3))
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.2), radius: 1, x: 0, y: 1)
     }
 }
+

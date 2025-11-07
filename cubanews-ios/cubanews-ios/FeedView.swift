@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import FirebaseStorage
+import SQLite3
 
 @MainActor
 class FeedViewModel: ObservableObject {
@@ -17,12 +18,16 @@ class FeedViewModel: ObservableObject {
     private var currentPage: Int = 1
     private let pageSize: Int = 2
     
+    // MARK: - SQLite Cache
+    private let cacheStore = FeedCacheStore()
+    
     func fetchFeedItems(reset: Bool = false) async {
         guard !isLoading else { return }
         
         if reset {
             currentPage = 1
-            items.removeAll()
+            // Show cached data immediately if present
+            primeFromCache()
         }
         
         isLoading = true
@@ -58,6 +63,8 @@ class FeedViewModel: ObservableObject {
             if !newItems.isEmpty {
                 items.append(contentsOf: newItems)
                 currentPage += 1
+                // Persist/merge the new items locally in SQLite
+                cacheStore?.upsertMany(newItems)
             }
             newItems.forEach { fetchImage(feedItem: $0) }
             
@@ -91,6 +98,13 @@ class FeedViewModel: ObservableObject {
             item.imageBytes = data
             item.imageLoadingState = state
             items[index] = item
+            cacheStore?.upsertImage(for: id, data: data, state: state)
+        }
+    }
+    
+    func primeFromCache() {
+        if let store = cacheStore {
+            self.items = store.loadAll()
         }
     }
 }
@@ -128,8 +142,10 @@ struct FeedView: View {
                 .background(Color(.systemBackground))
                 .navigationTitle("Cubanews")
                 .task {
+                    viewModel.primeFromCache()
                     await viewModel.fetchFeedItems(reset: true)
                 }
         }
     }
 }
+
