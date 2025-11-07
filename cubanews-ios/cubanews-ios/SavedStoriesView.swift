@@ -64,11 +64,6 @@ struct SavedStoriesView: View {
                 .task {
                     await viewModel.fetchSavedItems(reset: true)
                 }
-                .onAppear {
-                    Task {
-                        await viewModel.fetchSavedItems(reset: true)
-                    }
-                }
         }
     }
 }
