@@ -8,6 +8,7 @@
 
 import SwiftUI
 import UIKit
+import Combine
 
 struct ShareSheet: UIViewControllerRepresentable {
     var items: [Any]
@@ -22,7 +23,24 @@ struct ShareSheet: UIViewControllerRepresentable {
 struct FeedItemView: View {
     let item: FeedItem
     @Environment(\.openURL) var openURL
+    @EnvironmentObject var savedItemsManager: SavedItemsManager
     @State private var showingShareSheet = false
+
+    private static let iso8601DateFormatter: ISO8601DateFormatter = {
+        let f = ISO8601DateFormatter()
+        f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        f.timeZone = TimeZone(secondsFromGMT: 0)
+        return f
+    }()
+
+    private static let displayDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        f.timeStyle = .short
+        f.locale = .current
+        f.timeZone = .current
+        return f
+    }()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -38,7 +56,7 @@ struct FeedItemView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.secondary)
                 Spacer()
-                Text(DateFormatter.localizedString(from: ISO8601DateFormatter().date(from: item.isoDate) ?? Date(), dateStyle: .medium, timeStyle: .short))
+                Text(Self.displayDateFormatter.string(from: Self.iso8601DateFormatter.date(from: item.isoDate) ?? Date()))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -80,13 +98,26 @@ struct FeedItemView: View {
             }
             .buttonStyle(PlainButtonStyle())
 
-            // Share button
-            HStack {
+            // Save and Share buttons
+            HStack(spacing: 20) {
                 Spacer()
+
+                // Save button
+                Button(action: {
+                    savedItemsManager.toggleSaved(for: item.id)
+                }) {
+                    Image(systemName: savedItemsManager.isSaved(item.id) ? "bookmark.fill" : "bookmark")
+                        .font(.system(size: 20))
+                        .foregroundColor(savedItemsManager.isSaved(item.id) ? .accentColor : .secondary)
+                }
+                .buttonStyle(.plain)
+
+                // Share button
                 Button(action: {
                     showingShareSheet = true
                 }) {
                     Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 20))
                         .foregroundColor(.secondary)
                 }
                 .buttonStyle(.plain)
@@ -105,3 +136,4 @@ struct FeedItemView: View {
         .shadow(color: Color.black.opacity(0.2), radius: 1, x: 0, y: 1)
     }
 }
+

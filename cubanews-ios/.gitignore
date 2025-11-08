@@ -1,0 +1,5 @@
+*.xcbkptlist
+*.xcuserstate
+*/xcdebugger/Expressions.xcexplist
+.DS_Store
+.DS-Store

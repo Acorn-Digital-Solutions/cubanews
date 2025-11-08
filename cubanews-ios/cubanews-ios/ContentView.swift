@@ -13,6 +13,10 @@ struct ContentView: View {
                     .tabItem {
                         Label("Home", systemImage: "house.fill")
                     }
+                
+                SavedStoriesView().tabItem {
+                    Label("Saved", systemImage: "bookmark.fill")
+                }
 
                 Text("Profile")
                     .tabItem {

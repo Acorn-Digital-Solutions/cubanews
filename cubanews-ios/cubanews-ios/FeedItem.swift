@@ -58,6 +58,7 @@ struct FeedItem: Identifiable, Codable, Equatable {
     let image: String?
     var imageBytes: Data?
     var imageLoadingState: ImageLoadingState
+    var saved: Bool = false
 
     init(
         id: Int64,
@@ -74,7 +75,8 @@ struct FeedItem: Identifiable, Codable, Equatable {
         aiSummary: String? = nil,
         image: String? = nil,
         imageBytes: Data? = nil,
-        imageLoadingState: ImageLoadingState = .LOADING
+        imageLoadingState: ImageLoadingState = .LOADING,
+        saved: Bool = false
     ) {
         self.id = id
         self.title = title
@@ -91,6 +93,7 @@ struct FeedItem: Identifiable, Codable, Equatable {
         self.image = image
         self.imageBytes = imageBytes
         self.imageLoadingState = imageLoadingState
+        self.saved = saved
     }
     
     init(from decoder: Decoder) throws {
