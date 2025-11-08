@@ -98,6 +98,10 @@ struct FeedItemView: View {
             }
             .buttonStyle(PlainButtonStyle())
 
+            // Separator
+            Divider()
+                .padding(.vertical, 4)
+
             // Save and Share buttons
             HStack(spacing: 20) {
                 Spacer()
