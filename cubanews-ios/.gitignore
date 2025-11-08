@@ -1,5 +1,5 @@
 *.xcbkptlist
 *.xcuserstate
 */xcdebugger/Expressions.xcexplist
-cubanews-ios.xcodeproj/
-
+.DS_Store
+.DS-Store

@@ -10,19 +10,6 @@ import SwiftUI
 import UIKit
 import Combine
 
-class FeedItemViewModel: ObservableObject {
-    
-    let item: FeedItem
-    private let cacheStore = FeedCacheStore()
-    
-    init(_ item: FeedItem) {
-        self.item = item
-    }
-    
-    func saveToFavorites() {
-    }
-}
-
 struct ShareSheet: UIViewControllerRepresentable {
     var items: [Any]
 
@@ -36,8 +23,8 @@ struct ShareSheet: UIViewControllerRepresentable {
 struct FeedItemView: View {
     let item: FeedItem
     @Environment(\.openURL) var openURL
+    @EnvironmentObject var savedItemsManager: SavedItemsManager
     @State private var showingShareSheet = false
-    @State private var isSaved: Bool = false
 
     private static let iso8601DateFormatter: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
@@ -112,18 +99,16 @@ struct FeedItemView: View {
             .buttonStyle(PlainButtonStyle())
 
             // Save and Share buttons
-            HStack {
+            HStack(spacing: 20) {
                 Spacer()
 
                 // Save button
                 Button(action: {
-                    // Optimistically update local UI state
-                    isSaved = true
-                    // Notify parent to persist in cache
-                    
+                    savedItemsManager.toggleSaved(for: item.id)
                 }) {
-                    Image(systemName: isSaved ? "bookmark.fill" : "bookmark")
-                        .foregroundColor(isSaved ? .accentColor : .secondary)
+                    Image(systemName: savedItemsManager.isSaved(item.id) ? "bookmark.fill" : "bookmark")
+                        .font(.system(size: 20))
+                        .foregroundColor(savedItemsManager.isSaved(item.id) ? .accentColor : .secondary)
                 }
                 .buttonStyle(.plain)
 
@@ -132,6 +117,7 @@ struct FeedItemView: View {
                     showingShareSheet = true
                 }) {
                     Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 20))
                         .foregroundColor(.secondary)
                 }
                 .buttonStyle(.plain)
@@ -143,10 +129,6 @@ struct FeedItemView: View {
                     }
                 }
             }
-        }
-        .onAppear {
-            // If `FeedItem` has a saved flag, initialize local state here.
-            // Example: isSaved = item.isSaved
         }
         .padding()
         .background(Color(.systemGray5).opacity(0.3))

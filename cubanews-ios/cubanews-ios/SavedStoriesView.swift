@@ -14,17 +14,19 @@ class SavedStoriesViewModel: ObservableObject {
 
     private var store = FeedCacheStore()
 
-    func fetchSavedItems(reset: Bool = false) async {
+    func fetchSavedItems(savedIds: Set<Int64>) async {
         guard !isLoading else { return }
         isLoading = true
         defer { isLoading = false }
         let saved = store?.loadSaved() ?? []
-        self.items = saved
+        // Filter to only include items that are in the savedIds set
+        self.items = saved.filter { savedIds.contains($0.id) }
     }
 }
 
 struct SavedStoriesView: View {
     @StateObject private var viewModel = SavedStoriesViewModel()
+    @EnvironmentObject var savedItemsManager: SavedItemsManager
 
     var content: some View {
         Group {
@@ -62,7 +64,12 @@ struct SavedStoriesView: View {
                 .background(Color(.systemBackground))
                 .navigationTitle("Saved")
                 .task {
-                    await viewModel.fetchSavedItems(reset: true)
+                    await viewModel.fetchSavedItems(savedIds: savedItemsManager.savedItemIds)
+                }
+                .onChange(of: savedItemsManager.savedItemIds) { _ in
+                    Task {
+                        await viewModel.fetchSavedItems(savedIds: savedItemsManager.savedItemIds)
+                    }
                 }
         }
     }
