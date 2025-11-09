@@ -12,19 +12,18 @@ final class FeedCacheStore {
     
     init?(fileName: String = "feed_cache") {
         do {
-            let diskConfig = DiskConfig(name: fileName)
-            let memoryConfig = MemoryConfig(expiry: .never, countLimit: 100, totalCostLimit: 0)
+            let diskConfig = DiskConfig(name: fileName, expiry: .seconds(3600 * 36))
+            let memoryConfig = MemoryConfig(expiry: .seconds(3600), countLimit: 10, totalCostLimit: 0)
             
             let transformer = TransformerFactory.forCodable(ofType: FeedItem.self)
             self.storage = try Storage(
                 diskConfig: diskConfig,
                 memoryConfig: memoryConfig,
                 transformer: transformer
-            )
+            )	
             
             // Load saved item IDs
             loadSavedItemIds()
-            clearOldCache()
         } catch {
             print("❌ FeedCacheStore: could not initialize storage:", error)
             return nil
@@ -189,37 +188,6 @@ final class FeedCacheStore {
             try? storage.removeAll()
             savedItemIds.removeAll()
             saveSavedItemIds()
-        }
-    }
-    
-    func clearOldCache() {
-        queue.sync {
-            guard let storage = storage else { return }
-            
-            let twoDaysAgo = Int64(Date().addingTimeInterval(-2 * 24 * 60 * 60).timeIntervalSince1970)
-            
-            // Load all IDs
-            let stringStorage = storage.transformCodable(ofType: Set<Int64>.self)
-            guard var allIds = try? stringStorage.object(forKey: "all_item_ids") else { return }
-            
-            var idsToRemove: [Int64] = []
-            
-            for id in allIds {
-                let key = String(id)
-                if let item = try? storage.object(forKey: key) {
-                    // Remove if older than 2 days and not saved
-                    if let feedts = item.feedts, feedts < twoDaysAgo, !item.saved {
-                        try? storage.removeObject(forKey: key)
-                        idsToRemove.append(id)
-                    }
-                }
-            }
-            
-            // Update IDs list
-            for id in idsToRemove {
-                allIds.remove(id)
-            }
-            try? stringStorage.setObject(allIds, forKey: "all_item_ids")
         }
     }
 }

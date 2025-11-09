@@ -18,7 +18,6 @@ class FeedViewModel: ObservableObject {
     private var currentPage: Int = 1
     private let pageSize: Int = 2
     
-    // MARK: - SQLite Cache
     private let cacheStore = FeedCacheStore()
     
     func fetchFeedItems(reset: Bool = false) async {
