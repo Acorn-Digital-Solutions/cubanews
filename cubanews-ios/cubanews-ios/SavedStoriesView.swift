@@ -37,7 +37,7 @@ struct SavedStoriesView: View {
                     Image(systemName: "bookmark")
                         .font(.system(size: 40))
                         .foregroundStyle(.secondary)
-                    Text("No saved stories yet")
+                    Text("No tienes historias guardadas.")
                         .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -62,7 +62,7 @@ struct SavedStoriesView: View {
         NavigationView {
             content
                 .background(Color(.systemBackground))
-                .navigationTitle("Saved")
+                .navigationTitle("Guardadas")
                 .task {
                     await viewModel.fetchSavedItems(savedIds: savedItemsManager.savedItemIds)
                 }

@@ -59,14 +59,16 @@ class FeedViewModel: ObservableObject {
             
             let decoded = try decoder.decode(FeedResponse.self, from: data)
             let newItems = decoded.content.feed
-            
+            let existingIds = Set(items.map { $0.id })
+            let uniqueNewItems = newItems.filter { !existingIds.contains($0.id) }
             if !newItems.isEmpty {
-                items.append(contentsOf: newItems)
+                let uniqueNewItems = newItems.filter { !existingIds.contains($0.id) }
+                self.items.append(contentsOf: uniqueNewItems)
                 currentPage += 1
                 // Persist/merge the new items locally in SQLite
-                cacheStore?.upsertMany(newItems)
+                cacheStore?.upsertMany(uniqueNewItems)
             }
-            newItems.forEach { fetchImage(feedItem: $0) }
+            uniqueNewItems.forEach { fetchImage(feedItem: $0) }
             
         } catch {
             print("❌ Failed to load feed:", error)
@@ -148,4 +150,3 @@ struct FeedView: View {
         }
     }
 }
-

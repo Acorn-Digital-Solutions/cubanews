@@ -137,3 +137,17 @@ struct FeedItem: Identifiable, Codable, Equatable {
         lhs.id == rhs.id
     }
 }
+
+extension Array where Element == FeedItem {
+    func removingDuplicates() -> [FeedItem] {
+        var seen = Set<Int64>()
+        return self.filter { item in
+            if seen.contains(item.id) {
+                return false
+            } else {
+                seen.insert(item.id)
+                return true
+            }
+        }
+    }
+}
