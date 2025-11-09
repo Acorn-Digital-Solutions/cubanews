@@ -68,7 +68,7 @@ class FeedViewModel: ObservableObject {
                 // Persist/merge the new items locally in SQLite
                 cacheStore?.upsertMany(uniqueNewItems)
             }
-            newItems.forEach { fetchImage(feedItem: $0) }
+            uniqueNewItems.forEach { fetchImage(feedItem: $0) }
             
         } catch {
             print("❌ Failed to load feed:", error)
