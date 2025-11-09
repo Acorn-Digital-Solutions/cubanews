@@ -106,10 +106,10 @@ final class FeedCacheStore {
             for item in items {
                 let key = String(item.id)
                 
-                // Check if item already exists to preserve saved status
+                // Check if item already exists to preserve saved status and image data
                 var itemToSave = item
                 if let existingItem = try? storage.object(forKey: key) {
-                    // Preserve saved status from existing item
+                    // Preserve saved status and image data from existing item
                     itemToSave = FeedItem(
                         id: item.id,
                         title: item.title,
@@ -124,8 +124,8 @@ final class FeedCacheStore {
                         interactions: item.interactions,
                         aiSummary: item.aiSummary,
                         image: item.image,
-                        imageBytes: item.imageBytes,
-                        imageLoadingState: item.imageLoadingState,
+                        imageBytes: existingItem.imageBytes ?? item.imageBytes,
+                        imageLoadingState: existingItem.imageLoadingState != .LOADING ? existingItem.imageLoadingState : item.imageLoadingState,
                         saved: existingItem.saved
                     )
                 }
