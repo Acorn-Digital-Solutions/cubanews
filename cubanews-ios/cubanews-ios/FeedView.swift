@@ -61,7 +61,16 @@ class FeedViewModel: ObservableObject {
             let newItems = decoded.content.feed
             
             if !newItems.isEmpty {
-                items.append(contentsOf: newItems)
+                let combined = items + newItems
+                var seen = Set<Int64>()
+                self.items = combined.filter { item in
+                    if seen.contains(item.id) {
+                        return false
+                    } else {
+                        seen.insert(item.id)
+                        return true
+                    }
+                }
                 currentPage += 1
                 // Persist/merge the new items locally in SQLite
                 cacheStore?.upsertMany(newItems)
@@ -148,4 +157,3 @@ struct FeedView: View {
         }
     }
 }
-
