@@ -1,304 +1,225 @@
 import Foundation
-import SQLite3
+import Cache
 
-// A lightweight SQLite-backed cache for FeedItem
+// A Cache library-backed store for FeedItem
 final class FeedCacheStore {
-    private var db: OpaquePointer?
-    private let dbURL: URL
+    private let storage: Storage<String, FeedItem>?
     private let queue = DispatchQueue(label: "com.cubanews.feedcache.db", qos: .utility)
-
-    init?(fileName: String = "feed_cache.sqlite") {
+    
+    // Track saved items separately
+    private var savedItemIds: Set<Int64> = []
+    private let savedItemsKey = "saved_item_ids"
+    
+    init?(fileName: String = "feed_cache") {
         do {
-            let docs = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-            self.dbURL = docs.appendingPathComponent(fileName)
+            let diskConfig = DiskConfig(name: fileName)
+            let memoryConfig = MemoryConfig(expiry: .never, countLimit: 100, totalCostLimit: 0)
+            
+            let transformer = TransformerFactory.forCodable(ofType: FeedItem.self)
+            self.storage = try Storage(
+                diskConfig: diskConfig,
+                memoryConfig: memoryConfig,
+                transformer: transformer
+            )
+            
+            // Load saved item IDs
+            loadSavedItemIds()
+            clearOldCache()
         } catch {
-            print("❌ FeedCacheStore: could not resolve documents directory:", error)
+            print("❌ FeedCacheStore: could not initialize storage:", error)
             return nil
         }
-        guard queue.sync(execute: { open() }) else { return nil }
-        guard queue.sync(execute: { createSchema() }) else { return nil }
-        clearOldCache()
     }
-
-    deinit {
-        if db != nil {
-            sqlite3_close(db)
+    
+    private func loadSavedItemIds() {
+        guard let storage = storage else { return }
+        
+        // Try to load saved item IDs from a special key
+        let stringStorage = storage.transformCodable(ofType: Set<Int64>.self)
+        if let ids = try? stringStorage.object(forKey: savedItemsKey) {
+            savedItemIds = ids
         }
     }
-
-    private func open() -> Bool {
-        if sqlite3_open(dbURL.path, &db) == SQLITE_OK {
-            return true
-        } else {
-            print("❌ FeedCacheStore: failed to open database at \(dbURL.path)")
-            return false
-        }
-    }
-
-    private func createSchema() -> Bool {
-        let sql = """
-        CREATE TABLE IF NOT EXISTS feed_items (
-            id INTEGER PRIMARY KEY,
-            title TEXT,
-            url TEXT,
-            source TEXT,
-            updated INTEGER,
-            iso_date TEXT,
-            feedts INTEGER,
-            content TEXT,
-            tags TEXT,
-            score INTEGER,
-            interactions_json TEXT,
-            ai_summary TEXT,
-            image TEXT,
-            image_bytes BLOB,
-            image_state TEXT,
-            saved INTEGER NOT NULL DEFAULT 0
-        );
-        """
-        return execute(sql: sql)
-    }
-
-    private func execute(sql: String) -> Bool {
-        var errMsg: UnsafeMutablePointer<Int8>? = nil
-        if sqlite3_exec(db, sql, nil, nil, &errMsg) != SQLITE_OK {
-            if let err = errMsg { print("❌ FeedCacheStore SQL error:", String(cString: err)) }
-            return false
-        }
-        return true
+    
+    private func saveSavedItemIds() {
+        guard let storage = storage else { return }
+        
+        let stringStorage = storage.transformCodable(ofType: Set<Int64>.self)
+        try? stringStorage.setObject(savedItemIds, forKey: savedItemsKey)
     }
     
     func loadSaved() -> [FeedItem] {
-        let sql = "SELECT id, title, url, source, updated, iso_date, feedts, content, tags, score, interactions_json, ai_summary, image, image_bytes, image_state, saved FROM feed_items WHERE saved=1"
         return queue.sync {
-            let items = self.load(sql: sql)
-            return items.removingDuplicates()
-        }
-    }
-
-    // Load all cached items ordered by id ascending
-    func loadAll() -> [FeedItem] {
-        let sql = "SELECT id, title, url, source, updated, iso_date, feedts, content, tags, score, interactions_json, ai_summary, image, image_bytes, image_state, saved FROM feed_items"
-        return queue.sync {
-            let items = self.load(sql: sql)
-            return items.removingDuplicates()
+            guard let storage = storage else { return [] }
+            
+            var savedItems: [FeedItem] = []
+            for id in savedItemIds {
+                if let item = try? storage.object(forKey: String(id)) {
+                    savedItems.append(item)
+                }
+            }
+            return savedItems.removingDuplicates()
         }
     }
     
-    private func load(sql: String) -> [FeedItem] {
-        var stmt: OpaquePointer?
-        var result: [FeedItem] = []
-        if sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK {
-            defer { sqlite3_finalize(stmt) }
-            while sqlite3_step(stmt) == SQLITE_ROW {
-                let id = sqlite3_column_int64(stmt, 0)
-                let title = sqlite3_column_text(stmt, 1).flatMap { String(cString: $0) } ?? ""
-                let url = sqlite3_column_text(stmt, 2).flatMap { String(cString: $0) } ?? ""
-                let sourceRaw = sqlite3_column_text(stmt, 3).flatMap { String(cString: $0) } ?? "unknown"
-                let updated = sqlite3_column_int64(stmt, 4)
-                let isoDate = sqlite3_column_text(stmt, 5).flatMap { String(cString: $0) } ?? ""
-                let feedts: Int64? = {
-                    let v = sqlite3_column_int64(stmt, 6)
-                    return v == 0 && sqlite3_column_type(stmt, 6) == SQLITE_NULL ? nil : v
-                }()
-                let content = sqlite3_column_text(stmt, 7).flatMap { String(cString: $0) }
-                let tagsJSON = sqlite3_column_text(stmt, 8).flatMap { String(cString: $0) }
-                let score = Int(sqlite3_column_int64(stmt, 9))
-                let interactionsJSON = sqlite3_column_text(stmt, 10).flatMap { String(cString: $0) }
-                let aiSummary = sqlite3_column_text(stmt, 11).flatMap { String(cString: $0) }
-                let image = sqlite3_column_text(stmt, 12).flatMap { String(cString: $0) }
-                var imageBytes: Data? = nil
-                if let blob = sqlite3_column_blob(stmt, 13) {
-                    let size = Int(sqlite3_column_bytes(stmt, 13))
-                    imageBytes = Data(bytes: blob, count: size)
+    func loadAll() -> [FeedItem] {
+        return queue.sync {
+            guard let storage = storage else { return [] }
+            
+            var allItems: [FeedItem] = []
+            
+            // Load all keys from storage
+            // Cache library doesn't have a direct way to iterate all keys,
+            // so we'll need to track keys ourselves
+            // For now, we'll combine saved and recently added items
+            
+            // This is a limitation - we need to track all item IDs
+            // Let's try to use the existing disk storage to get all entries
+            do {
+                let entries = try storage.existsObject(forKey: "all_item_ids")
+                if entries {
+                    let stringStorage = storage.transformCodable(ofType: Set<Int64>.self)
+                    if let allIds = try? stringStorage.object(forKey: "all_item_ids") {
+                        for id in allIds {
+                            if let item = try? storage.object(forKey: String(id)) {
+                                allItems.append(item)
+                            }
+                        }
+                    }
                 }
-                let imageStateRaw = sqlite3_column_text(stmt, 14).flatMap { String(cString: $0) } ?? "LOADING"
-                let savedInt = sqlite3_column_int(stmt, 15)
-                let saved = savedInt != 0
-
-                // Decode tags from JSON array if present
-                let tags: [String] = {
-                    guard let tagsJSON = tagsJSON, let data = tagsJSON.data(using: .utf8) else { return [] }
-                    return (try? JSONDecoder().decode([String].self, from: data)) ?? []
-                }()
-
-                // Decode interactions from JSON if present
-                let interactions: InteractionData = {
-                    guard let interactionsJSON = interactionsJSON, let data = interactionsJSON.data(using: .utf8) else { return InteractionData(feedid: id) }
-                    return (try? JSONDecoder().decode(InteractionData.self, from: data)) ?? InteractionData(feedid: id)
-                }()
-
-                let item = FeedItem(
-                    id: id,
-                    title: title,
-                    url: url,
-                    source: NewsSourceName(rawValue: sourceRaw.uppercased()) ?? .unknown,
-                    updated: updated,
-                    isoDate: isoDate,
-                    feedts: feedts,
-                    content: content,
-                    tags: tags,
-                    score: score,
-                    interactions: interactions,
-                    aiSummary: aiSummary,
-                    image: image,
-                    imageBytes: imageBytes,
-                    imageLoadingState: ImageLoadingState(rawValue: imageStateRaw) ?? .LOADING,
-                    saved: saved
-                )
-                result.append(item)
-                _ = saved
+            } catch {
+                // No all_item_ids key exists, return empty
             }
-        } else {
-            print("❌ FeedCacheStore: failed to prepare loadAll")
+            
+            return allItems.removingDuplicates()
         }
-        return result
     }
-
-    // Insert many items, ignoring any that already exist (no upsert)
+    
     func upsertMany(_ items: [FeedItem]) {
         queue.sync {
-            let sql = """
-            INSERT OR IGNORE INTO feed_items (id, title, url, source, updated, iso_date, feedts, content, tags, score, interactions_json, ai_summary, image, image_bytes, image_state, saved)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-            """
-            var stmt: OpaquePointer?
-            if sqlite3_prepare_v2(db, sql, -1, &stmt, nil) != SQLITE_OK {
-                print("❌ FeedCacheStore: failed to prepare upsertMany")
-                return
-            }
-            defer { sqlite3_finalize(stmt) }
-
-            sqlite3_exec(db, "BEGIN TRANSACTION", nil, nil, nil)
+            guard let storage = storage else { return }
+            
+            // Load existing IDs
+            let stringStorage = storage.transformCodable(ofType: Set<Int64>.self)
+            var allIds: Set<Int64> = (try? stringStorage.object(forKey: "all_item_ids")) ?? []
+            
             for item in items {
-                bind(item: item, to: stmt)
-                if sqlite3_step(stmt) != SQLITE_DONE {
-                    print("❌ FeedCacheStore: upsert failed for id \(item.id)")
+                let key = String(item.id)
+                
+                // Check if item already exists to preserve saved status
+                var itemToSave = item
+                if let existingItem = try? storage.object(forKey: key) {
+                    // Preserve saved status from existing item
+                    itemToSave = FeedItem(
+                        id: item.id,
+                        title: item.title,
+                        url: item.url,
+                        source: item.source,
+                        updated: item.updated,
+                        isoDate: item.isoDate,
+                        feedts: item.feedts,
+                        content: item.content,
+                        tags: item.tags,
+                        score: item.score,
+                        interactions: item.interactions,
+                        aiSummary: item.aiSummary,
+                        image: item.image,
+                        imageBytes: item.imageBytes,
+                        imageLoadingState: item.imageLoadingState,
+                        saved: existingItem.saved
+                    )
                 }
-                sqlite3_reset(stmt)
-                sqlite3_clear_bindings(stmt)
+                
+                try? storage.setObject(itemToSave, forKey: key)
+                allIds.insert(item.id)
             }
-            sqlite3_exec(db, "COMMIT", nil, nil, nil)
+            
+            // Save updated IDs list
+            try? stringStorage.setObject(allIds, forKey: "all_item_ids")
         }
     }
-
-    private func bind(item: FeedItem, to stmt: OpaquePointer?) {
-        // id
-        sqlite3_bind_int64(stmt, 1, item.id)
-        // title
-        sqlite3_bind_text(stmt, 2, item.title, -1, SQLITE_TRANSIENT)
-        // url
-        sqlite3_bind_text(stmt, 3, item.url, -1, SQLITE_TRANSIENT)
-        // source (store raw string)
-        sqlite3_bind_text(stmt, 4, item.source.rawValue, -1, SQLITE_TRANSIENT)
-        // updated
-        sqlite3_bind_int64(stmt, 5, item.updated)
-        // iso_date
-        sqlite3_bind_text(stmt, 6, item.isoDate, -1, SQLITE_TRANSIENT)
-        // feedts
-        if let v = item.feedts { sqlite3_bind_int64(stmt, 7, v) } else { sqlite3_bind_null(stmt, 7) }
-        // content
-        if let v = item.content { sqlite3_bind_text(stmt, 8, v, -1, SQLITE_TRANSIENT) } else { sqlite3_bind_null(stmt, 8) }
-        // tags as JSON
-        if let data = try? JSONEncoder().encode(item.tags), let json = String(data: data, encoding: .utf8) {
-            sqlite3_bind_text(stmt, 9, json, -1, SQLITE_TRANSIENT)
-        } else {
-            sqlite3_bind_text(stmt, 9, "[]", -1, SQLITE_TRANSIENT)
-        }
-        // score
-        sqlite3_bind_int64(stmt, 10, Int64(item.score))
-        // interactions as JSON
-        if let data = try? JSONEncoder().encode(item.interactions), let json = String(data: data, encoding: .utf8) {
-            sqlite3_bind_text(stmt, 11, json, -1, SQLITE_TRANSIENT)
-        } else {
-            let fallback = try? JSONEncoder().encode(InteractionData(feedid: item.id))
-            let json = fallback.flatMap { String(data: $0, encoding: .utf8) } ?? "{\"feedid\":0}"
-            sqlite3_bind_text(stmt, 11, json, -1, SQLITE_TRANSIENT)
-        }
-        // ai_summary
-        if let v = item.aiSummary { sqlite3_bind_text(stmt, 12, v, -1, SQLITE_TRANSIENT) } else { sqlite3_bind_null(stmt, 12) }
-        // image URL
-        if let v = item.image { sqlite3_bind_text(stmt, 13, v, -1, SQLITE_TRANSIENT) } else { sqlite3_bind_null(stmt, 13) }
-        // image bytes
-        if let data = item.imageBytes {
-            data.withUnsafeBytes { buf in
-                _ = sqlite3_bind_blob(stmt, 14, buf.baseAddress, Int32(buf.count), SQLITE_TRANSIENT)
-            }
-        } else {
-            sqlite3_bind_null(stmt, 14)
-        }
-        // image state as raw string
-        sqlite3_bind_text(stmt, 15, item.imageLoadingState.rawValue, -1, SQLITE_TRANSIENT)
-        // saved as 0/1
-        let savedValue: Int32 = item.saved ? 1 : 0
-        sqlite3_bind_int(stmt, 16, savedValue)
-    }
-
+    
     func upsertImage(for id: Int64, data: Data?, state: ImageLoadingState) {
         queue.sync {
-            let sql = "UPDATE feed_items SET image_bytes = ?, image_state = ? WHERE id = ?;"
-            var stmt: OpaquePointer?
-            if sqlite3_prepare_v2(db, sql, -1, &stmt, nil) != SQLITE_OK {
-                print("❌ FeedCacheStore: failed to prepare upsertImage")
-                return
-            }
-            defer { sqlite3_finalize(stmt) }
-            if let data = data {
-                data.withUnsafeBytes { buf in
-                    _ = sqlite3_bind_blob(stmt, 1, buf.baseAddress, Int32(buf.count), SQLITE_TRANSIENT)
-                }
-            } else {
-                sqlite3_bind_null(stmt, 1)
-            }
-            sqlite3_bind_text(stmt, 2, state.rawValue, -1, SQLITE_TRANSIENT)
-            sqlite3_bind_int64(stmt, 3, id)
-            if sqlite3_step(stmt) != SQLITE_DONE {
-                print("❌ FeedCacheStore: upsertImage failed for id \(id)")
-            }
+            guard let storage = storage else { return }
+            
+            let key = String(id)
+            
+            // Load existing item
+            guard var item = try? storage.object(forKey: key) else { return }
+            
+            // Update image data and state
+            item.imageBytes = data
+            item.imageLoadingState = state
+            
+            // Save updated item
+            try? storage.setObject(item, forKey: key)
         }
     }
-
+    
     func updateSaved(for id: Int64, saved: Bool) {
         queue.sync {
-            let sql = "UPDATE feed_items SET saved = ? WHERE id = ?;"
-            var stmt: OpaquePointer?
-            if sqlite3_prepare_v2(db, sql, -1, &stmt, nil) != SQLITE_OK {
-                print("❌ FeedCacheStore: failed to prepare updateSaved")
-                return
+            guard let storage = storage else { return }
+            
+            let key = String(id)
+            
+            // Load existing item
+            guard var item = try? storage.object(forKey: key) else { return }
+            
+            // Update saved status
+            item.saved = saved
+            
+            // Save updated item
+            try? storage.setObject(item, forKey: key)
+            
+            // Update saved IDs set
+            if saved {
+                savedItemIds.insert(id)
+            } else {
+                savedItemIds.remove(id)
             }
-            defer { sqlite3_finalize(stmt) }
-            sqlite3_bind_int(stmt, 1, saved ? 1 : 0)
-            sqlite3_bind_int64(stmt, 2, id)
-            if sqlite3_step(stmt) != SQLITE_DONE {
-                print("❌ FeedCacheStore: updateSaved failed for id \(id)")
-            }
+            
+            saveSavedItemIds()
         }
     }
-
+    
     func clearAll() {
         queue.sync {
-            _ = execute(sql: "DELETE FROM feed_items;")
+            guard let storage = storage else { return }
+            try? storage.removeAll()
+            savedItemIds.removeAll()
+            saveSavedItemIds()
         }
     }
     
     func clearOldCache() {
-        queue.sync { [weak self] in
-            guard let self = self else { return }
+        queue.sync {
+            guard let storage = storage else { return }
+            
             let twoDaysAgo = Int64(Date().addingTimeInterval(-2 * 24 * 60 * 60).timeIntervalSince1970)
-            let sql = "DELETE FROM feed_items WHERE feedts IS NOT NULL AND feedts < ? AND saved = 0;"
-            var stmt: OpaquePointer?
-            if sqlite3_prepare_v2(self.db, sql, -1, &stmt, nil) == SQLITE_OK {
-                defer { sqlite3_finalize(stmt) }
-                sqlite3_bind_int64(stmt, 1, twoDaysAgo)
-                if sqlite3_step(stmt) != SQLITE_DONE {
-                    print("❌ FeedCacheStore: clearOldCache failed")
+            
+            // Load all IDs
+            let stringStorage = storage.transformCodable(ofType: Set<Int64>.self)
+            guard var allIds = try? stringStorage.object(forKey: "all_item_ids") else { return }
+            
+            var idsToRemove: [Int64] = []
+            
+            for id in allIds {
+                let key = String(id)
+                if let item = try? storage.object(forKey: key) {
+                    // Remove if older than 2 days and not saved
+                    if let feedts = item.feedts, feedts < twoDaysAgo, !item.saved {
+                        try? storage.removeObject(forKey: key)
+                        idsToRemove.append(id)
+                    }
                 }
-            } else {
-                print("❌ FeedCacheStore: failed to prepare clearOldCache")
             }
+            
+            // Update IDs list
+            for id in idsToRemove {
+                allIds.remove(id)
+            }
+            try? stringStorage.setObject(allIds, forKey: "all_item_ids")
         }
     }
 }
-
-// Provide SQLITE_TRANSIENT for blob/text binding lifecycle
-private let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
