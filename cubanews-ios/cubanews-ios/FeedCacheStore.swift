@@ -303,8 +303,17 @@ final class FeedCacheStore {
         queue.async { [weak self] in
             guard let self = self else { return }
             let twoDaysAgo = Int64(Date().addingTimeInterval(-2 * 24 * 60 * 60).timeIntervalSince1970)
-            let sql = "DELETE FROM feed_items WHERE feedts IS NOT NULL AND feedts < \(twoDaysAgo);"
-            _ = self.execute(sql: sql)
+            let sql = "DELETE FROM feed_items WHERE feedts IS NOT NULL AND feedts < ?;"
+            var stmt: OpaquePointer?
+            if sqlite3_prepare_v2(self.db, sql, -1, &stmt, nil) == SQLITE_OK {
+                defer { sqlite3_finalize(stmt) }
+                sqlite3_bind_int64(stmt, 1, twoDaysAgo)
+                if sqlite3_step(stmt) != SQLITE_DONE {
+                    print("❌ FeedCacheStore: clearOldCache failed")
+                }
+            } else {
+                print("❌ FeedCacheStore: failed to prepare clearOldCache")
+            }
         }
     }
 }
