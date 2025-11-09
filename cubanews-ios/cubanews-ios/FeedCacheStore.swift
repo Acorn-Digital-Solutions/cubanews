@@ -282,7 +282,7 @@ final class FeedCacheStore {
     }
     
     func clearOldCache() {
-        queue.async { [weak self] in
+        queue.sync { [weak self] in
             guard let self = self else { return }
             let twoDaysAgo = Int64(Date().addingTimeInterval(-2 * 24 * 60 * 60).timeIntervalSince1970)
             let sql = "DELETE FROM feed_items WHERE feedts IS NOT NULL AND feedts < ?;"
