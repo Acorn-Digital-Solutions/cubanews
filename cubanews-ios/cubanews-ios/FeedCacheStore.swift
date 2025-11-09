@@ -72,16 +72,7 @@ final class FeedCacheStore {
         let sql = "SELECT id, title, url, source, updated, iso_date, feedts, content, tags, score, interactions_json, ai_summary, image, image_bytes, image_state, saved FROM feed_items WHERE saved=1"
         return queue.sync {
             let items = self.load(sql: sql)
-            var seen = Set<Int64>()
-            let unique = items.filter { item in
-                if seen.contains(item.id) {
-                    return false
-                } else {
-                    seen.insert(item.id)
-                    return true
-                }
-            }
-            return unique
+            return items.removingDuplicates()
         }
     }
 
@@ -90,16 +81,7 @@ final class FeedCacheStore {
         let sql = "SELECT id, title, url, source, updated, iso_date, feedts, content, tags, score, interactions_json, ai_summary, image, image_bytes, image_state, saved FROM feed_items"
         return queue.sync {
             let items = self.load(sql: sql)
-            var seen = Set<Int64>()
-            let unique = items.filter { item in
-                if seen.contains(item.id) {
-                    return false
-                } else {
-                    seen.insert(item.id)
-                    return true
-                }
-            }
-            return unique
+            return items.removingDuplicates()
         }
     }
     
