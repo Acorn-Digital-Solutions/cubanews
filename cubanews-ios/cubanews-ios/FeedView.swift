@@ -61,19 +61,12 @@ class FeedViewModel: ObservableObject {
             let newItems = decoded.content.feed
             
             if !newItems.isEmpty {
-                let combined = items + newItems
-                var seen = Set<Int64>()
-                self.items = combined.filter { item in
-                    if seen.contains(item.id) {
-                        return false
-                    } else {
-                        seen.insert(item.id)
-                        return true
-                    }
-                }
+                let existingIds = Set(items.map { $0.id })
+                let uniqueNewItems = newItems.filter { !existingIds.contains($0.id) }
+                self.items.append(contentsOf: uniqueNewItems)
                 currentPage += 1
                 // Persist/merge the new items locally in SQLite
-                cacheStore?.upsertMany(newItems)
+                cacheStore?.upsertMany(uniqueNewItems)
             }
             newItems.forEach { fetchImage(feedItem: $0) }
             
