@@ -59,9 +59,9 @@ class FeedViewModel: ObservableObject {
             
             let decoded = try decoder.decode(FeedResponse.self, from: data)
             let newItems = decoded.content.feed
-            
+            let existingIds = Set(items.map { $0.id })
+            let uniqueNewItems = newItems.filter { !existingIds.contains($0.id) }
             if !newItems.isEmpty {
-                let existingIds = Set(items.map { $0.id })
                 let uniqueNewItems = newItems.filter { !existingIds.contains($0.id) }
                 self.items.append(contentsOf: uniqueNewItems)
                 currentPage += 1
