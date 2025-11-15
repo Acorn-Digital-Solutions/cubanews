@@ -15,6 +15,7 @@
 		1FF5F5F62EA40A7C001C9A75 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5F52EA40A7C001C9A75 /* FirebaseCrashlytics */; };
 		1FF5F5F82EA40A7C001C9A75 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5F72EA40A7C001C9A75 /* FirebaseFirestore */; };
 		1FF5F5FA2EA40A7C001C9A75 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5F92EA40A7C001C9A75 /* FirebaseStorage */; };
+		1FF5F5FB2EA40A7D001C9A75 /* Cache in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5FC2EA40A7D001C9A75 /* Cache */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +72,7 @@
 				1FF5F5FA2EA40A7C001C9A75 /* FirebaseStorage in Frameworks */,
 				1FF5F5F22EA40A7C001C9A75 /* FirebaseAuth in Frameworks */,
 				1FF5F5F82EA40A7C001C9A75 /* FirebaseFirestore in Frameworks */,
+				1FF5F5FB2EA40A7D001C9A75 /* Cache in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -139,6 +141,7 @@
 				1FF5F5F52EA40A7C001C9A75 /* FirebaseCrashlytics */,
 				1FF5F5F72EA40A7C001C9A75 /* FirebaseFirestore */,
 				1FF5F5F92EA40A7C001C9A75 /* FirebaseStorage */,
+				1FF5F5FC2EA40A7D001C9A75 /* Cache */,
 			);
 			productName = "cubanews-ios";
 			productReference = 1FF5F5A72E9C245A001C9A75 /* cubanews-ios.app */;
@@ -224,6 +227,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				1FF5F5FD2EA40A7D001C9A75 /* XCRemoteSwiftPackageReference "Cache" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1FF5F5A82E9C245A001C9A75 /* Products */;
@@ -638,6 +642,14 @@
 				minimumVersion = 12.4.0;
 			};
 		};
+		1FF5F5FD2EA40A7D001C9A75 /* XCRemoteSwiftPackageReference "Cache" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hyperoslo/Cache.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -680,6 +692,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		1FF5F5FC2EA40A7D001C9A75 /* Cache */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1FF5F5FD2EA40A7D001C9A75 /* XCRemoteSwiftPackageReference "Cache" */;
+			productName = Cache;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

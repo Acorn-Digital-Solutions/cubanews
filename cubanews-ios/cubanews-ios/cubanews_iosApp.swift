@@ -19,12 +19,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct cubanews_iosApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject private var savedItemsManager = SavedItemsManager()
+    @StateObject private var cubanewsViewModel = CubanewsViewModel.shared
     
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(savedItemsManager)
+                .environmentObject(cubanewsViewModel)
         }
     }
 }

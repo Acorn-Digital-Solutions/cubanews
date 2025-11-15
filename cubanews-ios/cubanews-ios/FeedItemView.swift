@@ -23,8 +23,13 @@ struct ShareSheet: UIViewControllerRepresentable {
 struct FeedItemView: View {
     let item: FeedItem
     @Environment(\.openURL) var openURL
-    @EnvironmentObject var savedItemsManager: SavedItemsManager
     @State private var showingShareSheet = false
+    private var cubanewsViewModel = CubanewsViewModel.shared
+
+    // Make the initializer explicit and internal so it's accessible from other views
+    init(item: FeedItem) {
+        self.item = item
+    }
 
     private static let iso8601DateFormatter: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
@@ -108,11 +113,11 @@ struct FeedItemView: View {
 
                 // Save button
                 Button(action: {
-                    savedItemsManager.toggleSaved(for: item.id)
+                    cubanewsViewModel.toogleSaved(for: item.id)
                 }) {
-                    Image(systemName: savedItemsManager.isSaved(item.id) ? "bookmark.fill" : "bookmark")
+                    Image(systemName: cubanewsViewModel.isSaved(item.id) ? "bookmark.fill" : "bookmark")
                         .font(.system(size: 20))
-                        .foregroundColor(savedItemsManager.isSaved(item.id) ? .accentColor : .secondary)
+                        .foregroundColor(cubanewsViewModel.isSaved(item.id) ? .accentColor : .secondary)
                 }
                 .buttonStyle(.plain)
 
@@ -140,4 +145,3 @@ struct FeedItemView: View {
         .shadow(color: Color.black.opacity(0.2), radius: 1, x: 0, y: 1)
     }
 }
-
