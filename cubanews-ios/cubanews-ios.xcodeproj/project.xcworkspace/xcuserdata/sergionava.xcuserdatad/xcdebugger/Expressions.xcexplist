@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "closure #1 in FeedCacheStore.upsertMany(_:):FeedCacheStore.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "storage.object(forKey: key)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in FeedCacheStore.loadAll():FeedCacheStore.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "storage.allKeys">
+            </PersistentString>
+            <PersistentString
+               value = "storage.existsObject(forKey: &quot;all_item_ids&quot;)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "FeedViewModel.primeFromCache():FeedView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.items">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
