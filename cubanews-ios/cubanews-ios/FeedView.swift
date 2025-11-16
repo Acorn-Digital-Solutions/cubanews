@@ -8,9 +8,11 @@
 import SwiftUI
 import Combine
 
+@available(iOS 17, *)
 struct FeedView: View {
     @ObservedObject private var viewModel = CubanewsViewModel.shared
 
+    @available(iOS 17, *)
     private var content: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
