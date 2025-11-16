@@ -20,6 +20,7 @@ struct ShareSheet: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
+@available(iOS 17, *)
 struct FeedItemView: View {
     let item: FeedItem
     @Environment(\.openURL) var openURL

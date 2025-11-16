@@ -7,6 +7,7 @@
 import SwiftUI
 import Combine
 
+@available(iOS 17, *)
 @MainActor
 class SavedStoriesViewModel: ObservableObject {
     @Published var items: [FeedItem] = []
@@ -22,6 +23,7 @@ class SavedStoriesViewModel: ObservableObject {
     }
 }
 
+@available(iOS 17, *)
 struct SavedStoriesView: View {
     @StateObject private var viewModel = SavedStoriesViewModel()
     @ObservedObject private var cubanewsViewModel = CubanewsViewModel.shared

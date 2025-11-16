@@ -6,6 +6,7 @@
 
 import SwiftUI
 
+@available(iOS 17, *)
 struct ContentView: View {
     var body: some View {
             TabView {
@@ -27,5 +28,9 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    if #available(iOS 17, *) {
+        ContentView()
+    } else {
+        // Fallback on earlier versions
+    }
 }

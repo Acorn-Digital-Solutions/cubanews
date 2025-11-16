@@ -6,6 +6,7 @@
 import SwiftUI
 import FirebaseCore
 import FirebaseStorage
+import SwiftData
 
 class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
@@ -16,6 +17,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
   }
 }
 
+@available(iOS 17, *)
 @main
 struct cubanews_iosApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
@@ -24,7 +26,9 @@ struct cubanews_iosApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(cubanewsViewModel)
+                .environmentObject(cubanewsViewModel).modelContainer(for: [
+                    SavedItem.self
+                ])
         }
     }
 }
