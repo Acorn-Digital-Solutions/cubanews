@@ -38,18 +38,29 @@ struct FeedView: View {
         return calendar.isDateInToday(itemDate)
     }
     
-    // Separate items into today and older
-    private var todayItems: [FeedItem] {
-        viewModel.allItems.filter { isFromToday($0) }
-    }
-    
-    private var olderItems: [FeedItem] {
-        viewModel.allItems.filter { !isFromToday($0) }
+    // Separate items into today and older with memoization
+    private func separateItems() -> (today: [FeedItem], older: [FeedItem]) {
+        var todayItems: [FeedItem] = []
+        var olderItems: [FeedItem] = []
+        
+        for item in viewModel.allItems {
+            if isFromToday(item) {
+                todayItems.append(item)
+            } else {
+                olderItems.append(item)
+            }
+        }
+        
+        return (todayItems, olderItems)
     }
 
     @available(iOS 17, *)
     private var content: some View {
-        ScrollView {
+        let separated = separateItems()
+        let todayItems = separated.today
+        let olderItems = separated.older
+        
+        return ScrollView {
             LazyVStack(spacing: 12) {
                 // Today's date header
                 Text(formatTodayInSpanish())
@@ -74,7 +85,7 @@ struct FeedView: View {
                 
                 // Separator header if there are older items
                 if !olderItems.isEmpty {
-                    Text("Mas Noticias:")
+                    Text("Más Noticias:")
                         .font(.title2)
                         .fontWeight(.bold)
                         .frame(maxWidth: .infinity, alignment: .leading)
