@@ -19,7 +19,7 @@ struct ContentView: View {
                     Label("Saved", systemImage: "bookmark.fill")
                 }
 
-                Text("Profile")
+                ProfileView()
                     .tabItem {
                         Label("Profile", systemImage: "person.fill")
                     }
