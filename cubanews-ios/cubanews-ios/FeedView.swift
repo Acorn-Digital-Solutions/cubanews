@@ -75,8 +75,8 @@ struct FeedView: View {
                     FeedItemView(item: item)
                         .padding(.horizontal)
                         .onAppear {
-                            // Trigger pagination if this is the last item overall
-                            if item == viewModel.allItems.last {
+                            // Trigger pagination when reaching the last item in this section
+                            if item == todayItems.last {
                                 Task {
                                     await viewModel.fetchFeedItems()
                                 }
@@ -99,8 +99,8 @@ struct FeedView: View {
                     FeedItemView(item: item)
                         .padding(.horizontal)
                         .onAppear {
-                            // Trigger pagination if this is the last item in older items or overall
-                            if item == olderItems.last || item == viewModel.allItems.last {
+                            // Trigger pagination when reaching the last item in this section
+                            if item == olderItems.last {
                                 Task {
                                     await viewModel.fetchFeedItems()
                                 }
