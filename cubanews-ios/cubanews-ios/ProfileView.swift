@@ -105,6 +105,11 @@ struct ProfileView: View {
         if let userPrefs = preferences.first {
             userPrefs.preferredPublications = Array(selectedPublications)
             try? modelContext.save()
+        } else {
+            // Create new preferences if none exist
+            let newPrefs = UserPreferences(preferredPublications: Array(selectedPublications))
+            modelContext.insert(newPrefs)
+            try? modelContext.save()
         }
     }
 }
