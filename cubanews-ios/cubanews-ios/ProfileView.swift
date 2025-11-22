@@ -61,6 +61,12 @@ struct ProfileView: View {
                             .padding(.horizontal)
                         }
                         .padding(.bottom, 20)
+                        
+                        Divider()
+                        
+                        // Account Management Section
+                        ManageAccountSection()
+                            .padding(.bottom, 20)
                     }
                 }
                 
@@ -140,6 +146,72 @@ struct PreferenceCheckboxRow: View {
         }
         .buttonStyle(PlainButtonStyle())
         .padding(.vertical, 4)
+    }
+}
+
+struct ManageAccountSection: View {
+    @State private var showingDeleteAlert = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Cuenta")
+                .font(.headline)
+                .padding(.horizontal)
+            
+            VStack(spacing: 12) {
+                // Logout Button
+                Button(action: handleLogout) {
+                    Text("Cerrar Sesión")
+                        .font(.body)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.blue)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.blue, lineWidth: 2)
+                        )
+                }
+                .padding(.horizontal)
+                
+                // Delete Account Button
+                Button(action: {
+                    showingDeleteAlert = true
+                }) {
+                    Text("Eliminar Cuenta")
+                        .font(.body)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.red)
+                        )
+                }
+                .padding(.horizontal)
+            }
+        }
+        .alert("¿Eliminar Cuenta?", isPresented: $showingDeleteAlert) {
+            Button("Cancelar", role: .cancel) { }
+            Button("Eliminar", role: .destructive) {
+                handleDeleteAccount()
+            }
+        } message: {
+            Text("Esta acción no se puede deshacer. Todos tus datos serán eliminados permanentemente.")
+        }
+    }
+    
+    private func handleLogout() {
+        // TODO: Implement logout logic
+        // Clear user session, navigate to login screen, etc.
+        print("Logout button tapped")
+    }
+    
+    private func handleDeleteAccount() {
+        // TODO: Implement delete account logic
+        // Delete user data from SwiftData and backend
+        print("Delete account confirmed")
     }
 }
 
