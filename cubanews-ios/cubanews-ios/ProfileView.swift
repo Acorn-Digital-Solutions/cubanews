@@ -205,13 +205,13 @@ struct ManageAccountSection: View {
     private func handleLogout() {
         // TODO: Implement logout logic
         // Clear user session, navigate to login screen, etc.
-        print("Logout button tapped")
+        NSLog("Logout button tapped")
     }
     
     private func handleDeleteAccount() {
         // TODO: Implement delete account logic
         // Delete user data from SwiftData and backend
-        print("Delete account confirmed")
+        NSLog("Delete account confirmed")
     }
 }
 
