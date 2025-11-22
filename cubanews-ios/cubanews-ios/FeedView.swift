@@ -38,7 +38,7 @@ struct FeedView: View {
         return calendar.isDateInToday(itemDate)
     }
     
-    // Separate items into today and older with memoization
+    // Separate items into today and older in a single pass
     private func separateItems() -> (today: [FeedItem], older: [FeedItem]) {
         var todayItems: [FeedItem] = []
         var olderItems: [FeedItem] = []
@@ -75,6 +75,7 @@ struct FeedView: View {
                     FeedItemView(item: item)
                         .padding(.horizontal)
                         .onAppear {
+                            // Trigger pagination if this is the last item overall
                             if item == viewModel.allItems.last {
                                 Task {
                                     await viewModel.fetchFeedItems()
@@ -98,7 +99,8 @@ struct FeedView: View {
                     FeedItemView(item: item)
                         .padding(.horizontal)
                         .onAppear {
-                            if item == viewModel.allItems.last {
+                            // Trigger pagination if this is the last item in older items or overall
+                            if item == olderItems.last || item == viewModel.allItems.last {
                                 Task {
                                     await viewModel.fetchFeedItems()
                                 }
