@@ -112,7 +112,7 @@ final class CubanewsViewModel: ObservableObject {
         return latestNews + moreNews
     }
 
-    func toogleSaved(for itemId: Int64) {
+    func toggleSaved(for itemId: Int64) {
 
         if savedItemIds.contains(itemId) {
             savedItemIds.remove(itemId)
