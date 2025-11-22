@@ -22,13 +22,18 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct cubanews_iosApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var cubanewsViewModel = CubanewsViewModel.shared
+    @State private var isAuthenticated = false
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(cubanewsViewModel).modelContainer(for: [
-                    SavedItem.self
-                ])
+            if isAuthenticated {
+                ContentView()
+                    .environmentObject(cubanewsViewModel).modelContainer(for: [
+                        SavedItem.self
+                    ])
+            } else {
+                LoginView(isAuthenticated: $isAuthenticated)
+            }
         }
     }
 }
