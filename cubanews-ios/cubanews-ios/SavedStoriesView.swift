@@ -16,10 +16,11 @@ class SavedStoriesViewModel: ObservableObject {
     private var cubanewsViewModel = CubanewsViewModel.shared
 
     func loadSavedItems() -> Void {
-        let newItems = cubanewsViewModel.allItems.filter { cubanewsViewModel.savedItemIds.contains($0.id) }
+        let allItems = cubanewsViewModel.getAllItems()
+        let newItems = allItems.filter { cubanewsViewModel.savedItemIds.contains($0.id) }
         let newItemIds = newItems.map { $0.id }
         print("➡️ New Items ids: \(newItemIds)")
-        items = cubanewsViewModel.allItems.filter { cubanewsViewModel.savedItemIds.contains($0.id) }
+        items = allItems.filter { cubanewsViewModel.savedItemIds.contains($0.id) }
     }
 }
 

@@ -88,7 +88,8 @@ final class CubanewsViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var savedItemIds: Set<Int64> = []
     @Published var allItemsIds: Set<Int64> = []
-    @Published var allItems: [FeedItem] = []
+    @Published var latestNews: [FeedItem] = []
+    @Published var moreNews: [FeedItem] = []
 
     private let modelContext: ModelContext
 
@@ -106,8 +107,12 @@ final class CubanewsViewModel: ObservableObject {
         let items = (try? modelContext.fetch(FetchDescriptor<SavedItem>())) ?? []
         savedItemIds = Set(items.map { $0.id })
     }
+    
+    func getAllItems() -> [FeedItem] {
+        return latestNews + moreNews
+    }
 
-    func toogleSaved(for itemId: Int64) {
+    func toggleSaved(for itemId: Int64) {
 
         if savedItemIds.contains(itemId) {
             savedItemIds.remove(itemId)
@@ -167,7 +172,11 @@ final class CubanewsViewModel: ObservableObject {
             let newItems = decoded.content.feed.filter { !self.allItemsIds.contains($0.id) }
             if !newItems.isEmpty {
                 self.allItemsIds.formUnion(newItems.map { $0.id })
-                self.allItems.append(contentsOf: newItems)
+                if (currentPage == 1) {
+                    self.latestNews.append(contentsOf: newItems)
+                } else {
+                    self.moreNews.append(contentsOf: newItems)
+                }
                 currentPage += 1
             }
             newItems.forEach { fetchImage(feedItem: $0) }
@@ -209,11 +218,18 @@ final class CubanewsViewModel: ObservableObject {
     }
 
     private func updateImageState(for id: Int64, data: Data?, state: ImageLoadingState) {
-        if let index = allItems.firstIndex(where: { $0.id == id }) {
-            var item = allItems[index]
+        if let index = self.latestNews.firstIndex(where: { $0.id == id }) {
+            var item = self.latestNews[index]
             item.imageBytes = data
             item.imageLoadingState = state
-            allItems[index] = item
+            self.latestNews[index] = item
+        }
+        
+        if let index = self.moreNews.firstIndex(where: { $0.id == id }) {
+            var item = self.moreNews[index]
+            item.imageBytes = data
+            item.imageLoadingState = state
+            self.moreNews[index] = item
         }
     }
 

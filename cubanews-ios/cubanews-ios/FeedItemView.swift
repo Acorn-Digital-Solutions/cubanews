@@ -114,7 +114,7 @@ struct FeedItemView: View {
 
                 // Save button
                 Button(action: {
-                    cubanewsViewModel.toogleSaved(for: item.id)
+                    cubanewsViewModel.toggleSaved(for: item.id)
                 }) {
                     Image(systemName: cubanewsViewModel.isSaved(item.id) ? "bookmark.fill" : "bookmark")
                         .font(.system(size: 20))

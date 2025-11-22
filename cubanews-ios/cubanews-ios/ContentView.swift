@@ -12,16 +12,16 @@ struct ContentView: View {
             TabView {
                 FeedView()
                     .tabItem {
-                        Label("Home", systemImage: "house.fill")
+                        Label("Titulares", systemImage: "house.fill")
                     }
                 
                 SavedStoriesView().tabItem {
-                    Label("Saved", systemImage: "bookmark.fill")
+                    Label("Guardados", systemImage: "bookmark.fill")
                 }
 
                 ProfileView()
                     .tabItem {
-                        Label("Profile", systemImage: "person.fill")
+                        Label("Perfil", systemImage: "person.fill")
                     }
             }
         }
