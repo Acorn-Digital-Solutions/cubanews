@@ -17,65 +17,69 @@ struct ProfileView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    // User name at the top
-                    VStack(alignment: .center, spacing: 8) {
-                        Image(systemName: "person.circle.fill")
-                            .font(.system(size: 80))
-                            .foregroundColor(.blue)
-                        
-                        Text("User")
-                            .font(.title)
-                            .fontWeight(.bold)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 20)
-                    
-                    Divider()
-                    
-                    // Preferences Section
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Preferred Publications")
-                            .font(.headline)
-                            .padding(.horizontal)
-                        
-                        Text("Select your preferred news sources to personalize your feed")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                            .padding(.horizontal)
-                        
-                        VStack(alignment: .leading, spacing: 12) {
-                            ForEach(publications, id: \.self) { publication in
-                                PreferenceCheckboxRow(
-                                    publication: publication,
-                                    isSelected: selectedPublications.contains(publication),
-                                    onToggle: {
-                                        togglePreference(publication)
-                                    }
-                                )
-                            }
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        // User name at the top
+                        HStack(spacing: 16) {
+                            Image(systemName: "person.circle.fill")
+                                .font(.system(size: 40))
+                                .foregroundColor(.blue)
+                            
+                            Text("User")
+                                .font(.title)
+                                .fontWeight(.bold)
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
-                    }
-                    
-                    Spacer()
-                    
-                    // App version and copyright at the bottom
-                    VStack(spacing: 8) {
-                        Text("Version 0.0.1")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                        .padding(.top, 20)
                         
-                        Text("© Acorn Digital Solutions 2025")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                        Divider()
+                        
+                        // Preferences Section
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Preferencias")
+                                .font(.headline)
+                                .padding(.horizontal)
+                            
+                            Text("Selecciona tus fuentes de noticias preferidas para personalizar tu feed")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .padding(.horizontal)
+                            
+                            VStack(alignment: .leading, spacing: 12) {
+                                ForEach(publications, id: \.self) { publication in
+                                    PreferenceCheckboxRow(
+                                        publication: publication,
+                                        isSelected: selectedPublications.contains(publication),
+                                        onToggle: {
+                                            togglePreference(publication)
+                                        }
+                                    )
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                        .padding(.bottom, 20)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.bottom, 20)
                 }
+                
+                Spacer()
+                
+                // App version and copyright at the bottom
+                VStack(spacing: 8) {
+                    Text("Version 0.0.1")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                    
+                    Text("© Acorn Digital Solutions 2025")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
+                .background(Color(UIColor.systemBackground))
             }
-            .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.large)
         }
         .onAppear {
