@@ -65,7 +65,7 @@ struct SavedStoriesView: View {
                 .task {
                     viewModel.loadSavedItems()
                 }
-                .onChange(of: cubanewsViewModel.savedItemIds) { _ in
+                .onChange(of: cubanewsViewModel.savedItemIds) { oldValue, newValue in
                     Task {
                         viewModel.loadSavedItems()
                     }
@@ -73,3 +73,4 @@ struct SavedStoriesView: View {
         }
     }
 }
+

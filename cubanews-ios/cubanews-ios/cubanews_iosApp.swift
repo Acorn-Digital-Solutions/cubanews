@@ -29,7 +29,8 @@ struct cubanews_iosApp: App {
             if isAuthenticated {
                 ContentView()
                     .environmentObject(cubanewsViewModel).modelContainer(for: [
-                        SavedItem.self
+                        SavedItem.self,
+                        UserPreferences.self
                     ])
             } else {
                 LoginView(isAuthenticated: $isAuthenticated)
