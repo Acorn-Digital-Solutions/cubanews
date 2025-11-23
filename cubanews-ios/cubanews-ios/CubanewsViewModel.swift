@@ -85,7 +85,7 @@ final class CubanewsViewModel: ObservableObject {
     private static let sharedModelContainer: ModelContainer = {
         do {
             // ModelContainer initializer takes variadic model types; pass the type directly.
-            let schema = Schema([SavedItem.self, CachedFeedItem.self])
+            let schema = Schema([SavedItem.self, CachedFeedItem.self, UserPreferences.self])
             return try ModelContainer(for: schema)
         } catch {
             fatalError("Failed to create ModelContainer for SavedItem: \(error)")
