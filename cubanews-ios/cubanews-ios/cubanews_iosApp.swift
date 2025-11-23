@@ -61,7 +61,6 @@ struct cubanews_iosApp: App {
                         User.self,
                         CachedFeedItem.self
                     ])
-                
             } else {
                 LoginView(authManager: authManager, isAuthenticated: $authManager.isAuthenticated)
             }
