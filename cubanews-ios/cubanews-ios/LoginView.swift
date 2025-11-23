@@ -4,9 +4,11 @@
 //
 
 import SwiftUI
+import AuthenticationServices
 
 @available(iOS 17, *)
 struct LoginView: View {
+    @ObservedObject var authManager: AuthenticationManager
     @Binding var isAuthenticated: Bool
     
     var body: some View {
@@ -26,9 +28,23 @@ struct LoginView: View {
             
             // Login Buttons
             VStack(spacing: 16) {
-                // Google Login Button
+                // Apple Sign In Button (Native)
+                SignInWithAppleButton(
+                    onRequest: { request in
+                        request.requestedScopes = [.email, .fullName]
+                    },
+                    onCompletion: { result in
+                        handleSignInWithApple(result)
+                    }
+                )
+                .signInWithAppleButtonStyle(.black)
+                .frame(height: 50)
+                .cornerRadius(10)
+                
+                // Google Login Button (Placeholder)
                 Button(action: {
-                    // Mock login - just set authenticated to true
+                    // TODO: Implement Google Sign In
+                    // Placeholder - Mock login for now
                     isAuthenticated = true
                 }) {
                     HStack {
@@ -48,27 +64,10 @@ struct LoginView: View {
                     )
                 }
                 
-                // Apple Login Button
+                // Facebook Login Button (Placeholder)
                 Button(action: {
-                    // Mock login - just set authenticated to true
-                    isAuthenticated = true
-                }) {
-                    HStack {
-                        Image(systemName: "apple.logo")
-                            .font(.title2)
-                        Text("Continue with Apple")
-                            .fontWeight(.semibold)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.black)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                }
-                
-                // Facebook Login Button
-                Button(action: {
-                    // Mock login - just set authenticated to true
+                    // TODO: Implement Facebook Sign In
+                    // Placeholder - Mock login for now
                     isAuthenticated = true
                 }) {
                     HStack {
@@ -90,10 +89,43 @@ struct LoginView: View {
         }
         .background(Color(.systemBackground))
     }
+    
+    // MARK: - Sign in with Apple Handler
+    private func handleSignInWithApple(_ result: Result<ASAuthorization, Error>) {
+        switch result {
+        case .success(let authorization):
+            if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+                let userId = appleIDCredential.user
+                let email = appleIDCredential.email
+                let fullName = appleIDCredential.fullName
+                let identityToken = appleIDCredential.identityToken
+                let authorizationCode = appleIDCredential.authorizationCode
+                
+                authManager.handleSignInWithApple(
+                    userId: userId,
+                    email: email,
+                    fullName: fullName,
+                    identityToken: identityToken,
+                    authorizationCode: authorizationCode
+                )
+                
+                // Update authentication state
+                isAuthenticated = true
+            }
+            
+        case .failure(let error):
+            authManager.handleSignInFailure(error: error)
+        }
+    }
 }
 
 #Preview {
     if #available(iOS 17, *) {
-        LoginView(isAuthenticated: .constant(false))
+        // Create a preview model context
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try! ModelContainer(for: User.self, configurations: config)
+        let authManager = AuthenticationManager(modelContext: container.mainContext)
+        
+        LoginView(authManager: authManager, isAuthenticated: .constant(false))
     }
 }

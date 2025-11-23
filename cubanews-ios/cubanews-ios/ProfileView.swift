@@ -9,6 +9,7 @@ import SwiftData
 @available(iOS 17, *)
 struct ProfileView: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var authManager: AuthenticationManager
     @Query private var preferences: [UserPreferences]
     @State private var selectedPublications: Set<String> = []
     
@@ -49,15 +50,23 @@ struct ProfileView: View {
             VStack(spacing: 0) {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
-                        // User name at the top
+                        // User name at the top with real user data
                         HStack(spacing: 16) {
                             Image(systemName: "person.circle.fill")
                                 .font(.system(size: 40))
                                 .foregroundColor(.blue)
                             
-                            Text("User")
-                                .font(.title)
-                                .fontWeight(.bold)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(authManager.currentUser?.displayName ?? "User")
+                                    .font(.title)
+                                    .fontWeight(.bold)
+                                
+                                if let email = authManager.currentUser?.email {
+                                    Text(email)
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                }
+                            }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
@@ -112,7 +121,7 @@ struct ProfileView: View {
                         Divider()
                         
                         // Account Management Section
-                        ManageAccountSection()
+                        ManageAccountSection(authManager: authManager)
                             .padding(.bottom, 20)
                         
                         Spacer()
@@ -229,6 +238,7 @@ struct PreferencePillButton: View {
 }
 
 struct ManageAccountSection: View {
+    @ObservedObject var authManager: AuthenticationManager
     @State private var showingDeleteAlert = false
     
     var body: some View {
@@ -282,15 +292,40 @@ struct ManageAccountSection: View {
     }
     
     private func handleLogout() {
-        // TODO: Implement logout logic
-        // Clear user session, navigate to login screen, etc.
-        NSLog("Logout button tapped")
+        authManager.signOut()
+        NSLog("✅ User logged out successfully")
     }
     
     private func handleDeleteAccount() {
-        // TODO: Implement delete account logic
-        // Delete user data from SwiftData and backend
-        NSLog("Delete account confirmed")
+        authManager.deleteAccount()
+        NSLog("✅ User account deleted successfully")
     }
 }
 
+#Preview {
+    if #available(iOS 17, *) {
+        // Create a preview model context with sample data
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try! ModelContainer(
+            for: UserPreferences.self, SavedItem.self, User.self,
+            configurations: config
+        )
+        let authManager = AuthenticationManager(modelContext: container.mainContext)
+        
+        // Create a sample user for preview
+        let sampleUser = User(
+            id: "preview-user",
+            email: "user@example.com",
+            fullName: "Juan Pérez",
+            givenName: "Juan",
+            familyName: "Pérez"
+        )
+        container.mainContext.insert(sampleUser)
+        authManager.currentUser = sampleUser
+        authManager.isAuthenticated = true
+        
+        ProfileView()
+            .environmentObject(authManager)
+            .modelContainer(container)
+    }
+}
