@@ -123,8 +123,12 @@ class AuthenticationManager: ObservableObject {
         if let user = currentUser {
             // Delete user from SwiftData
             modelContext.delete(user)
-            try? modelContext.save()
-            NSLog("✅ User signed out and deleted from local storage")
+            do {
+                try modelContext.save()
+                NSLog("✅ User signed out and deleted from local storage")
+            } catch {
+                NSLog("❌ Failed to save after sign out: \(error.localizedDescription)")
+            }
         }
         
         self.currentUser = nil
@@ -135,8 +139,12 @@ class AuthenticationManager: ObservableObject {
     func deleteAccount() {
         if let user = currentUser {
             modelContext.delete(user)
-            try? modelContext.save()
-            NSLog("✅ User account deleted")
+            do {
+                try modelContext.save()
+                NSLog("✅ User account deleted")
+            } catch {
+                NSLog("❌ Failed to save after account deletion: \(error.localizedDescription)")
+            }
         }
         
         self.currentUser = nil
