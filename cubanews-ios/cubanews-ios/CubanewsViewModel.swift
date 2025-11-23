@@ -93,9 +93,12 @@ final class CubanewsViewModel: ObservableObject {
     // Singleton shared instance
     static let shared = CubanewsViewModel()
     let TAG = "CubanewsViewModel"
+    let TAG = "CubanewsViewModel"
     private static let sharedModelContainer: ModelContainer = {
         do {
             // ModelContainer initializer takes variadic model types; pass the type directly.
+            let schema = Schema([SavedItem.self, CachedFeedItem.self, UserPreferences.self])
+            return try ModelContainer(for: schema)
             let schema = Schema([SavedItem.self, CachedFeedItem.self, UserPreferences.self])
             return try ModelContainer(for: schema)
         } catch {
