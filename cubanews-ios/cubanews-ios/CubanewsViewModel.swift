@@ -156,11 +156,13 @@ final class CubanewsViewModel: ObservableObject {
     }
 
     func fetchFeedItems() async {
-        let cachedItems = fetchItemsFromCache()
-        NSLog("➡️ \(TAG): Cached items count: \(cachedItems.count)")
-        if (cachedItems.count > 0 && self.latestNews.isEmpty) {
-            NSLog("➡️ \(TAG): Filling latest news from cache")
-            self.latestNews = cachedItems
+        if self.latestNews.isEmpty {
+            let cachedItems = fetchItemsFromCache()
+            NSLog("➡️ \(TAG): Cached items count: \(cachedItems.count)")
+            if cachedItems.count > 0 {
+                NSLog("➡️ \(TAG): Filling latest news from cache")
+                self.latestNews = cachedItems
+            }
         }
         guard !isLoading else { return }
 
