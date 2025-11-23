@@ -203,12 +203,12 @@ final class CubanewsViewModel: ObservableObject {
                     for item in existingCachedItems {
                         modelContext.delete(item)
                     }
-                    try? modelContext.save()
-                    // Now, insert new cached items
+                    // Insert new cached items
                     for item in newItems {
                         let cachedItem = CachedFeedItem(feedItem: item)
                         modelContext.insert(cachedItem)
                     }
+                    // Perform a single save for all operations
                     try? modelContext.save()
                     
                 } else {
