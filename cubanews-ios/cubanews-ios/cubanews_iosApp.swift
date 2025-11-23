@@ -30,8 +30,10 @@ struct cubanews_iosApp: App {
                 ContentView()
                     .environmentObject(cubanewsViewModel).modelContainer(for: [
                         SavedItem.self,
-                        UserPreferences.self
+                        UserPreferences.self,
+                        CachedFeedItem.self
                     ])
+                
             } else {
                 LoginView(isAuthenticated: $isAuthenticated)
             }

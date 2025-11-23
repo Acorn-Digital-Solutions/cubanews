@@ -65,20 +65,30 @@ final class SavedItem {
 }
 
 @available(iOS 17, *)
+@Model
+final class CachedFeedItem {
+    @Attribute(.unique) var id: Int64
+    var feedItem: FeedItem
+    
+    init(feedItem: FeedItem) {
+        self.id = feedItem.id
+        self.feedItem = feedItem
+    }
+}
+
+@available(iOS 17, *)
 @MainActor
 final class CubanewsViewModel: ObservableObject {
     // Singleton shared instance
     static let shared = CubanewsViewModel()
-
-    // Provide a local shared ModelContainer used by the view model when none is supplied.
-    // Creating a ModelContainer can throw; we create it lazily and fall back to a runtime fatal error
-    // if creation fails because SwiftData requires a properly configured model container.
+    let TAG = "CubanewsViewModel"
     private static let sharedModelContainer: ModelContainer = {
         do {
             // ModelContainer initializer takes variadic model types; pass the type directly.
-            return try ModelContainer(for: SavedItem.self)
+            let schema = Schema([SavedItem.self, CachedFeedItem.self, UserPreferences.self])
+            return try ModelContainer(for: schema)
         } catch {
-            fatalError("Failed to create ModelContainer for SavedItem: \(error)")
+            fatalError("Failed to create ModelContainer for SavedItem and CachedFeedItem: \(error)")
         }
     }()
 
@@ -138,8 +148,22 @@ final class CubanewsViewModel: ObservableObject {
     func isSaved(_ itemId: Int64) -> Bool {
         return savedItemIds.contains(itemId)
     }
+    
+    func fetchItemsFromCache() -> [FeedItem] {
+        NSLog("➡️ \(TAG): Fetching items from Cache")
+        let cachedItems = (try? modelContext.fetch(FetchDescriptor<CachedFeedItem>())) ?? []
+        return cachedItems.map { $0.feedItem }
+    }
 
     func fetchFeedItems() async {
+        if self.latestNews.isEmpty {
+            let cachedItems = fetchItemsFromCache()
+            NSLog("➡️ \(TAG): Cached items count: \(cachedItems.count)")
+            if cachedItems.count > 0 {
+                NSLog("➡️ \(TAG): Filling latest news from cache")
+                self.latestNews = cachedItems
+            }
+        }
         guard !isLoading else { return }
 
         isLoading = true
@@ -173,7 +197,20 @@ final class CubanewsViewModel: ObservableObject {
             if !newItems.isEmpty {
                 self.allItemsIds.formUnion(newItems.map { $0.id })
                 if (currentPage == 1) {
-                    self.latestNews.append(contentsOf: newItems)
+                    NSLog("➡️ \(TAG): Fetched items from API")
+                    self.latestNews = newItems
+                    let existingCachedItems = (try? modelContext.fetch(FetchDescriptor<CachedFeedItem>())) ?? []
+                    for item in existingCachedItems {
+                        modelContext.delete(item)
+                    }
+                    // Insert new cached items
+                    for item in newItems {
+                        let cachedItem = CachedFeedItem(feedItem: item)
+                        modelContext.insert(cachedItem)
+                    }
+                    // Perform a single save for all operations
+                    try? modelContext.save()
+                    
                 } else {
                     self.moreNews.append(contentsOf: newItems)
                 }
