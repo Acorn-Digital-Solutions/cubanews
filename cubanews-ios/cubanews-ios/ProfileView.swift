@@ -306,26 +306,30 @@ struct ManageAccountSection: View {
     if #available(iOS 17, *) {
         // Create a preview model context with sample data
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        let container = try! ModelContainer(
-            for: UserPreferences.self, SavedItem.self, User.self,
-            configurations: config
-        )
-        let authManager = AuthenticationManager(modelContext: container.mainContext)
-        
-        // Create a sample user for preview
-        let sampleUser = User(
-            id: "preview-user",
-            email: "user@example.com",
-            fullName: "Juan Pérez",
-            givenName: "Juan",
-            familyName: "Pérez"
-        )
-        container.mainContext.insert(sampleUser)
-        authManager.currentUser = sampleUser
-        authManager.isAuthenticated = true
-        
-        ProfileView()
-            .environmentObject(authManager)
-            .modelContainer(container)
+        do {
+            let container = try ModelContainer(
+                for: UserPreferences.self, SavedItem.self, User.self,
+                configurations: config
+            )
+            let authManager = AuthenticationManager(modelContext: container.mainContext)
+            
+            // Create a sample user for preview
+            let sampleUser = User(
+                id: "preview-user",
+                email: "user@example.com",
+                fullName: "Juan Pérez",
+                givenName: "Juan",
+                familyName: "Pérez"
+            )
+            container.mainContext.insert(sampleUser)
+            authManager.currentUser = sampleUser
+            authManager.isAuthenticated = true
+            
+            ProfileView()
+                .environmentObject(authManager)
+                .modelContainer(container)
+        } catch {
+            Text("Failed to create preview: \(error.localizedDescription)")
+        }
     }
 }

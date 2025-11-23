@@ -123,9 +123,13 @@ struct LoginView: View {
     if #available(iOS 17, *) {
         // Create a preview model context
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        let container = try! ModelContainer(for: User.self, configurations: config)
-        let authManager = AuthenticationManager(modelContext: container.mainContext)
-        
-        LoginView(authManager: authManager, isAuthenticated: .constant(false))
+        do {
+            let container = try ModelContainer(for: User.self, configurations: config)
+            let authManager = AuthenticationManager(modelContext: container.mainContext)
+            
+            LoginView(authManager: authManager, isAuthenticated: .constant(false))
+        } catch {
+            Text("Failed to create preview: \(error.localizedDescription)")
+        }
     }
 }

@@ -24,6 +24,8 @@ struct cubanews_iosApp: App {
     @StateObject private var cubanewsViewModel = CubanewsViewModel.shared
     @StateObject private var authManager: AuthenticationManager
     
+    private let modelContainer: ModelContainer
+    
     // MARK: - IMPORTANT: Apple Sign In Configuration
     // To enable Sign in with Apple, you need to:
     // 1. Add "Sign in with Apple" capability in Xcode project settings
@@ -36,11 +38,15 @@ struct cubanews_iosApp: App {
     // 5. For development, ensure your device/simulator is signed into an Apple ID
     
     init() {
-        // Create the model container with User model
-        let container = try! ModelContainer(for: SavedItem.self, UserPreferences.self, User.self)
-        
-        // Initialize AuthenticationManager with the model context
-        _authManager = StateObject(wrappedValue: AuthenticationManager(modelContext: container.mainContext))
+        // Create the model container with proper error handling
+        do {
+            let container = try ModelContainer(for: SavedItem.self, UserPreferences.self, User.self)
+            self.modelContainer = container
+            _authManager = StateObject(wrappedValue: AuthenticationManager(modelContext: container.mainContext))
+        } catch {
+            // If we can't create the model container, we can't run the app
+            fatalError("Failed to create ModelContainer: \(error.localizedDescription)")
+        }
     }
     
     var body: some Scene {
