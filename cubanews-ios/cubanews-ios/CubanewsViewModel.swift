@@ -88,7 +88,7 @@ final class CubanewsViewModel: ObservableObject {
             let schema = Schema([SavedItem.self, CachedFeedItem.self, UserPreferences.self])
             return try ModelContainer(for: schema)
         } catch {
-            fatalError("Failed to create ModelContainer for SavedItem: \(error)")
+            fatalError("Failed to create ModelContainer for SavedItem and CachedFeedItem: \(error)")
         }
     }()
 
