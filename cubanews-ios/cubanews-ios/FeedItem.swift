@@ -107,8 +107,8 @@ struct FeedItem: Identifiable, Codable, Equatable {
         tags = (try? container.decode([String].self, forKey: .tags)) ?? []
         score = (try? container.decode(Int.self, forKey: .score)) ?? 0
         interactions = (try? container.decode(InteractionData.self, forKey: .interactions)) ?? InteractionData(feedid: 0)
-        aiSummary = try? container.decodeIfPresent(String.self, forKey: .aiSummary)
-        image = try? container.decodeIfPresent(String.self, forKey: .image)
+        aiSummary = container.decodeIfPresent(String.self, forKey: .aiSummary)
+        image = container.decodeIfPresent(String.self, forKey: .image)
         imageBytes = nil
         imageLoadingState = .LOADING
         
