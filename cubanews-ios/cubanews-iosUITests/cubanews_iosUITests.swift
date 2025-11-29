@@ -173,7 +173,7 @@ final class cubanews_iosUITests: XCTestCase {
         app.swipeUp()
         
         // Verify logout button exists
-        let logoutButton = app.buttons["Cerrar Sesion"]
+        let logoutButton = app.buttons["Cerrar Sesión"]
         XCTAssertTrue(logoutButton.waitForExistence(timeout: 5), "Should show logout button")
         
         // Verify delete account button exists
