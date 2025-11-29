@@ -56,7 +56,7 @@ actor ImageCache {
 
 @available(iOS 17, *)
 @Model
-final class SavedItem {
+final class SavedItem: Sendable {
     @Attribute(.unique) var id: Int64
 
     init(id: Int64) {
@@ -66,7 +66,7 @@ final class SavedItem {
 
 @available(iOS 17, *)
 @Model
-final class CachedFeedItem {
+final class CachedFeedItem: Sendable {
     @Attribute(.unique) var id: Int64
     var feedItem: FeedItem
     
@@ -75,6 +75,17 @@ final class CachedFeedItem {
         self.feedItem = feedItem
     }
 }
+
+struct FeedResponse: Codable, Sendable {
+    let banter: String
+    let content: FeedContent
+}
+
+struct FeedContent: Codable, Sendable {
+    let timestamp: String
+    let feed: [FeedItem]
+}
+
 
 @available(iOS 17, *)
 @MainActor
@@ -150,25 +161,32 @@ final class CubanewsViewModel: ObservableObject {
     }
     
     func fetchItemsFromCache() -> [FeedItem] {
-        NSLog("➡️ \(TAG): Fetching items from Cache")
+        NSLog("➡️ \(TAG): FetchingFeedItemsFromCache_START")
         let cachedItems = (try? modelContext.fetch(FetchDescriptor<CachedFeedItem>())) ?? []
+        cachedItems.forEach { fetchImage(feedItem: $0.feedItem) }
+        NSLog("➡️ \(TAG): FetchingFeedItemsFromCache_END")
         return cachedItems.map { $0.feedItem }
+    }
+    
+    private func shouldUpdateLatestNews(with itemIds: Set<Int64>) -> Bool {
+        return self.latestNews.isEmpty || Set(self.latestNews.map { $0.id }).isDisjoint(with: itemIds)
     }
 
     func fetchFeedItems() async {
+        NSLog("➡️ \(TAG): FetchingFeedItems_START")
         if self.latestNews.isEmpty {
             let cachedItems = fetchItemsFromCache()
             NSLog("➡️ \(TAG): Cached items count: \(cachedItems.count)")
             if cachedItems.count > 0 {
                 NSLog("➡️ \(TAG): Filling latest news from cache")
-                self.latestNews = cachedItems
+                self.latestNews = cachedItems.sorted(by: { $0.isoDate > $1.isoDate })
             }
         }
         guard !isLoading else { return }
 
         isLoading = true
         defer { isLoading = false }
-
+        NSLog("➡️ \(TAG): FetchingFeedItemsFromWeb_START")
         let urlString = "https://www.cubanews.icu/api/feed?page=\(currentPage)&pageSize=\(pageSize)"
         guard let url = URL(string: urlString) else { return }
 
@@ -179,16 +197,6 @@ final class CubanewsViewModel: ObservableObject {
                 return
             }
 
-            struct FeedResponse: Codable {
-                let banter: String
-                let content: FeedContent
-            }
-
-            struct FeedContent: Codable {
-                let timestamp: String
-                let feed: [FeedItem]
-            }
-
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
 
@@ -196,36 +204,42 @@ final class CubanewsViewModel: ObservableObject {
             let newItems = decoded.content.feed.filter { !self.allItemsIds.contains($0.id) }
             if !newItems.isEmpty {
                 self.allItemsIds.formUnion(newItems.map { $0.id })
-                if (currentPage == 1) {
-                    NSLog("➡️ \(TAG): Fetched items from API")
-                    self.latestNews = newItems
+                if (currentPage > 1) {
+                    self.moreNews.append(contentsOf: newItems)
+                } else if (shouldUpdateLatestNews(with: Set(newItems.map { $0.id }))) {
+                    NSLog("➡️ \(TAG): Updateing Latest News")
+                    self.latestNews = newItems.sorted(by: { $0.isoDate > $1.isoDate }) //TODO Make sure sorting is the same for cached and not cached.
                     let existingCachedItems = (try? modelContext.fetch(FetchDescriptor<CachedFeedItem>())) ?? []
                     for item in existingCachedItems {
                         modelContext.delete(item)
                     }
                     // Insert new cached items
+                    NSLog("➡️ \(TAG): UpdatingCachedFeedItems_START")
                     for item in newItems {
                         let cachedItem = CachedFeedItem(feedItem: item)
                         modelContext.insert(cachedItem)
                     }
+                    NSLog("➡️ \(TAG): UpdatingCachedFeedItems_END")
                     // Perform a single save for all operations
                     try? modelContext.save()
                     
-                } else {
-                    self.moreNews.append(contentsOf: newItems)
                 }
                 currentPage += 1
             }
             newItems.forEach { fetchImage(feedItem: $0) }
+            NSLog("➡️ \(TAG): FetchingFeedItemsFromWeb_END")
         } catch {
             print("❌ Failed to load feed:", error)
         }
     }
 
     func fetchImage(feedItem: FeedItem) {
-        guard let imageUrlString = feedItem.image,
-              feedItem.imageLoadingState == .LOADING else { return }
-
+        guard feedItem.imageBytes == nil else {
+            return // Image already loaded
+        }
+        guard let imageUrlString = feedItem.image else {
+            return // No image URL
+        }
         Task {
             // Try disk cache first
             if let cachedData = await ImageCache.shared.loadImage(for: feedItem.id) {
