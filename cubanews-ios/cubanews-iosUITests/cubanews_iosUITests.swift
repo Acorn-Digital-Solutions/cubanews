@@ -27,6 +27,26 @@ final class cubanews_iosUITests: XCTestCase {
         app = nil
     }
     
+    // MARK: - Helper Methods
+    
+    /// Performs login using the Google button and waits for the main content to appear
+    private func performLogin() {
+        let googleButton = app.buttons["Continue with Google"]
+        XCTAssertTrue(googleButton.waitForExistence(timeout: 5), "Google login button should exist")
+        googleButton.tap()
+        
+        // Wait for main content to load
+        let titularesTab = app.buttons["Titulares"]
+        XCTAssertTrue(titularesTab.waitForExistence(timeout: 5), "Should navigate to main content after login")
+    }
+    
+    /// Navigates to the specified tab
+    private func navigateToTab(_ tabName: String) {
+        let tab = app.buttons[tabName]
+        XCTAssertTrue(tab.waitForExistence(timeout: 5), "\(tabName) tab should exist")
+        tab.tap()
+    }
+    
     // MARK: - Login Screen Tests
     
     @MainActor
@@ -43,14 +63,7 @@ final class cubanews_iosUITests: XCTestCase {
     
     @MainActor
     func testLoginWithGoogleNavigatesToMainContent() throws {
-        // Tap Google login button
-        let googleButton = app.buttons["Continue with Google"]
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5))
-        googleButton.tap()
-        
-        // Verify we're now on the main content (TabView)
-        let titularesTab = app.buttons["Titulares"]
-        XCTAssertTrue(titularesTab.waitForExistence(timeout: 5), "Should navigate to main content after login")
+        performLogin()
     }
     
     @MainActor
@@ -81,32 +94,22 @@ final class cubanews_iosUITests: XCTestCase {
     
     @MainActor
     func testTabBarNavigation() throws {
-        // First login
-        let googleButton = app.buttons["Continue with Google"]
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5))
-        googleButton.tap()
+        performLogin()
         
         // Verify all tabs are present
         let titularesTab = app.buttons["Titulares"]
         let guardadosTab = app.buttons["Guardados"]
         let perfilTab = app.buttons["Perfil"]
         
-        XCTAssertTrue(titularesTab.waitForExistence(timeout: 5), "Titulares tab should exist")
+        XCTAssertTrue(titularesTab.exists, "Titulares tab should exist")
         XCTAssertTrue(guardadosTab.exists, "Guardados tab should exist")
         XCTAssertTrue(perfilTab.exists, "Perfil tab should exist")
     }
     
     @MainActor
     func testNavigateToSavedStoriesTab() throws {
-        // First login
-        let googleButton = app.buttons["Continue with Google"]
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5))
-        googleButton.tap()
-        
-        // Navigate to Guardados tab
-        let guardadosTab = app.buttons["Guardados"]
-        XCTAssertTrue(guardadosTab.waitForExistence(timeout: 5))
-        guardadosTab.tap()
+        performLogin()
+        navigateToTab("Guardados")
         
         // Verify we're on the saved stories screen
         let navigationTitle = app.navigationBars["Guardadas"]
@@ -115,15 +118,8 @@ final class cubanews_iosUITests: XCTestCase {
     
     @MainActor
     func testNavigateToProfileTab() throws {
-        // First login
-        let googleButton = app.buttons["Continue with Google"]
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5))
-        googleButton.tap()
-        
-        // Navigate to Perfil tab
-        let perfilTab = app.buttons["Perfil"]
-        XCTAssertTrue(perfilTab.waitForExistence(timeout: 5))
-        perfilTab.tap()
+        performLogin()
+        navigateToTab("Perfil")
         
         // Verify we're on the profile screen by checking for profile elements
         let preferencesHeader = app.staticTexts["Preferencias"]
@@ -134,15 +130,8 @@ final class cubanews_iosUITests: XCTestCase {
     
     @MainActor
     func testEmptySavedStoriesShowsMessage() throws {
-        // First login
-        let googleButton = app.buttons["Continue with Google"]
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5))
-        googleButton.tap()
-        
-        // Navigate to Guardados tab
-        let guardadosTab = app.buttons["Guardados"]
-        XCTAssertTrue(guardadosTab.waitForExistence(timeout: 5))
-        guardadosTab.tap()
+        performLogin()
+        navigateToTab("Guardados")
         
         // Verify empty state message
         let emptyMessage = app.staticTexts["No tienes historias guardadas."]
@@ -153,15 +142,8 @@ final class cubanews_iosUITests: XCTestCase {
     
     @MainActor
     func testProfileViewShowsPreferences() throws {
-        // First login
-        let googleButton = app.buttons["Continue with Google"]
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5))
-        googleButton.tap()
-        
-        // Navigate to Perfil tab
-        let perfilTab = app.buttons["Perfil"]
-        XCTAssertTrue(perfilTab.waitForExistence(timeout: 5))
-        perfilTab.tap()
+        performLogin()
+        navigateToTab("Perfil")
         
         // Verify preferences section exists
         let preferencesHeader = app.staticTexts["Preferencias"]
@@ -174,15 +156,8 @@ final class cubanews_iosUITests: XCTestCase {
     
     @MainActor
     func testProfileViewShowsPublicationOptions() throws {
-        // First login
-        let googleButton = app.buttons["Continue with Google"]
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5))
-        googleButton.tap()
-        
-        // Navigate to Perfil tab
-        let perfilTab = app.buttons["Perfil"]
-        XCTAssertTrue(perfilTab.waitForExistence(timeout: 5))
-        perfilTab.tap()
+        performLogin()
+        navigateToTab("Perfil")
         
         // Verify publication options exist
         let adnCubaOption = app.staticTexts["AdnCuba"]
@@ -191,15 +166,8 @@ final class cubanews_iosUITests: XCTestCase {
     
     @MainActor
     func testProfileViewShowsAccountButtons() throws {
-        // First login
-        let googleButton = app.buttons["Continue with Google"]
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5))
-        googleButton.tap()
-        
-        // Navigate to Perfil tab
-        let perfilTab = app.buttons["Perfil"]
-        XCTAssertTrue(perfilTab.waitForExistence(timeout: 5))
-        perfilTab.tap()
+        performLogin()
+        navigateToTab("Perfil")
         
         // Scroll down to account section
         app.swipeUp()
@@ -215,15 +183,8 @@ final class cubanews_iosUITests: XCTestCase {
     
     @MainActor
     func testProfileViewShowsVersionInfo() throws {
-        // First login
-        let googleButton = app.buttons["Continue with Google"]
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5))
-        googleButton.tap()
-        
-        // Navigate to Perfil tab
-        let perfilTab = app.buttons["Perfil"]
-        XCTAssertTrue(perfilTab.waitForExistence(timeout: 5))
-        perfilTab.tap()
+        performLogin()
+        navigateToTab("Perfil")
         
         // Scroll to bottom
         app.swipeUp()
@@ -239,15 +200,8 @@ final class cubanews_iosUITests: XCTestCase {
     
     @MainActor
     func testDeleteAccountShowsConfirmationDialog() throws {
-        // First login
-        let googleButton = app.buttons["Continue with Google"]
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5))
-        googleButton.tap()
-        
-        // Navigate to Perfil tab
-        let perfilTab = app.buttons["Perfil"]
-        XCTAssertTrue(perfilTab.waitForExistence(timeout: 5))
-        perfilTab.tap()
+        performLogin()
+        navigateToTab("Perfil")
         
         // Scroll to account section
         app.swipeUp()
@@ -273,10 +227,7 @@ final class cubanews_iosUITests: XCTestCase {
     
     @MainActor
     func testFeedViewShowsHeader() throws {
-        // First login
-        let googleButton = app.buttons["Continue with Google"]
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5))
-        googleButton.tap()
+        performLogin()
         
         // Verify we're on the feed view with the header
         let titularesHeader = app.staticTexts["Titulares"]

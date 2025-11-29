@@ -15,6 +15,32 @@ final class cubanews_iosUITestsLaunchTests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
     }
+    
+    // MARK: - Helper Methods
+    
+    /// Performs login using the Google button
+    private func performLogin(app: XCUIApplication) {
+        let googleButton = app.buttons["Continue with Google"]
+        if googleButton.waitForExistence(timeout: 5) {
+            googleButton.tap()
+        }
+    }
+    
+    /// Navigates to the specified tab
+    private func navigateToTab(_ tabName: String, app: XCUIApplication) {
+        let tab = app.buttons[tabName]
+        if tab.waitForExistence(timeout: 5) {
+            tab.tap()
+        }
+    }
+    
+    /// Takes a screenshot with the given name and adds it to the test
+    private func captureScreenshot(named name: String, app: XCUIApplication) {
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
 
     @MainActor
     func testLaunch() throws {
@@ -22,10 +48,7 @@ final class cubanews_iosUITestsLaunchTests: XCTestCase {
         app.launch()
 
         // Take a screenshot of the launch screen (Login View)
-        let attachment = XCTAttachment(screenshot: app.screenshot())
-        attachment.name = "Launch Screen"
-        attachment.lifetime = .keepAlways
-        add(attachment)
+        captureScreenshot(named: "Launch Screen", app: app)
     }
     
     @MainActor
@@ -34,20 +57,14 @@ final class cubanews_iosUITestsLaunchTests: XCTestCase {
         app.launch()
         
         // Login to the app
-        let googleButton = app.buttons["Continue with Google"]
-        if googleButton.waitForExistence(timeout: 5) {
-            googleButton.tap()
-        }
+        performLogin(app: app)
         
         // Wait for feed view to load
         let titularesHeader = app.staticTexts["Titulares"]
         XCTAssertTrue(titularesHeader.waitForExistence(timeout: 5))
         
         // Take a screenshot of the feed view
-        let attachment = XCTAttachment(screenshot: app.screenshot())
-        attachment.name = "Feed View"
-        attachment.lifetime = .keepAlways
-        add(attachment)
+        captureScreenshot(named: "Feed View", app: app)
     }
     
     @MainActor
@@ -56,22 +73,13 @@ final class cubanews_iosUITestsLaunchTests: XCTestCase {
         app.launch()
         
         // Login to the app
-        let googleButton = app.buttons["Continue with Google"]
-        if googleButton.waitForExistence(timeout: 5) {
-            googleButton.tap()
-        }
+        performLogin(app: app)
         
         // Navigate to saved stories
-        let guardadosTab = app.buttons["Guardados"]
-        if guardadosTab.waitForExistence(timeout: 5) {
-            guardadosTab.tap()
-        }
+        navigateToTab("Guardados", app: app)
         
         // Take a screenshot of the saved stories view
-        let attachment = XCTAttachment(screenshot: app.screenshot())
-        attachment.name = "Saved Stories View"
-        attachment.lifetime = .keepAlways
-        add(attachment)
+        captureScreenshot(named: "Saved Stories View", app: app)
     }
     
     @MainActor
@@ -80,21 +88,12 @@ final class cubanews_iosUITestsLaunchTests: XCTestCase {
         app.launch()
         
         // Login to the app
-        let googleButton = app.buttons["Continue with Google"]
-        if googleButton.waitForExistence(timeout: 5) {
-            googleButton.tap()
-        }
+        performLogin(app: app)
         
         // Navigate to profile
-        let perfilTab = app.buttons["Perfil"]
-        if perfilTab.waitForExistence(timeout: 5) {
-            perfilTab.tap()
-        }
+        navigateToTab("Perfil", app: app)
         
         // Take a screenshot of the profile view
-        let attachment = XCTAttachment(screenshot: app.screenshot())
-        attachment.name = "Profile View"
-        attachment.lifetime = .keepAlways
-        add(attachment)
+        captureScreenshot(named: "Profile View", app: app)
     }
 }
