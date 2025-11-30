@@ -47,18 +47,20 @@ struct ProfileView: View {
                                 .foregroundColor(.gray)
                                 .padding(.horizontal)
                             
-                            FlowLayout(spacing: 10) {
-                                ForEach(publications, id: \.self) { publication in
-                                    PreferencePillButton(
-                                        publication: publication,
-                                        isSelected: selectedPublications.contains(publication),
-                                        onToggle: {
-                                            togglePreference(publication)
-                                        }
-                                    )
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 10) {
+                                    ForEach(publications, id: \.self) { publication in
+                                        PreferencePillButton(
+                                            publication: publication,
+                                            isSelected: selectedPublications.contains(publication),
+                                            onToggle: {
+                                                togglePreference(publication)
+                                            }
+                                        )
+                                    }
                                 }
+                                .padding(.horizontal)
                             }
-                            .padding(.horizontal)
                         }
                         .padding(.bottom, 20)
                         
@@ -150,66 +152,6 @@ struct PreferencePillButton: View {
                 )
         }
         .buttonStyle(PlainButtonStyle())
-    }
-}
-
-/// A flow layout that arranges subviews in rows, wrapping to a new row
-/// when the current row would exceed the available width.
-/// - Parameter spacing: The spacing between elements (both horizontal and vertical).
-struct FlowLayout: Layout {
-    var spacing: CGFloat = 10
-    
-    struct LayoutCache {
-        var size: CGSize
-        var positions: [CGPoint]
-    }
-    
-    func makeCache(subviews: Subviews) -> LayoutCache {
-        return LayoutCache(size: .zero, positions: [])
-    }
-    
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout LayoutCache) -> CGSize {
-        cache = computeLayout(proposal: proposal, subviews: subviews)
-        return cache.size
-    }
-    
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout LayoutCache) {
-        for (index, subview) in subviews.enumerated() {
-            if index < cache.positions.count {
-                let position = cache.positions[index]
-                subview.place(at: CGPoint(x: bounds.minX + position.x, y: bounds.minY + position.y), proposal: .unspecified)
-            }
-        }
-    }
-    
-    private func computeLayout(proposal: ProposedViewSize, subviews: Subviews) -> LayoutCache {
-        let maxWidth = proposal.width ?? .infinity
-        var positions: [CGPoint] = []
-        var currentX: CGFloat = 0
-        var currentY: CGFloat = 0
-        var rowHeight: CGFloat = 0
-        var totalHeight: CGFloat = 0
-        var totalWidth: CGFloat = 0
-        
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            
-            if currentX + size.width > maxWidth && currentX > 0 {
-                currentX = 0
-                currentY += rowHeight + spacing
-                rowHeight = 0
-            }
-            
-            positions.append(CGPoint(x: currentX, y: currentY))
-            
-            rowHeight = max(rowHeight, size.height)
-            currentX += size.width + spacing
-            totalWidth = max(totalWidth, currentX - spacing)
-        }
-        
-        totalHeight = currentY + rowHeight
-        
-        return LayoutCache(size: CGSize(width: totalWidth, height: totalHeight), positions: positions)
     }
 }
 
