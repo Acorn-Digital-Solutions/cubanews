@@ -15,6 +15,36 @@ struct ProfileView: View {
     // Available publications
     let publications = ["AdnCuba", "Cibercuba", "CatorceYMedio", "ElToque", "DiariodeCuba", "Cubanet"]
     
+    // Inline linked privacy text
+    private var privacyAttributedText: AttributedString {
+        var text = AttributedString("Consulta nuestra política de privacidad para entender cómo manejamos tus datos.")
+        // Base color for non-link text
+        text.foregroundColor = .gray
+        if let range = text.range(of: "política de privacidad"),
+           let url = URL(string: "https://www.freeprivacypolicy.com/live/38c1b534-4ac4-4b6d-8c68-71f89805459f") {
+            text[range].link = url
+            text[range].foregroundColor = .blue
+            // Optional underline to indicate interactivity
+            text[range].underlineStyle = .single
+        }
+        return text
+    }
+    
+    private var misionAttributedText: AttributedString {
+        var text = AttributedString("La mision de CubaNews es amplificar el mensaje de la prensa independiente cubana . Ver mas en nuestra web cubanews.icu")
+        // Base color for non-link text
+        text.foregroundColor = .gray
+        if let range = text.range(of: "cubanews.icu"),
+           let url = URL(string: "https://www.cubanews.icu/about") {
+            text[range].link = url
+            text[range].foregroundColor = .blue
+            // Optional underline to indicate interactivity
+            text[range].underlineStyle = .single
+        }
+        return text
+    }
+    
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -66,27 +96,43 @@ struct ProfileView: View {
                         
                         Divider()
                         
+                        Text("Acerca de CubaNews")
+                            .font(.headline)
+                            .padding(.horizontal)
+                        
+                        // Privacy Section
+                        Text(misionAttributedText)
+                            .font(.subheadline)
+                            .padding(.horizontal)
+                        
+                        // Inline link for "política de privacidad"
+                        Text(privacyAttributedText)
+                            .font(.subheadline)
+                            .padding(.horizontal)
+                        
+                        Divider()
+                        
                         // Account Management Section
                         ManageAccountSection()
                             .padding(.bottom, 20)
+                        
+                        Spacer()
+                        
+                        // App version and copyright at the bottom
+                        VStack(spacing: 8) {
+                            Text("Cubanews Version 0.0.1")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                            
+                            Text("© Acorn Digital Solutions 2025")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                        .background(Color(UIColor.systemBackground))
                     }
                 }
-                
-                Spacer()
-                
-                // App version and copyright at the bottom
-                VStack(spacing: 8) {
-                    Text("Version 0.0.1")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                    
-                    Text("© Acorn Digital Solutions 2025")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 20)
-                .background(Color(UIColor.systemBackground))
             }
             .navigationBarTitleDisplayMode(.large)
         }
@@ -160,16 +206,16 @@ struct ManageAccountSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Cuenta")
+            Text("Maneja tu Cuenta")
                 .font(.headline)
                 .padding(.horizontal)
             
-            VStack(spacing: 12) {
+            HStack(spacing: 2) {
                 // Logout Button
                 Button(action: handleLogout) {
                     Text("Cerrar Sesión")
                         .font(.body)
-                        .fontWeight(.semibold)
+                        .fontWeight(.light)
                         .foregroundColor(.blue)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -186,7 +232,7 @@ struct ManageAccountSection: View {
                 }) {
                     Text("Eliminar Cuenta")
                         .font(.body)
-                        .fontWeight(.semibold)
+                        .fontWeight(.light)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
