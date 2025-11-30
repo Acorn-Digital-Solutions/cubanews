@@ -22,6 +22,11 @@ struct ShareSheet: UIViewControllerRepresentable {
 
 @available(iOS 17, *)
 struct FeedItemView: View {
+    /// Threshold to distinguish milliseconds from seconds timestamps.
+    /// This value (1_000_000_000_000) corresponds to September 9, 2001 when interpreted as seconds.
+    /// Timestamps greater than this are assumed to be in milliseconds.
+    private static let millisecondsThreshold: Int64 = 1_000_000_000_000
+
     let item: FeedItem
     @Environment(\.openURL) var openURL
     @State private var showingShareSheet = false
@@ -31,6 +36,21 @@ struct FeedItemView: View {
     init(item: FeedItem) {
         self.item = item
     }
+    
+    private static let relativeDateFormatter: RelativeDateTimeFormatter = {
+        let formatter = RelativeDateTimeFormatter()
+        // Debug logging
+        #if DEBUG
+        NSLog("\(String(describing: Self.self)): 🌍 RelativeDateTimeFormatter locale: \(formatter.locale?.identifier ?? "nil")")
+        NSLog("\(String(describing: Self.self)): 🌍 Current device locale: \(Locale.current.identifier)")
+        NSLog("\(String(describing: Self.self)): 🌍 Preferred languages: \(Locale.preferredLanguages)")
+        #endif
+        formatter.locale = Locale(identifier: Locale.preferredLanguages.first ?? "es_ES")
+        formatter.dateTimeStyle = .named
+        formatter.unitsStyle = .full
+        
+        return formatter
+    }()
 
     private static let iso8601DateFormatter: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
@@ -48,11 +68,37 @@ struct FeedItemView: View {
         return f
     }()
 
+    private static func resolvedDate(for item: FeedItem) -> Date? {
+        // Try ISO 8601 first
+        if !item.isoDate.isEmpty, let isoParsed = iso8601DateFormatter.date(from: item.isoDate) {
+            return isoParsed
+        }
+        // Fallback to feedts then updated epoch (seconds or milliseconds)
+        let candidates: [Int64?] = [item.feedts, item.updated]
+        for candidate in candidates {
+            if let raw = candidate, raw > 0 {
+                // Detect ms vs s using millisecondsThreshold
+                let seconds: TimeInterval = raw > millisecondsThreshold ? TimeInterval(raw) / 1000.0 : TimeInterval(raw)
+                return Date(timeIntervalSince1970: seconds)
+            }
+        }
+        return nil
+    }
+
+    private static func relativeTimeString(for item: FeedItem) -> String {
+        guard let date = resolvedDate(for: item) else { return "Unknown time" }
+        let now = Date()
+        // Clamp future dates to now to avoid "in X" for slight clock skews
+        let reference = date > now ? now : date
+        return relativeDateFormatter.localizedString(for: reference, relativeTo: now)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Header: Source and Date
             HStack {
                 let sourceImage = UIImage(named: item.source.rawValue.lowercased()) ?? UIImage(systemName: "newspaper")
+                let relative = Self.relativeTimeString(for: item)
                 Image(uiImage: sourceImage!)
                     .resizable()
                     .frame(width: 16, height: 16)
@@ -62,9 +108,11 @@ struct FeedItemView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.secondary)
                 Spacer()
-                Text(Self.displayDateFormatter.string(from: Self.iso8601DateFormatter.date(from: item.isoDate) ?? Date()))
+                // Replaced absolute date with relative time string
+                Text(relative)
                     .font(.caption)
                     .foregroundColor(.secondary)
+                    .accessibilityLabel("Published " + relative)
             }
 
             // Image (if exists)

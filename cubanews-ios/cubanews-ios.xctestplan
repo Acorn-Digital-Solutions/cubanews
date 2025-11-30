@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "0A917A9D-67E5-498A-91D7-9D8DEF8DB1F8",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:cubanews-ios.xcodeproj",
+      "identifier" : "1FF5F5A62E9C245A001C9A75",
+      "name" : "cubanews-ios"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:cubanews-ios.xcodeproj",
+        "identifier" : "1FF5F5B32E9C245B001C9A75",
+        "name" : "cubanews-iosTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:cubanews-ios.xcodeproj",
+        "identifier" : "1FF5F5BD2E9C245B001C9A75",
+        "name" : "cubanews-iosUITests"
+      }
+    }
+  ],
+  "version" : 1
+}
