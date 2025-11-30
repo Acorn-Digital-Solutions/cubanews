@@ -45,6 +45,36 @@ struct ProfileView: View {
     }
     
     
+    // Inline linked privacy text
+    private var privacyAttributedText: AttributedString {
+        var text = AttributedString("Consulta nuestra política de privacidad para entender cómo manejamos tus datos.")
+        // Base color for non-link text
+        text.foregroundColor = .gray
+        if let range = text.range(of: "política de privacidad"),
+           let url = URL(string: "https://www.freeprivacypolicy.com/live/38c1b534-4ac4-4b6d-8c68-71f89805459f") {
+            text[range].link = url
+            text[range].foregroundColor = .blue
+            // Optional underline to indicate interactivity
+            text[range].underlineStyle = .single
+        }
+        return text
+    }
+    
+    private var misionAttributedText: AttributedString {
+        var text = AttributedString("La mision de CubaNews es amplificar el mensaje de la prensa independiente cubana . Ver mas en nuestra web cubanews.icu")
+        // Base color for non-link text
+        text.foregroundColor = .gray
+        if let range = text.range(of: "cubanews.icu"),
+           let url = URL(string: "https://www.cubanews.icu/about") {
+            text[range].link = url
+            text[range].foregroundColor = .blue
+            // Optional underline to indicate interactivity
+            text[range].underlineStyle = .single
+        }
+        return text
+    }
+    
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
