@@ -124,6 +124,9 @@ struct ProfileView: View {
     }
 }
 
+/// A pill-shaped button for selecting preferences.
+/// When unselected, displays with an outlined blue border and blue text.
+/// When selected, displays with a solid blue background and white text.
 struct PreferencePillButton: View {
     let publication: String
     let isSelected: Bool
@@ -150,25 +153,36 @@ struct PreferencePillButton: View {
     }
 }
 
+/// A flow layout that arranges subviews in rows, wrapping to a new row
+/// when the current row would exceed the available width.
+/// - Parameter spacing: The spacing between elements (both horizontal and vertical).
 struct FlowLayout: Layout {
     var spacing: CGFloat = 10
     
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let result = arrangeSubviews(proposal: proposal, subviews: subviews)
-        return result.size
+    struct LayoutCache {
+        var size: CGSize
+        var positions: [CGPoint]
     }
     
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let result = arrangeSubviews(proposal: proposal, subviews: subviews)
+    func makeCache(subviews: Subviews) -> LayoutCache {
+        return LayoutCache(size: .zero, positions: [])
+    }
+    
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout LayoutCache) -> CGSize {
+        cache = computeLayout(proposal: proposal, subviews: subviews)
+        return cache.size
+    }
+    
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout LayoutCache) {
         for (index, subview) in subviews.enumerated() {
-            if index < result.positions.count {
-                let position = result.positions[index]
+            if index < cache.positions.count {
+                let position = cache.positions[index]
                 subview.place(at: CGPoint(x: bounds.minX + position.x, y: bounds.minY + position.y), proposal: .unspecified)
             }
         }
     }
     
-    private func arrangeSubviews(proposal: ProposedViewSize, subviews: Subviews) -> (size: CGSize, positions: [CGPoint]) {
+    private func computeLayout(proposal: ProposedViewSize, subviews: Subviews) -> LayoutCache {
         let maxWidth = proposal.width ?? .infinity
         var positions: [CGPoint] = []
         var currentX: CGFloat = 0
@@ -195,7 +209,7 @@ struct FlowLayout: Layout {
         
         totalHeight = currentY + rowHeight
         
-        return (CGSize(width: totalWidth, height: totalHeight), positions)
+        return LayoutCache(size: CGSize(width: totalWidth, height: totalHeight), positions: positions)
     }
 }
 
