@@ -22,13 +22,11 @@ struct ShareSheet: UIViewControllerRepresentable {
 
 @available(iOS 17, *)
 struct FeedItemView: View {
-    private static let TAG: String = "FeedItemView"
-    
     /// Threshold to distinguish milliseconds from seconds timestamps.
     /// This value (1_000_000_000_000) corresponds to September 9, 2001 when interpreted as seconds.
     /// Timestamps greater than this are assumed to be in milliseconds.
     private static let millisecondsThreshold: Int64 = 1_000_000_000_000
-    
+
     let item: FeedItem
     @Environment(\.openURL) var openURL
     @State private var showingShareSheet = false
@@ -43,9 +41,9 @@ struct FeedItemView: View {
         let formatter = RelativeDateTimeFormatter()
         // Debug logging
         #if DEBUG
-        NSLog("\(TAG): 🌍 RelativeDateTimeFormatter locale: \(formatter.locale?.identifier ?? "nil")")
-        NSLog("\(TAG): 🌍 Current device locale: \(Locale.current.identifier)")
-        NSLog("\(TAG): 🌍 Preferred languages: \(Locale.preferredLanguages)")
+        NSLog("\(String(describing: Self.self)): 🌍 RelativeDateTimeFormatter locale: \(formatter.locale?.identifier ?? "nil")")
+        NSLog("\(String(describing: Self.self)): 🌍 Current device locale: \(Locale.current.identifier)")
+        NSLog("\(String(describing: Self.self)): 🌍 Preferred languages: \(Locale.preferredLanguages)")
         #endif
         formatter.locale = Locale(identifier: Locale.preferredLanguages.first ?? "es_ES")
         formatter.dateTimeStyle = .named
