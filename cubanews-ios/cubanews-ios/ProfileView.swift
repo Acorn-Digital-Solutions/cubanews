@@ -47,9 +47,9 @@ struct ProfileView: View {
                                 .foregroundColor(.gray)
                                 .padding(.horizontal)
                             
-                            VStack(alignment: .leading, spacing: 12) {
+                            FlowLayout(spacing: 10) {
                                 ForEach(publications, id: \.self) { publication in
-                                    PreferenceCheckboxRow(
+                                    PreferencePillButton(
                                         publication: publication,
                                         isSelected: selectedPublications.contains(publication),
                                         onToggle: {
@@ -124,28 +124,78 @@ struct ProfileView: View {
     }
 }
 
-struct PreferenceCheckboxRow: View {
+struct PreferencePillButton: View {
     let publication: String
     let isSelected: Bool
     let onToggle: () -> Void
     
     var body: some View {
         Button(action: onToggle) {
-            HStack {
-                Image(systemName: isSelected ? "checkmark.square.fill" : "square")
-                    .foregroundColor(isSelected ? .blue : .gray)
-                    .font(.title3)
-                
-                Text(publication)
-                    .foregroundColor(.primary)
-                    .font(.body)
-                
-                Spacer()
-            }
-            .contentShape(Rectangle())
+            Text(publication)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(isSelected ? .white : .blue)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(
+                    Capsule()
+                        .fill(isSelected ? Color.blue : Color.clear)
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(Color.blue, lineWidth: 1.5)
+                )
         }
         .buttonStyle(PlainButtonStyle())
-        .padding(.vertical, 4)
+    }
+}
+
+struct FlowLayout: Layout {
+    var spacing: CGFloat = 10
+    
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let result = arrangeSubviews(proposal: proposal, subviews: subviews)
+        return result.size
+    }
+    
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let result = arrangeSubviews(proposal: proposal, subviews: subviews)
+        for (index, subview) in subviews.enumerated() {
+            if index < result.positions.count {
+                let position = result.positions[index]
+                subview.place(at: CGPoint(x: bounds.minX + position.x, y: bounds.minY + position.y), proposal: .unspecified)
+            }
+        }
+    }
+    
+    private func arrangeSubviews(proposal: ProposedViewSize, subviews: Subviews) -> (size: CGSize, positions: [CGPoint]) {
+        let maxWidth = proposal.width ?? .infinity
+        var positions: [CGPoint] = []
+        var currentX: CGFloat = 0
+        var currentY: CGFloat = 0
+        var rowHeight: CGFloat = 0
+        var totalHeight: CGFloat = 0
+        var totalWidth: CGFloat = 0
+        
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            
+            if currentX + size.width > maxWidth && currentX > 0 {
+                currentX = 0
+                currentY += rowHeight + spacing
+                rowHeight = 0
+            }
+            
+            positions.append(CGPoint(x: currentX, y: currentY))
+            
+            rowHeight = max(rowHeight, size.height)
+            currentX += size.width + spacing
+            totalWidth = max(totalWidth, currentX - spacing)
+        }
+        
+        totalHeight = currentY + rowHeight
+        
+        return (CGSize(width: totalWidth, height: totalHeight), positions)
     }
 }
 
