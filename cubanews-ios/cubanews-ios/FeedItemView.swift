@@ -22,7 +22,6 @@ struct ShareSheet: UIViewControllerRepresentable {
 
 @available(iOS 17, *)
 struct FeedItemView: View {
-    private static let TAG: String = "FeedItemView"
     let item: FeedItem
     @Environment(\.openURL) var openURL
     @State private var showingShareSheet = false
@@ -37,9 +36,9 @@ struct FeedItemView: View {
         let formatter = RelativeDateTimeFormatter()
         // Debug logging
         #if DEBUG
-        NSLog("\(TAG): 🌍 RelativeDateTimeFormatter locale: \(formatter.locale?.identifier ?? "nil")")
-        NSLog("\(TAG): 🌍 Current device locale: \(Locale.current.identifier)")
-        NSLog("\(TAG): 🌍 Preferred languages: \(Locale.preferredLanguages)")
+        NSLog("\(String(describing: Self.self)): 🌍 RelativeDateTimeFormatter locale: \(formatter.locale?.identifier ?? "nil")")
+        NSLog("\(String(describing: Self.self)): 🌍 Current device locale: \(Locale.current.identifier)")
+        NSLog("\(String(describing: Self.self)): 🌍 Preferred languages: \(Locale.preferredLanguages)")
         #endif
         formatter.locale = Locale(identifier: Locale.preferredLanguages.first ?? "es_ES")
         formatter.dateTimeStyle = .named
