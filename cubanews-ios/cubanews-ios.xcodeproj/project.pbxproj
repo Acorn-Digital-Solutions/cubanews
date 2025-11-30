@@ -36,6 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1F7D75DF2EDC9B65006FA5F0 /* cubanews-ios.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "cubanews-ios.xctestplan"; sourceTree = "<group>"; };
 		1FF5F5A72E9C245A001C9A75 /* cubanews-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "cubanews-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FF5F5B42E9C245B001C9A75 /* cubanews-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "cubanews-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FF5F5BE2E9C245B001C9A75 /* cubanews-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "cubanews-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -96,6 +97,7 @@
 		1FF5F59E2E9C245A001C9A75 = {
 			isa = PBXGroup;
 			children = (
+				1F7D75DF2EDC9B65006FA5F0 /* cubanews-ios.xctestplan */,
 				1FF5F5A92E9C245A001C9A75 /* cubanews-ios */,
 				1FF5F5B72E9C245B001C9A75 /* cubanews-iosTests */,
 				1FF5F5C12E9C245B001C9A75 /* cubanews-iosUITests */,
