@@ -66,12 +66,6 @@ struct FeedItemView: View {
         return f
     }()
 
-//    private static let relativeDateFormatter: RelativeDateTimeFormatter = {
-//        let f = RelativeDateTimeFormatter()
-//        f.unitsStyle = .full // "2 hours ago"
-//        return f
-//    }()
-
     private static func resolvedDate(for item: FeedItem) -> Date? {
         // Try ISO 8601 first
         if !item.isoDate.isEmpty, let isoParsed = iso8601DateFormatter.date(from: item.isoDate) {
