@@ -36,16 +36,14 @@ struct FeedItemView: View {
     private static let relativeDateFormatter: RelativeDateTimeFormatter = {
         let formatter = RelativeDateTimeFormatter()
         // Debug logging
+        #if DEBUG
         NSLog("\(TAG): 🌍 RelativeDateTimeFormatter locale: \(formatter.locale?.identifier ?? "nil")")
         NSLog("\(TAG): 🌍 Current device locale: \(Locale.current.identifier)")
         NSLog("\(TAG): 🌍 Preferred languages: \(Locale.preferredLanguages)")
+        #endif
         formatter.locale = Locale(identifier: Locale.preferredLanguages.first ?? "es_ES")
         formatter.dateTimeStyle = .named
         formatter.unitsStyle = .full
-        
-        NSLog("\(TAG): 🌍 RelativeDateTimeFormatter locale: \(formatter.locale?.identifier ?? "nil")")
-        NSLog("\(TAG): 🌍 Current device locale: \(Locale.current.identifier)")
-        NSLog("\(TAG): 🌍 Preferred languages: \(Locale.preferredLanguages)")
         
         return formatter
     }()
