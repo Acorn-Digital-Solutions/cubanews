@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "cubanewsIdentity.png",
+      "filename" : "identity.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "tinted icon.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "dark icon 1.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

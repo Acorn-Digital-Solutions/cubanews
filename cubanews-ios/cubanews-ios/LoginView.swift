@@ -15,10 +15,12 @@ struct LoginView: View {
             
             // App Logo/Title
             VStack(spacing: 10) {
-                Image("cubanewsIdentityWithText")
+                Image("cubanewsIdentity")
                     .resizable()
                     .renderingMode(.original)
                     .frame(width: 250, height: 250)
+                Text("Cuba News").font(.largeTitle).fontWeight(.bold)
+                    
             }
             .padding(.bottom, 50)
             
