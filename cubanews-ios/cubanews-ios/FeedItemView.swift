@@ -22,6 +22,11 @@ struct ShareSheet: UIViewControllerRepresentable {
 
 @available(iOS 17, *)
 struct FeedItemView: View {
+    /// Threshold to distinguish milliseconds from seconds timestamps.
+    /// This value (1_000_000_000_000) corresponds to September 9, 2001 when interpreted as seconds.
+    /// Timestamps greater than this are assumed to be in milliseconds.
+    private static let millisecondsThreshold: Int64 = 1_000_000_000_000
+
     let item: FeedItem
     @Environment(\.openURL) var openURL
     @State private var showingShareSheet = false
@@ -72,8 +77,8 @@ struct FeedItemView: View {
         let candidates: [Int64?] = [item.feedts, item.updated]
         for candidate in candidates {
             if let raw = candidate, raw > 0 {
-                // Detect ms vs s
-                let seconds: TimeInterval = raw > 1_000_000_000_000 ? TimeInterval(raw) / 1000.0 : TimeInterval(raw)
+                // Detect ms vs s using millisecondsThreshold
+                let seconds: TimeInterval = raw > millisecondsThreshold ? TimeInterval(raw) / 1000.0 : TimeInterval(raw)
                 return Date(timeIntervalSince1970: seconds)
             }
         }
