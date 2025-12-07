@@ -229,7 +229,7 @@ final class CubanewsViewModel: ObservableObject {
                 if (currentPage > 1) {
                     self.moreNews.append(contentsOf: newItems)
                 } else if (shouldUpdateLatestNews(with: Set(newItems.map { $0.id }))) {
-                    NSLog("➡️ \(TAG): Updateing Latest News")
+                    NSLog("➡️ \(TAG): Updating Latest News")
                     self.latestNews = newItems.sorted(by: sortFeedItems(a:b:))
                     let existingCachedItems = (try? modelContext.fetch(FetchDescriptor<CachedFeedItem>())) ?? []
                     for item in existingCachedItems {
