@@ -111,26 +111,25 @@ struct FeedItemView: View {
             // Save and Share buttons
             HStack(spacing: 20) {
                 Spacer()
-
+                
                 // Save button
                 Button(action: {
                     cubanewsViewModel.toggleSaved(for: item.id)
                 }) {
-                    Image(systemName: cubanewsViewModel.isSaved(item.id) ? "bookmark.fill" : "bookmark")
-                        .font(.system(size: 20))
+                    Label("Guardar", systemImage: cubanewsViewModel.isSaved(item.id) ? "bookmark.fill" : "bookmark")
+                        .labelStyle(.titleAndIcon)
+                        .font(.system(size: 14))
                         .foregroundColor(cubanewsViewModel.isSaved(item.id) ? .accentColor : .secondary)
                 }
-                .buttonStyle(.plain)
-
                 // Share button
                 Button(action: {
                     showingShareSheet = true
                 }) {
-                    Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 20))
+                    Label("Compartir", systemImage: "square.and.arrow.up")
+                        .labelStyle(.titleAndIcon)
+                        .font(.system(size: 14))
                         .foregroundColor(.secondary)
                 }
-                .buttonStyle(.plain)
                 .sheet(isPresented: $showingShareSheet) {
                     if let url = URL(string: item.url) {
                         ShareSheet(items: [url])

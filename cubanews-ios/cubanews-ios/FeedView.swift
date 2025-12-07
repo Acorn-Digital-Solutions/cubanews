@@ -18,7 +18,7 @@ struct FeedView: View {
     private var content: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                HighlightedNewsHeader()
+                NewsHeader(header: "Titulares", showDate: true)
                 ForEach(viewModel.latestNews) { item in
                     FeedItemView(item: item)
                         .padding(.horizontal)
@@ -67,31 +67,6 @@ struct FeedView: View {
             NSLog("\(String(describing: type(of: self))) selectedPublications changed - oldValue: \(Array(oldValue)), newValue: \(Array(newValue))")
             viewModel.loadPreferences()
         }
-    }
-}
-
-struct HighlightedNewsHeader: View {
-    let todayLocalFormatted = Date().formatted(.dateTime.day().month(.wide))
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 12) {
-                Image("cubanewsIdentity")
-                    .resizable()
-                    .renderingMode(.original)
-                    .frame(width: 48, height: 48)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                Text("Titulares")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-            }
-            Label(todayLocalFormatted, systemImage: "calendar")
-                .labelStyle(.titleOnly)
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .foregroundColor(.gray)
-        }
-        .padding(.horizontal)
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
