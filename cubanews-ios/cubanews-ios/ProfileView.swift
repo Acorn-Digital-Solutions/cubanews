@@ -1,5 +1,5 @@
 //
-//  UserPreferences.swift
+//  ProfileView.swift
 //  cubanews-ios
 //
 
