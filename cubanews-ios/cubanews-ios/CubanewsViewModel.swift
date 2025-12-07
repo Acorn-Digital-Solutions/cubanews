@@ -112,7 +112,6 @@ final class CubanewsViewModel: ObservableObject {
     @Published var allItemsIds: Set<Int64> = []
     @Published var latestNews: [FeedItem] = []
     @Published var moreNews: [FeedItem] = []
-    @Query var preferences: [UserPreferences]
     @Published var selectedPublications: Set<String> = []
 
     private let modelContext: ModelContext
