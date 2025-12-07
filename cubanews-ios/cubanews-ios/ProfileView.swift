@@ -16,7 +16,7 @@ struct ProfileView: View {
     
     // Inline linked privacy text
     private var privacyAttributedText: AttributedString {
-        var text = AttributedString("Consulta nuestra política de privacidad para entender cómo manejamos tus datos.")
+        var text = AttributedString("Cubanews no comparte informacion de sus usuarios con terceros. Consulta nuestra política de privacidad para más detalles.")
         // Base color for non-link text
         text.foregroundColor = .gray
         if let range = text.range(of: "política de privacidad"),
@@ -30,7 +30,7 @@ struct ProfileView: View {
     }
     
     private var misionAttributedText: AttributedString {
-        var text = AttributedString("La mision de CubaNews es amplificar el mensaje de la prensa independiente cubana . Ver mas en nuestra web cubanews.icu")
+        var text = AttributedString("La mision de CubaNews es amplificar el mensaje de la prensa independiente cubana . Ver más en nuestra web cubanews.icu")
         // Base color for non-link text
         text.foregroundColor = .gray
         if let range = text.range(of: "cubanews.icu"),
