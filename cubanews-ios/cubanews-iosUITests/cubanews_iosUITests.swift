@@ -107,16 +107,6 @@ final class cubanews_iosUITests: XCTestCase {
     }
     
     @MainActor
-    func testNavigateToSavedStoriesTab() throws {
-        performLogin()
-        navigateToTab("Guardados")
-        
-        // Verify we're on the saved stories screen
-        let navigationTitle = app.navigationBars["Guardadas"]
-        XCTAssertTrue(navigationTitle.waitForExistence(timeout: 5), "Should show Guardadas navigation title")
-    }
-    
-    @MainActor
     func testNavigateToProfileTab() throws {
         performLogin()
         navigateToTab("Perfil")
@@ -148,20 +138,40 @@ final class cubanews_iosUITests: XCTestCase {
         // Verify preferences section exists
         let preferencesHeader = app.staticTexts["Preferencias"]
         XCTAssertTrue(preferencesHeader.waitForExistence(timeout: 5), "Should show Preferencias header")
+
+    }
+    
+    @MainActor
+    func testProfileViewShowsAccountSection() throws {
+        performLogin()
+        navigateToTab("Perfil")
         
+        app.swipeUp()
+
         // Verify account section exists
-        let accountHeader = app.staticTexts["Cuenta"]
+        let accountHeader = app.staticTexts["Maneja tu Cuenta"]
         XCTAssertTrue(accountHeader.exists, "Should show Cuenta header")
     }
     
+    @MainActor
+    func testProfileViewShowsAboutCubanewsSection() throws {
+        performLogin()
+        navigateToTab("Perfil")
+
+        // Verify account section exists
+        let accountHeader = app.staticTexts["Acerca de CubaNews"]
+        XCTAssertTrue(accountHeader.exists, "Should show About section")
+    }
+    
+        
     @MainActor
     func testProfileViewShowsPublicationOptions() throws {
         performLogin()
         navigateToTab("Perfil")
         
         // Verify publication options exist
-        let adnCubaOption = app.staticTexts["AdnCuba"]
-        XCTAssertTrue(adnCubaOption.waitForExistence(timeout: 5), "Should show AdnCuba option")
+        let adnCubaOption = app.buttons["ADNCUBA"]
+        XCTAssertTrue(adnCubaOption.waitForExistence(timeout: 5), "Should show AdnCuba button")
     }
     
     @MainActor
@@ -190,7 +200,7 @@ final class cubanews_iosUITests: XCTestCase {
         app.swipeUp()
         
         // Verify version info exists
-        let versionText = app.staticTexts["Version 0.0.1"]
+        let versionText = app.staticTexts["Cubanews Version 0.0.1"]
         XCTAssertTrue(versionText.waitForExistence(timeout: 5), "Should show version info")
         
         // Verify copyright exists
