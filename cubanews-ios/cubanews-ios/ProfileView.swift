@@ -1,5 +1,5 @@
 //
-//  ProfileView.swift
+//  UserPreferences.swift
 //  cubanews-ios
 //
 
@@ -12,8 +12,7 @@ struct ProfileView: View {
     @Query private var preferences: [UserPreferences]
     @State private var selectedPublications: Set<String> = []
     
-    // Available publications
-    let publications = ["AdnCuba", "Cibercuba", "CatorceYMedio", "ElToque", "DiariodeCuba", "Cubanet"]
+    let publications = NewsSourceName.allCases.filter { $0 != .unknown }.map { $0.rawValue }
     
     // Inline linked privacy text
     private var privacyAttributedText: AttributedString {
@@ -137,37 +136,85 @@ struct ProfileView: View {
             .navigationBarTitleDisplayMode(.large)
         }
         .onAppear {
+            NSLog("ProfileView appeared")
+            loadPreferences()
+        }
+        .onChange(of: selectedPublications) { oldValue, newValue in
+            NSLog("selectedPublications changed - oldValue: \(Array(oldValue)), newValue: \(Array(newValue))")
             loadPreferences()
         }
     }
     
     private func loadPreferences() {
+        NSLog("xxx - loadPreferences() called - preferences.count: \(preferences.count)")
+        // Sync from preferences to state
+        selectedPublications.removeAll()
         if let userPrefs = preferences.first {
+            NSLog("Found preferences with \(userPrefs.preferredPublications.count) publications")
             selectedPublications = Set(userPrefs.preferredPublications)
+            NSLog("selectedPublications now contains: \(Array(selectedPublications))")
         } else {
-            // Create default preferences
+            NSLog("No preferences found - creating defaults...")
+            // Create default preferences if none exist
             let newPrefs = UserPreferences(preferredPublications: [])
             modelContext.insert(newPrefs)
             try? modelContext.save()
         }
     }
     
+    private func fetchAndSyncPreferences() {
+        NSLog("fetchAndSyncPreferences() called")
+        do {
+            // Manually fetch all UserPreferences from the database
+            let descriptor = FetchDescriptor<UserPreferences>()
+            let fetchedPreferences = try modelContext.fetch(descriptor)
+            NSLog("Fetched \(fetchedPreferences.count) preferences from database")
+            
+            // Sync to UI state
+            selectedPublications.removeAll()
+            if let userPrefs = fetchedPreferences.first {
+                NSLog("Syncing \(userPrefs.preferredPublications.count) publications to selectedPublications")
+                selectedPublications = Set(userPrefs.preferredPublications)
+                NSLog("selectedPublications now contains: \(Array(selectedPublications))")
+            }
+        } catch {
+            NSLog("Error fetching preferences: \(error)")
+        }
+    }
+    
     private func togglePreference(_ publication: String) {
+        NSLog("togglePreference: \(publication)")
+        
         if selectedPublications.contains(publication) {
             selectedPublications.remove(publication)
+            NSLog("  -> Removed \(publication)")
         } else {
             selectedPublications.insert(publication)
+            NSLog("  -> Added \(publication)")
         }
+        
+        NSLog("  -> selectedPublications now: \(Array(selectedPublications))")
         
         // Save to SwiftData
         if let userPrefs = preferences.first {
+            NSLog("  -> Updating existing UserPreferences")
             userPrefs.preferredPublications = Array(selectedPublications)
-            try? modelContext.save()
+            do {
+                try modelContext.save()
+                NSLog("  -> Saved successfully")
+            } catch {
+                NSLog("  -> Error saving: \(error)")
+            }
         } else {
-            // Create new preferences if none exist
+            NSLog("  -> Creating new UserPreferences")
             let newPrefs = UserPreferences(preferredPublications: Array(selectedPublications))
             modelContext.insert(newPrefs)
-            try? modelContext.save()
+            do {
+                try modelContext.save()
+                NSLog("  -> New preferences saved successfully")
+            } catch {
+                NSLog("  -> Error saving new preferences: \(error)")
+            }
         }
     }
 }
@@ -267,9 +314,3 @@ struct ManageAccountSection: View {
     }
 }
 
-#Preview {
-    if #available(iOS 17, *) {
-        ProfileView()
-            .modelContainer(for: [UserPreferences.self, SavedItem.self])
-    }
-}

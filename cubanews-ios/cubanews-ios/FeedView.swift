@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import SwiftData
 import Combine
 
 @available(iOS 17, *)
 struct FeedView: View {
+    @Environment(\.modelContext) private var modelContext
     @ObservedObject private var viewModel = CubanewsViewModel.shared
-
+        
     @available(iOS 17, *)
     private var content: some View {
         ScrollView {
@@ -58,6 +60,12 @@ struct FeedView: View {
                 .task {
                     await viewModel.fetchFeedItems()
                 }
+        }.onAppear {
+            NSLog("\(String(describing: type(of: self))) appeared")
+            viewModel.loadPreferences()
+        }.onChange(of: viewModel.selectedPublications) { oldValue, newValue in
+            NSLog("\(String(describing: type(of: self))) selectedPublications changed - oldValue: \(Array(oldValue)), newValue: \(Array(newValue))")
+            viewModel.loadPreferences()
         }
     }
 }
