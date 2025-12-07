@@ -162,26 +162,6 @@ struct ProfileView: View {
         }
     }
     
-    private func fetchAndSyncPreferences() {
-        NSLog("fetchAndSyncPreferences() called")
-        do {
-            // Manually fetch all UserPreferences from the database
-            let descriptor = FetchDescriptor<UserPreferences>()
-            let fetchedPreferences = try modelContext.fetch(descriptor)
-            NSLog("Fetched \(fetchedPreferences.count) preferences from database")
-            
-            // Sync to UI state
-            selectedPublications.removeAll()
-            if let userPrefs = fetchedPreferences.first {
-                NSLog("Syncing \(userPrefs.preferredPublications.count) publications to selectedPublications")
-                selectedPublications = Set(userPrefs.preferredPublications)
-                NSLog("selectedPublications now contains: \(Array(selectedPublications))")
-            }
-        } catch {
-            NSLog("Error fetching preferences: \(error)")
-        }
-    }
-    
     private func togglePreference(_ publication: String) {
         NSLog("togglePreference: \(publication)")
         

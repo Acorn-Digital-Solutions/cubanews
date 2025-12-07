@@ -128,7 +128,6 @@ final class CubanewsViewModel: ObservableObject {
     }
     
     func loadPreferences() {
-        NSLog("➡️ \(TAG) loadPreferences() called - preferences.count: \(preferences.count)")
         if let userPrefs = ((try? modelContext.fetch(FetchDescriptor<UserPreferences>())) ?? []).first {
             NSLog("➡️ \(TAG) Found preferences with \(userPrefs.preferredPublications.count) publications")
             selectedPublications = Set(userPrefs.preferredPublications)
