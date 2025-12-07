@@ -11,7 +11,6 @@ import Combine
 
 @available(iOS 17, *)
 struct FeedView: View {
-    @Environment(\.modelContext) private var modelContext
     @ObservedObject private var viewModel = CubanewsViewModel.shared
         
     @available(iOS 17, *)
