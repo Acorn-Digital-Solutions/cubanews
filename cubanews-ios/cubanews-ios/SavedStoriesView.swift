@@ -45,6 +45,7 @@ struct SavedStoriesView: View {
         } else {
             ScrollView {
                 LazyVStack(spacing: 12) {
+                    NewsHeader(header: "Guardados", showDate: false)
                     ForEach(viewModel.items) { item in
                         FeedItemView(item: item)
                             .padding(.horizontal)
@@ -62,7 +63,6 @@ struct SavedStoriesView: View {
         NavigationView {
             content
                 .background(Color(.systemBackground))
-                .navigationTitle("Guardadas")
                 .task {
                     viewModel.loadSavedItems()
                 }

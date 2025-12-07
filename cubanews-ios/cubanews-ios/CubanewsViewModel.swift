@@ -99,7 +99,8 @@ final class CubanewsViewModel: ObservableObject {
             let schema = Schema([SavedItem.self, CachedFeedItem.self, UserPreferences.self])
             return try ModelContainer(for: schema)
         } catch {
-            fatalError("Failed to create ModelContainer for SavedItem and CachedFeedItem: \(error)")
+            let TAG = "CubanewsViewModel"
+            fatalError("➡️ \(TAG) Failed to create ModelContainer for SavedItem and CachedFeedItem: \(error)")
         }
     }()
 
@@ -111,6 +112,7 @@ final class CubanewsViewModel: ObservableObject {
     @Published var allItemsIds: Set<Int64> = []
     @Published var latestNews: [FeedItem] = []
     @Published var moreNews: [FeedItem] = []
+    @Published var selectedPublications: Set<String> = []
 
     private let modelContext: ModelContext
 
@@ -119,8 +121,17 @@ final class CubanewsViewModel: ObservableObject {
         // We're on the MainActor; safe to access the sharedModelContainer.mainContext here.
         self.modelContext = Self.sharedModelContainer.mainContext
         loadSavedIds()
+        loadPreferences()
         Task.detached {
             await ImageCache.shared.removeExpiredImages()
+        }
+    }
+    
+    func loadPreferences() {
+        if let userPrefs = ((try? modelContext.fetch(FetchDescriptor<UserPreferences>())) ?? []).first {
+            NSLog("➡️ \(TAG) Found preferences with \(userPrefs.preferredPublications.count) publications")
+            selectedPublications = Set(userPrefs.preferredPublications)
+            NSLog("➡️ \(TAG) selectedPublications now contains: \(Array(selectedPublications))")
         }
     }
 
@@ -171,15 +182,26 @@ final class CubanewsViewModel: ObservableObject {
     private func shouldUpdateLatestNews(with itemIds: Set<Int64>) -> Bool {
         return self.latestNews.isEmpty || Set(self.latestNews.map { $0.id }).isDisjoint(with: itemIds)
     }
+    
+    func sortFeedItems(a: FeedItem, b: FeedItem) -> Bool {
+        let aIsPreferred = selectedPublications.contains(a.source.rawValue)
+        let bIsPreferred = selectedPublications.contains(b.source.rawValue)
+        
+        if aIsPreferred != bIsPreferred {
+            return aIsPreferred
+        }
+        return a.isoDate > b.isoDate
+    }
 
     func fetchFeedItems() async {
+        self.latestNews = self.latestNews.sorted(by: sortFeedItems(a:b:))
         NSLog("➡️ \(TAG): FetchingFeedItems_START")
         if self.latestNews.isEmpty {
             let cachedItems = fetchItemsFromCache()
             NSLog("➡️ \(TAG): Cached items count: \(cachedItems.count)")
             if cachedItems.count > 0 {
                 NSLog("➡️ \(TAG): Filling latest news from cache")
-                self.latestNews = cachedItems.sorted(by: { $0.isoDate > $1.isoDate })
+                self.latestNews = cachedItems.sorted(by: sortFeedItems(a:b:))
             }
         }
         guard !isLoading else { return }
@@ -207,8 +229,8 @@ final class CubanewsViewModel: ObservableObject {
                 if (currentPage > 1) {
                     self.moreNews.append(contentsOf: newItems)
                 } else if (shouldUpdateLatestNews(with: Set(newItems.map { $0.id }))) {
-                    NSLog("➡️ \(TAG): Updateing Latest News")
-                    self.latestNews = newItems.sorted(by: { $0.isoDate > $1.isoDate }) //TODO Make sure sorting is the same for cached and not cached.
+                    NSLog("➡️ \(TAG): Updating Latest News")
+                    self.latestNews = newItems.sorted(by: sortFeedItems(a:b:))
                     let existingCachedItems = (try? modelContext.fetch(FetchDescriptor<CachedFeedItem>())) ?? []
                     for item in existingCachedItems {
                         modelContext.delete(item)

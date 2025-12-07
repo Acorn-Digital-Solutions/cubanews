@@ -5,7 +5,7 @@
 
 import Foundation
 
-enum NewsSourceName: String, Codable {
+enum NewsSourceName: String, Codable, CaseIterable {
     case ADNCUBA
     case CATORCEYMEDIO
     case DIARIODECUBA
