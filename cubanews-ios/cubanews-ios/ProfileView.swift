@@ -11,6 +11,7 @@ struct ProfileView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var preferences: [UserPreferences]
     @State private var selectedPublications: Set<String> = []
+    @State private var userFullName: String = "Usuario Anónimo"
     
     let publications = NewsSourceName.allCases.filter { $0 != .unknown }.map { $0.rawValue }
     
@@ -55,7 +56,7 @@ struct ProfileView: View {
                                 .font(.system(size: 40))
                                 .foregroundColor(.blue)
                             
-                            Text("User")
+                            Text(userFullName)
                                 .font(.title)
                                 .fontWeight(.bold)
                         }
@@ -153,6 +154,7 @@ struct ProfileView: View {
             NSLog("Found preferences with \(userPrefs.preferredPublications.count) publications")
             selectedPublications = Set(userPrefs.preferredPublications)
             NSLog("selectedPublications now contains: \(Array(selectedPublications))")
+            userFullName = userPrefs.userFullName ?? "Usuario Anónimo"
         } else {
             NSLog("No preferences found - creating defaults...")
             // Create default preferences if none exist
