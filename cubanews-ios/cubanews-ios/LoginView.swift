@@ -44,22 +44,23 @@ struct LoginView: View {
                                 let email = credential.email
                                 let fullName = credential.fullName.flatMap { PersonNameComponentsFormatter().string(from: $0) }
                                 let appelUserID = credential.user
-                                if email != nil || fullName != nil {
-                                    NSLog("➡️ \(Self.TAG) Authorization successful. email: \(String(describing: email)), name: \(String(describing: fullName))")
-                                    if let existing = preferences.first {
-                                        existing.userEmail = email
-                                        existing.userFullName = fullName
-                                        existing.appleUserID = credential.user
-                                        try? modelContext.save()
-                                        NSLog("➡️ \(Self.TAG) Updated existing UserPreferences")
-                                    } else {
-                                        let prefs = UserPreferences(userEmail: email, userFullName: fullName, appleUserID: appelUserID)
-                                        modelContext.insert(prefs)
-                                        try? modelContext.save()
-                                        NSLog("➡️ \(Self.TAG) Created new UserPreferences")
-                                    }
+                                // Save the Apple user identifier at minimum. The email and full name
+                                // are only provided by Apple the first time a user signs in. Relying
+                                // on them prevents subsequent sign-ins from being recorded.
+                                NSLog("➡️ \(Self.TAG) Authorization successful. email: \(String(describing: email)), name: \(String(describing: fullName))")
+                                if let existing = preferences.first {
+                                    // Update fields that are available (may be nil)
+                                    existing.userEmail = email ?? existing.userEmail
+                                    existing.userFullName = fullName ?? existing.userFullName
+                                    existing.appleUserID = credential.user
+                                    try? modelContext.save()
+                                    NSLog("➡️ \(Self.TAG) Updated existing UserPreferences")
                                 } else {
-                                    NSLog("➡️ \(Self.TAG) Authorization successful but no email or name provided. THIS SHOULD NEVER HAPPEN")
+                                    // Create with whatever data we have (appleUserID is always present)
+                                    let prefs = UserPreferences(userEmail: email, userFullName: fullName, appleUserID: appelUserID)
+                                    modelContext.insert(prefs)
+                                    try? modelContext.save()
+                                    NSLog("➡️ \(Self.TAG) Created new UserPreferences")
                                 }
                             }
                         case .failure(let error):
@@ -78,4 +79,3 @@ struct LoginView: View {
         .background(Color(.systemBackground))
     }
 }
-
