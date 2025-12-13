@@ -5,6 +5,7 @@
 
 import SwiftUI
 import SwiftData
+import AuthenticationServices
 
 @available(iOS 17, *)
 struct ProfileView: View {
@@ -230,8 +231,49 @@ struct PreferencePillButton: View {
     }
 }
 
+struct AccountDeletedView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: 24) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 64))
+                .foregroundColor(.green)
+
+            Text("Cuenta eliminada")
+                .font(.title2)
+                .fontWeight(.semibold)
+
+            Text("Todos tus datos han sido eliminados correctamente.")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+
+            Button {
+                do {
+                    try modelContext.save()
+                } catch {
+                    NSLog("Error saving model context after account deletion: \(error)")
+                }
+                dismiss()
+            } label: {
+                Text("Volver al inicio")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .padding(.top, 16)
+        }
+        .padding()
+    }
+}
+
+
 struct ManageAccountSection: View {
     @State private var showingDeleteAlert = false
+    @Environment(\.modelContext) private var modelContext
+    @Query private var preferences: [UserPreferences]
+    @State private var showDeletedConfirmation = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -240,21 +282,6 @@ struct ManageAccountSection: View {
                 .padding(.horizontal)
             
             HStack(spacing: 2) {
-                // Logout Button
-                Button(action: handleLogout) {
-                    Text("Cerrar Sesión")
-                        .font(.body)
-                        .fontWeight(.light)
-                        .foregroundColor(.blue)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.blue, lineWidth: 2)
-                        )
-                }
-                .padding(.horizontal)
-                
                 // Delete Account Button
                 Button(action: {
                     showingDeleteAlert = true
@@ -276,23 +303,34 @@ struct ManageAccountSection: View {
         .alert("¿Eliminar Cuenta?", isPresented: $showingDeleteAlert) {
             Button("Cancelar", role: .cancel) { }
             Button("Eliminar", role: .destructive) {
-                handleDeleteAccount()
+                Task {
+                    await handleDeleteAccount()
+                }
             }
         } message: {
             Text("Esta acción no se puede deshacer. Todos tus datos serán eliminados permanentemente.")
         }
-    }
+    }    
     
-    private func handleLogout() {
-        // TODO: Implement logout logic
-        // Clear user session, navigate to login screen, etc.
-        NSLog("Logout button tapped")
+    @MainActor
+    private func handleDeleteAccount() async {
+        guard preferences.first != nil else { return }
+        do {
+            try modelContext.fetch(FetchDescriptor<UserPreferences>())
+                .forEach { modelContext.delete($0) }
+            
+            try modelContext.fetch(FetchDescriptor<SavedItem>())
+                .forEach { modelContext.delete($0) }
+            
+            try modelContext.fetch(FetchDescriptor<CachedFeedItem>())
+                .forEach { modelContext.delete($0) }
+            
+            try modelContext.save()
+            NSLog("✅ Local user data deleted")
+        } catch {
+            NSLog("❌ Failed to delete account: \(error)")
+        }
     }
-    
-    private func handleDeleteAccount() {
-        // TODO: Implement delete account logic
-        // Delete user data from SwiftData and backend
-        NSLog("Delete account confirmed")
-    }
+   
 }
 

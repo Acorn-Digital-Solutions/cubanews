@@ -21,58 +21,57 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct cubanews_iosApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject private var cubanewsViewModel = CubanewsViewModel.shared
-    @State private var userPreferences: UserPreferences? = nil
-    @State private var isLoadingPreferences: Bool = true
-    private let modelContainer: ModelContainer
-    private static let TAG = "cubanews_iosApp"
-    
-    init() {
-        NSLog("➡️ \(Self.TAG) Creating ModelContainer")
-        modelContainer = {
-            do {
-                let schema = Schema([SavedItem.self, CachedFeedItem.self, UserPreferences.self])
-                return try ModelContainer(for: schema)
-            } catch {
-                fatalError("➡️ \(Self.TAG) Failed to create ModelContainer")
-            }
-        }()
-    }
-        
+    private let modelContainer: ModelContainer = {
+        do {
+            let schema = Schema([SavedItem.self, CachedFeedItem.self, UserPreferences.self])
+            return try ModelContainer(for: schema)
+        } catch {
+            fatalError("➡️ Failed to create ModelContainer")
+        }
+    }()
     var body: some Scene {
         WindowGroup {
-            Group {
-                if isLoadingPreferences {
-                    AppLaunchView()
-                } else if userPreferences?.userEmail != nil {
-                    ContentView()
-                        .environmentObject(cubanewsViewModel)
-                } else {
-                    LoginView(userPreferences: $userPreferences)
-                        .environmentObject(cubanewsViewModel)
-                }
+            RootView()
+        }
+        .modelContainer(modelContainer)
+    }
+}
+
+struct RootView: View {
+    private static let TAG = "cubanews_iosApp"
+    @StateObject private var cubanewsViewModel = CubanewsViewModel.shared
+    @Query private var preferences: [UserPreferences]
+    @State private var isLoadingPreferences: Bool = true
+        
+    private var userPreferences: UserPreferences? {
+        return preferences.first
+    }
+    
+    private var isAuthenticated: Bool {
+        NSLog("➡️ \(Self.TAG) Checking authentication status")
+        return userPreferences?.appleUserID != nil
+    }
+    
+    var body: some View {
+        Group {
+            if isLoadingPreferences {
+                AppLaunchView()
+            } else if isAuthenticated {
+                ContentView()
+                    .environmentObject(cubanewsViewModel)
+            } else {
+                LoginView()
+                    .environmentObject(cubanewsViewModel)
             }
-            .modelContainer(modelContainer)
-            .task {
-                await loadUserPreferences()
-            }
+        }
+        .task {
+            await launch()
         }
     }
     
     @MainActor
-    private func loadUserPreferences() async {
+    private func launch() async {
         let start = Date()
-
-        let context = modelContainer.mainContext
-        do {
-            let prefs = try context.fetch(FetchDescriptor<UserPreferences>()).first
-            userPreferences = prefs
-            NSLog("➡️ \(Self.TAG) Loaded UserPreferences: \(prefs?.appleUserID ?? "nil") \(prefs?.userEmail ?? "nil")")
-        } catch {
-            userPreferences = nil
-            NSLog("➡️ \(Self.TAG) Failed to load UserPreferences: \(error)")
-        }
-
         // Ensure the launch view is visible for at least 2 seconds
         let elapsed = Date().timeIntervalSince(start)
         let remaining = max(0, 1.0 - elapsed)
@@ -81,6 +80,7 @@ struct cubanews_iosApp: App {
         }
         isLoadingPreferences = false
     }
+
 }
 
 struct AppLaunchView: View {

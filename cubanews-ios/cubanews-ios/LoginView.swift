@@ -11,7 +11,6 @@ import SwiftData
 struct LoginView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var preferences: [UserPreferences]
-    @Binding var userPreferences: UserPreferences?
     private static let TAG = "cubanews_iosApp"
     
     var body: some View {
@@ -31,28 +30,6 @@ struct LoginView: View {
             
             // Login Buttons
             VStack(spacing: 16) {
-                // Google Login Button
-                Button(action: {
-                    // Mock login - just set authenticated to true
-//                    isAuthenticated = true
-                }) {
-                    HStack {
-                        Image(systemName: "g.circle.fill")
-                            .font(.title2)
-                        Text("Continue with Google")
-                            .fontWeight(.semibold)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.white)
-                    .foregroundColor(.black)
-                    .cornerRadius(10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                    )
-                }
-                
                 // Apple Login Button
                 SignInWithAppleButton(
                     .signIn,
@@ -74,17 +51,11 @@ struct LoginView: View {
                                         existing.userFullName = fullName
                                         existing.appleUserID = credential.user
                                         try? modelContext.save()
-                                        DispatchQueue.main.async {
-                                            userPreferences = existing
-                                        }
                                         NSLog("➡️ \(Self.TAG) Updated existing UserPreferences")
                                     } else {
                                         let prefs = UserPreferences(userEmail: email, userFullName: fullName, appleUserID: appelUserID)
                                         modelContext.insert(prefs)
                                         try? modelContext.save()
-                                        DispatchQueue.main.async {
-                                            userPreferences = prefs
-                                        }
                                         NSLog("➡️ \(Self.TAG) Created new UserPreferences")
                                     }
                                 } else {
@@ -100,24 +71,6 @@ struct LoginView: View {
                 .signInWithAppleButtonStyle(.black)
                 .frame(height: 45)
                 .padding()
-                
-                // Facebook Login Button
-                Button(action: {
-                    // Mock login - just set authenticated to true
-//                    isAuthenticated = true
-                }) {
-                    HStack {
-                        Image(systemName: "f.circle.fill")
-                            .font(.title2)
-                        Text("Continue with Facebook")
-                            .fontWeight(.semibold)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                }
             }
             .padding(.horizontal, 40)
             Spacer()
