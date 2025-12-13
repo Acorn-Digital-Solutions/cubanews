@@ -66,18 +66,20 @@ struct LoginView: View {
                             if let credential = authResults.credential as? ASAuthorizationAppleIDCredential {
                                 let email = credential.email
                                 let fullName = credential.fullName.flatMap { PersonNameComponentsFormatter().string(from: $0) }
+                                let appelUserID = credential.user
                                 if email != nil || fullName != nil {
                                     NSLog("➡️ \(Self.TAG) Authorization successful. email: \(String(describing: email)), name: \(String(describing: fullName))")
                                     if let existing = preferences.first {
                                         existing.userEmail = email
                                         existing.userFullName = fullName
+                                        existing.appleUserID = credential.user
                                         try? modelContext.save()
                                         DispatchQueue.main.async {
                                             userPreferences = existing
                                         }
                                         NSLog("➡️ \(Self.TAG) Updated existing UserPreferences")
                                     } else {
-                                        let prefs = UserPreferences(userEmail: email, userFullName: fullName)
+                                        let prefs = UserPreferences(userEmail: email, userFullName: fullName, appleUserID: appelUserID)
                                         modelContext.insert(prefs)
                                         try? modelContext.save()
                                         DispatchQueue.main.async {

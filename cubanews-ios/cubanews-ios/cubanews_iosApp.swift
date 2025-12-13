@@ -67,7 +67,7 @@ struct cubanews_iosApp: App {
         do {
             let prefs = try context.fetch(FetchDescriptor<UserPreferences>()).first
             userPreferences = prefs
-            NSLog("➡️ \(Self.TAG) Loaded UserPreferences: \(prefs?.userEmail ?? "nil")")
+            NSLog("➡️ \(Self.TAG) Loaded UserPreferences: \(prefs?.appleUserID ?? "nil") \(prefs?.userEmail ?? "nil")")
         } catch {
             userPreferences = nil
             NSLog("➡️ \(Self.TAG) Failed to load UserPreferences: \(error)")
@@ -79,7 +79,6 @@ struct cubanews_iosApp: App {
         if remaining > 0 {
             try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
         }
-
         isLoadingPreferences = false
     }
 }
@@ -89,14 +88,12 @@ struct AppLaunchView: View {
         ZStack {
             Color(.systemBackground)
                 .ignoresSafeArea()
-            ProgressView()
-            // App Logo/Title
+            
             VStack(spacing: 10) {
                 Image("cubanewsIdentity")
                     .resizable()
                     .renderingMode(.original)
                     .frame(width: 250, height: 250)
-                Text("Cuba News").font(.largeTitle).fontWeight(.bold)
                     
             }
         }
