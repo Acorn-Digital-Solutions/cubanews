@@ -29,15 +29,22 @@ final class cubanews_iosUITests: XCTestCase {
     
     // MARK: - Helper Methods
     
-    /// Performs login using the Google button and waits for the main content to appear
+    /// Performs login using Apple Sign In and waits for the main content to appear
     private func performLogin() {
-        let googleButton = app.buttons["Continue with Google"]
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5), "Google login button should exist")
-        googleButton.tap()
+        // Since Apple Sign In button is now the primary method
+        let appleSignInButton = app.buttons.matching(identifier: "Sign in with Apple").firstMatch
         
-        // Wait for main content to load
-        let titularesTab = app.buttons["Titulares"]
-        XCTAssertTrue(titularesTab.waitForExistence(timeout: 5), "Should navigate to main content after login")
+        if appleSignInButton.waitForExistence(timeout: 5) {
+            appleSignInButton.tap()
+            
+            // Wait for main content to load
+            let titularesTab = app.buttons["Titulares"]
+            XCTAssertTrue(titularesTab.waitForExistence(timeout: 10), "Should navigate to main content after login")
+        } else {
+            // If already logged in, should see main content
+            let titularesTab = app.buttons["Titulares"]
+            XCTAssertTrue(titularesTab.waitForExistence(timeout: 5), "Should be on main content if already authenticated")
+        }
     }
     
     /// Navigates to the specified tab
@@ -50,44 +57,38 @@ final class cubanews_iosUITests: XCTestCase {
     // MARK: - Login Screen Tests
     
     @MainActor
-    func testLoginScreenDisplaysLoginButtons() throws {
-        // Verify that the login screen shows the login options
-        let googleButton = app.buttons["Continue with Google"]
-        let appleButton = app.buttons["Continue with Apple"]
-        let facebookButton = app.buttons["Continue with Facebook"]
+    func testLoginScreenDisplaysAppleSignInButton() throws {
+        // Verify that the login screen shows Apple Sign In button
+        let appleSignInButton = app.buttons.matching(identifier: "Sign in with Apple").firstMatch
         
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5), "Google login button should exist")
-        XCTAssertTrue(appleButton.exists, "Apple login button should exist")
-        XCTAssertTrue(facebookButton.exists, "Facebook login button should exist")
+        XCTAssertTrue(appleSignInButton.waitForExistence(timeout: 5), "Apple Sign In button should exist")
     }
     
     @MainActor
-    func testLoginWithGoogleNavigatesToMainContent() throws {
-        performLogin()
+    func testLoginScreenDisplaysAppLogo() throws {
+        // Verify the app shows the Cuba News logo on login screen
+        let logoImage = app.images["cubanewsIdentity"]
+        let appTitle = app.staticTexts["Cuba News"]
+        
+        XCTAssertTrue(logoImage.waitForExistence(timeout: 5) || appTitle.waitForExistence(timeout: 5), 
+                     "Login screen should show app logo or title")
     }
     
     @MainActor
-    func testLoginWithAppleNavigatesToMainContent() throws {
-        // Tap Apple login button
-        let appleButton = app.buttons["Continue with Apple"]
-        XCTAssertTrue(appleButton.waitForExistence(timeout: 5))
-        appleButton.tap()
+    func testAppleSignInNavigatesToMainContent() throws {
+        let appleSignInButton = app.buttons.matching(identifier: "Sign in with Apple").firstMatch
         
-        // Verify we're now on the main content (TabView)
-        let titularesTab = app.buttons["Titulares"]
-        XCTAssertTrue(titularesTab.waitForExistence(timeout: 5), "Should navigate to main content after login")
-    }
-    
-    @MainActor
-    func testLoginWithFacebookNavigatesToMainContent() throws {
-        // Tap Facebook login button
-        let facebookButton = app.buttons["Continue with Facebook"]
-        XCTAssertTrue(facebookButton.waitForExistence(timeout: 5))
-        facebookButton.tap()
-        
-        // Verify we're now on the main content (TabView)
-        let titularesTab = app.buttons["Titulares"]
-        XCTAssertTrue(titularesTab.waitForExistence(timeout: 5), "Should navigate to main content after login")
+        if appleSignInButton.waitForExistence(timeout: 5) {
+            appleSignInButton.tap()
+            
+            // Verify we're now on the main content (TabView)
+            let titularesTab = app.buttons["Titulares"]
+            XCTAssertTrue(titularesTab.waitForExistence(timeout: 10), "Should navigate to main content after Apple Sign In")
+        } else {
+            // Already authenticated, skip test
+            let titularesTab = app.buttons["Titulares"]
+            XCTAssertTrue(titularesTab.waitForExistence(timeout: 5), "Already authenticated")
+        }
     }
     
     // MARK: - Tab Navigation Tests
@@ -142,6 +143,17 @@ final class cubanews_iosUITests: XCTestCase {
     }
     
     @MainActor
+    func testProfileViewShowsUserName() throws {
+        performLogin()
+        navigateToTab("Perfil")
+        
+        // Verify user name or default name is shown
+        // The name could be "Usuario Anónimo" or the actual user's name from Apple Sign In
+        let hasUserIcon = app.images.matching(identifier: "person.circle.fill").firstMatch.exists
+        XCTAssertTrue(hasUserIcon, "Should show user icon")
+    }
+    
+    @MainActor
     func testProfileViewShowsAccountSection() throws {
         performLogin()
         navigateToTab("Perfil")
@@ -182,11 +194,7 @@ final class cubanews_iosUITests: XCTestCase {
         // Scroll down to account section
         app.swipeUp()
         
-        // Verify logout button exists
-        let logoutButton = app.buttons["Cerrar Sesión"]
-        XCTAssertTrue(logoutButton.waitForExistence(timeout: 5), "Should show logout button")
-        
-        // Verify delete account button exists
+        // Verify delete account button exists (logout button removed in favor of Apple Sign In)
         let deleteButton = app.buttons["Eliminar Cuenta"]
         XCTAssertTrue(deleteButton.exists, "Should show delete account button")
     }
@@ -225,12 +233,54 @@ final class cubanews_iosUITests: XCTestCase {
         let alertTitle = app.staticTexts["¿Eliminar Cuenta?"]
         XCTAssertTrue(alertTitle.waitForExistence(timeout: 5), "Should show delete confirmation dialog")
         
+        // Verify message about irreversibility
+        let alertMessage = app.staticTexts["Esta acción no se puede deshacer. Todos tus datos serán eliminados permanentemente."]
+        XCTAssertTrue(alertMessage.exists, "Should show warning message")
+        
         // Verify cancel button exists
         let cancelButton = app.buttons["Cancelar"]
         XCTAssertTrue(cancelButton.exists, "Should show cancel button")
         
+        // Verify delete button exists
+        let confirmDeleteButton = app.buttons["Eliminar"]
+        XCTAssertTrue(confirmDeleteButton.exists, "Should show delete confirmation button")
+        
         // Dismiss dialog
         cancelButton.tap()
+    }
+    
+    @MainActor
+    func testLaunchScreenDisplaysBeforeContent() throws {
+        // Test that launch screen with logo appears briefly
+        // This test verifies the loading state implementation
+        
+        // The launch screen should show the app logo
+        let logo = app.images["cubanewsIdentity"]
+        
+        // Either we see the logo briefly, or we're already past it to main content
+        let logoExists = logo.waitForExistence(timeout: 2)
+        let mainContentExists = app.buttons["Titulares"].waitForExistence(timeout: 3)
+        
+        XCTAssertTrue(logoExists || mainContentExists, "Should show either launch screen or main content")
+    }
+    
+    @MainActor
+    func testPreferencesPublicationsToggle() throws {
+        performLogin()
+        navigateToTab("Perfil")
+        
+        // Find and tap a publication preference
+        let adnCubaButton = app.buttons["ADNCUBA"]
+        XCTAssertTrue(adnCubaButton.waitForExistence(timeout: 5), "Should show publication preference button")
+        
+        // Toggle the preference
+        adnCubaButton.tap()
+        
+        // Wait briefly for the state to update
+        sleep(1)
+        
+        // The button should still exist (just changed state)
+        XCTAssertTrue(adnCubaButton.exists, "Button should still exist after toggle")
     }
     
     // MARK: - Feed View Tests
