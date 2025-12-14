@@ -61,16 +61,10 @@ struct ProfileViewTests {
     }
     
     @Test func testPublicationPreferencesWithAllSources() throws {
-        // Test with all possible news sources
-        let allSources = [
-            "ADNCUBA", 
-            "CIBERCUBA", 
-            "ELTOQUE", 
-            "CUBANET", 
-            "DIARIODECUBA",
-            "CATORCEYMEDIO",
-            "PERIODICOCUBANO"
-        ]
+        // Test with all possible news sources (excluding .unknown)
+        let allSources = NewsSourceName.allCases
+            .filter { $0 != .unknown }
+            .map { $0.rawValue }
         
         let prefs = UserPreferences(preferredPublications: allSources)
         

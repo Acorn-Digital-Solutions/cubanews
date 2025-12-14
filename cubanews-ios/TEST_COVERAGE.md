@@ -95,7 +95,7 @@ Updated existing UI tests to work with Apple Sign In:
 ## Test Coverage Breakdown
 
 ### Unit Tests (cubanews-iosTests)
-- **Total new tests:** 37+
+- **Total new tests:** 42
 - **Files:** 4 new, 1 extended
 - **Lines added:** ~545
 

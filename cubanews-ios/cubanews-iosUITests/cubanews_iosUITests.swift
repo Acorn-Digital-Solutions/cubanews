@@ -29,7 +29,7 @@ final class cubanews_iosUITests: XCTestCase {
     
     // MARK: - Helper Methods
     
-    /// Performs login using Apple Sign In and waits for the main content to appear
+    /// Performs Apple Sign In and waits for the main content to appear
     private func performLogin() {
         // Since Apple Sign In button is now the primary method
         let appleSignInButton = app.buttons.matching(identifier: "Sign in with Apple").firstMatch
@@ -194,7 +194,7 @@ final class cubanews_iosUITests: XCTestCase {
         // Scroll down to account section
         app.swipeUp()
         
-        // Verify delete account button exists (logout button removed in favor of Apple Sign In)
+        // Verify delete account button exists
         let deleteButton = app.buttons["Eliminar Cuenta"]
         XCTAssertTrue(deleteButton.exists, "Should show delete account button")
     }

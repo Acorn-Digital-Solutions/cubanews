@@ -145,15 +145,24 @@ final class AuthenticationUITests: XCTestCase {
         XCTAssertTrue(perfilTab.waitForExistence(timeout: 5))
         perfilTab.tap()
         
-        // Find and interact with a publication button
-        let publicationButtons = app.buttons.matching(NSPredicate(format: "identifier CONTAINS[c] 'CUBA'"))
-        XCTAssertGreaterThan(publicationButtons.count, 0, "Should have publication preference buttons")
+        // Find publication buttons using more specific identification
+        // Check for known publication names
+        let knownPublications = ["ADNCUBA", "CIBERCUBA", "ELTOQUE", "CUBANET"]
+        var foundButton: XCUIElement?
         
-        if publicationButtons.count > 0 {
-            let firstButton = publicationButtons.firstMatch
-            XCTAssertTrue(firstButton.exists, "Publication button should exist")
-            XCTAssertTrue(firstButton.isEnabled, "Publication button should be enabled")
-            XCTAssertTrue(firstButton.isHittable, "Publication button should be hittable")
+        for pubName in knownPublications {
+            let button = app.buttons[pubName]
+            if button.exists {
+                foundButton = button
+                break
+            }
+        }
+        
+        XCTAssertNotNil(foundButton, "Should find at least one publication preference button")
+        
+        if let button = foundButton {
+            XCTAssertTrue(button.isEnabled, "Publication button should be enabled")
+            XCTAssertTrue(button.isHittable, "Publication button should be hittable")
         }
     }
     
