@@ -45,7 +45,6 @@ struct UserPreferencesTests {
         )
         
         #expect(prefs.preferredPublications == publications)
-        #expect(prefs.preferredPublications.count == 3)
         #expect(prefs.userEmail == "user@test.com")
         #expect(prefs.userFullName == "John Doe")
         #expect(prefs.appleUserID == "apple123")

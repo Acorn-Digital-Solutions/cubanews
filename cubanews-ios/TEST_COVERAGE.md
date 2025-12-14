@@ -105,7 +105,7 @@ Updated existing UI tests to work with Apple Sign In:
 - **Lines added:** ~394
 
 ### Total Impact
-- **939 lines of test code added**
+- **1,090 net lines of test code added (1,130 insertions - 40 deletions)**
 - **49+ test methods covering Apple Sign In feature**
 
 ## Test Categories
