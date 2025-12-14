@@ -276,8 +276,9 @@ final class cubanews_iosUITests: XCTestCase {
         // Toggle the preference
         adnCubaButton.tap()
         
-        // Wait briefly for the state to update
-        sleep(1)
+        // Wait for the UI to update after toggle
+        // The button should remain visible but its state may change
+        _ = adnCubaButton.waitForExistence(timeout: 2)
         
         // The button should still exist (just changed state)
         XCTAssertTrue(adnCubaButton.exists, "Button should still exist after toggle")
