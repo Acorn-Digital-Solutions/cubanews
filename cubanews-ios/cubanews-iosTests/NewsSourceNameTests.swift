@@ -47,4 +47,40 @@ struct NewsSourceNameTests {
             #expect(decoded == .CIBERCUBA)
         }
     }
+    
+    @Test func testNewsSourceDisplayNames() throws {
+        #expect(NewsSourceName.ADNCUBA.displayName == "ADNCuba")
+        #expect(NewsSourceName.CATORCEYMEDIO.displayName == "14yMedio")
+        #expect(NewsSourceName.DIARIODECUBA.displayName == "DiarioDeCuba")
+        #expect(NewsSourceName.CIBERCUBA.displayName == "CiberCuba")
+        #expect(NewsSourceName.ELTOQUE.displayName == "elTOQUE")
+        #expect(NewsSourceName.CUBANET.displayName == "Cubanet")
+        #expect(NewsSourceName.unknown.displayName == "Unknown")
+    }
+    
+    @Test func testNewsSourceImageNames() throws {
+        #expect(NewsSourceName.ADNCUBA.imageName == "adncuba")
+        #expect(NewsSourceName.CATORCEYMEDIO.imageName == "catorceymedio")
+        #expect(NewsSourceName.DIARIODECUBA.imageName == "ddc")
+        #expect(NewsSourceName.CIBERCUBA.imageName == "cibercuba")
+        #expect(NewsSourceName.ELTOQUE.imageName == "eltoque")
+        #expect(NewsSourceName.CUBANET.imageName == "cubanet")
+        #expect(NewsSourceName.unknown.imageName == "cubanewsIdentity")
+    }
+    
+    @Test func testAllSourcesHaveDisplayNames() throws {
+        // Ensure all cases have display names defined
+        for source in NewsSourceName.allCases {
+            let displayName = source.displayName
+            #expect(!displayName.isEmpty, "Source \(source.rawValue) should have a non-empty display name")
+        }
+    }
+    
+    @Test func testAllSourcesHaveImageNames() throws {
+        // Ensure all cases have image names defined
+        for source in NewsSourceName.allCases {
+            let imageName = source.imageName
+            #expect(!imageName.isEmpty, "Source \(source.rawValue) should have a non-empty image name")
+        }
+    }
 }
