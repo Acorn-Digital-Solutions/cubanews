@@ -43,7 +43,7 @@ struct LoginView: View {
                             if let credential = authResults.credential as? ASAuthorizationAppleIDCredential {
                                 let email = credential.email
                                 let fullName = credential.fullName.flatMap { PersonNameComponentsFormatter().string(from: $0) }
-                                let appelUserID = credential.user
+                                let appleUserID = credential.user
                                 // Save the Apple user identifier at minimum. The email and full name
                                 // are only provided by Apple the first time a user signs in. Relying
                                 // on them prevents subsequent sign-ins from being recorded.
@@ -57,7 +57,7 @@ struct LoginView: View {
                                     NSLog("➡️ \(Self.TAG) Updated existing UserPreferences")
                                 } else {
                                     // Create with whatever data we have (appleUserID is always present)
-                                    let prefs = UserPreferences(userEmail: email, userFullName: fullName, appleUserID: appelUserID)
+                                    let prefs = UserPreferences(userEmail: email, userFullName: fullName, appleUserID: appleUserID)
                                     modelContext.insert(prefs)
                                     try? modelContext.save()
                                     NSLog("➡️ \(Self.TAG) Created new UserPreferences")
