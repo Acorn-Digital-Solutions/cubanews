@@ -23,11 +23,11 @@ enum NewsSourceName: String, Codable, CaseIterable {
     // Human-friendly display name in UpperCamelCase for UI pills
     var displayName: String {
         switch self {
-        case .ADNCUBA: return "AdnCuba"
-        case .CATORCEYMEDIO: return "CatorceYMedio"
+        case .ADNCUBA: return "ADNCuba"
+        case .CATORCEYMEDIO: return "14yMedio"
         case .DIARIODECUBA: return "DiarioDeCuba"
         case .CIBERCUBA: return "CiberCuba"
-        case .ELTOQUE: return "ElToque"
+        case .ELTOQUE: return "elTOQUE"
         case .CUBANET: return "Cubanet"
         case .unknown: return "Unknown"
         }
