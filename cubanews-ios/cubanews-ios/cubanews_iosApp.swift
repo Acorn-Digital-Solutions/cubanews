@@ -21,21 +21,80 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct cubanews_iosApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject private var cubanewsViewModel = CubanewsViewModel.shared
-    @State private var isAuthenticated = false
-    
+    private let modelContainer: ModelContainer = {
+        do {
+            let schema = Schema([SavedItem.self, CachedFeedItem.self, UserPreferences.self])
+            return try ModelContainer(for: schema)
+        } catch {
+            fatalError("➡️ Failed to create ModelContainer")
+        }
+    }()
     var body: some Scene {
         WindowGroup {
-            if isAuthenticated {
+            RootView()
+        }
+        .modelContainer(modelContainer)
+    }
+}
+
+struct RootView: View {
+    private static let TAG = "cubanews_iosApp"
+    @StateObject private var cubanewsViewModel = CubanewsViewModel.shared
+    @Query private var preferences: [UserPreferences]
+    @State private var isLoadingPreferences: Bool = true
+        
+    private var userPreferences: UserPreferences? {
+        return preferences.first
+    }
+    
+    private var isAuthenticated: Bool {
+        NSLog("➡️ \(Self.TAG) Checking authentication status")
+        return userPreferences?.appleUserID != nil
+    }
+    
+    var body: some View {
+        Group {
+            if isLoadingPreferences {
+                AppLaunchView()
+            } else if isAuthenticated {
                 ContentView()
-                    .environmentObject(cubanewsViewModel).modelContainer(for: [
-                        SavedItem.self,
-                        UserPreferences.self,
-                        CachedFeedItem.self
-                    ])
-                
+                    .environmentObject(cubanewsViewModel)
             } else {
-                LoginView(isAuthenticated: $isAuthenticated)
+                LoginView()
+                    .environmentObject(cubanewsViewModel)
+            }
+        }
+        .task {
+            await launch()
+        }
+    }
+    
+    @MainActor
+    private func launch() async {
+        let start = Date()
+        // Ensure the launch view is visible for at least 2 seconds
+        let elapsed = Date().timeIntervalSince(start)
+        let remaining = max(0, 1.0 - elapsed)
+        if remaining > 0 {
+            try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
+        }
+        isLoadingPreferences = false
+    }
+
+}
+
+struct AppLaunchView: View {
+    var body: some View {
+        ZStack {
+            Color(.systemBackground)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 10) {
+                Image("cubanewsIdentity")
+                    .resizable()
+                    .renderingMode(.original)
+                    .frame(width: 250, height: 250)
+                    
             }
         }
     }

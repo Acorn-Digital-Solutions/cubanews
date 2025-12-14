@@ -19,6 +19,32 @@ enum NewsSourceName: String, Codable, CaseIterable {
         let rawValue = try container.decode(String.self).uppercased()
         self = NewsSourceName(rawValue: rawValue) ?? .unknown
     }
+
+    // Human-friendly display name in UpperCamelCase for UI pills
+    var displayName: String {
+        switch self {
+        case .ADNCUBA: return "ADNCuba"
+        case .CATORCEYMEDIO: return "14yMedio"
+        case .DIARIODECUBA: return "DiarioDeCuba"
+        case .CIBERCUBA: return "CiberCuba"
+        case .ELTOQUE: return "elTOQUE"
+        case .CUBANET: return "Cubanet"
+        case .unknown: return "Unknown"
+        }
+    }
+
+    // Asset name for the source icon (matches assets in Assets.xcassets)
+    var imageName: String {
+        switch self {
+        case .ADNCUBA: return "adncuba"
+        case .CATORCEYMEDIO: return "catorceymedio"
+        case .DIARIODECUBA: return "ddc"
+        case .CIBERCUBA: return "cibercuba"
+        case .ELTOQUE: return "eltoque"
+        case .CUBANET: return "cubanet"
+        case .unknown: return "cubanewsIdentity"
+        }
+    }
 }
 
 
