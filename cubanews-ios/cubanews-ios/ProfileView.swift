@@ -14,7 +14,8 @@ struct ProfileView: View {
     @State private var selectedPublications: Set<String> = []
     @State private var userFullName: String = "Usuario Anónimo"
     
-    let publications = NewsSourceName.allCases.filter { $0 != .unknown }.map { $0.rawValue }
+    // Keep publications as NewsSourceName so we can show icon and displayName
+    let publications: [NewsSourceName] = NewsSourceName.allCases.filter { $0 != .unknown }
     
     // Inline linked privacy text
     private var privacyAttributedText: AttributedString {
@@ -78,20 +79,26 @@ struct ProfileView: View {
                                 .foregroundColor(.gray)
                                 .padding(.horizontal)
                             
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 10) {
-                                    ForEach(publications, id: \.self) { publication in
-                                        PreferencePillButton(
-                                            publication: publication,
-                                            isSelected: selectedPublications.contains(publication),
-                                            onToggle: {
-                                                togglePreference(publication)
-                                            }
-                                        )
-                                    }
+                            // Display publications in a 2-column grid (two pills per row)
+                            let columns = [
+                                GridItem(.flexible(), spacing: 10),
+                                GridItem(.flexible(), spacing: 10)
+                            ]
+                            
+                            LazyVGrid(columns: columns, alignment: .leading, spacing: 10) {
+                                ForEach(publications, id: \.self) { publication in
+                                    PreferencePillButton(
+                                        publication: publication,
+                                        isSelected: selectedPublications.contains(publication.rawValue),
+                                        onToggle: {
+                                            togglePreference(publication)
+                                        }
+                                    )
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                                 }
-                                .padding(.horizontal).padding(.vertical)
                             }
+                            .padding(.horizontal)
+                            .padding(.vertical)
                         }
                         .padding(.bottom, 20)
                         
@@ -165,20 +172,21 @@ struct ProfileView: View {
         }
     }
     
-    private func togglePreference(_ publication: String) {
-        NSLog("togglePreference: \(publication)")
+    private func togglePreference(_ publication: NewsSourceName) {
+        let key = publication.rawValue
+        NSLog("togglePreference: \(key)")
         
-        if selectedPublications.contains(publication) {
-            selectedPublications.remove(publication)
-            NSLog("  -> Removed \(publication)")
+        if selectedPublications.contains(key) {
+            selectedPublications.remove(key)
+            NSLog("  -> Removed \(key)")
         } else {
-            selectedPublications.insert(publication)
-            NSLog("  -> Added \(publication)")
+            selectedPublications.insert(key)
+            NSLog("  -> Added \(key)")
         }
         
         NSLog("  -> selectedPublications now: \(Array(selectedPublications))")
         
-        // Save to SwiftData
+        // Save to SwiftData (store rawValue strings to keep compatibility)
         if let userPrefs = preferences.first {
             NSLog("  -> Updating existing UserPreferences")
             userPrefs.preferredPublications = Array(selectedPublications)
@@ -206,26 +214,33 @@ struct ProfileView: View {
 /// When unselected, displays with an outlined blue border and blue text.
 /// When selected, displays with a solid blue background and white text.
 struct PreferencePillButton: View {
-    let publication: String
+    let publication: NewsSourceName
     let isSelected: Bool
     let onToggle: () -> Void
     
     var body: some View {
         Button(action: onToggle) {
-            Text(publication)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundColor(isSelected ? .white : .blue)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(
-                    Capsule()
-                        .fill(isSelected ? Color.blue : Color.clear)
-                )
-                .overlay(
-                    Capsule()
-                        .stroke(Color.blue, lineWidth: 1.5)
-                )
+            HStack(spacing: 8) {
+                Image(publication.imageName)
+                    .resizable()
+                    .renderingMode(.original)
+                    .frame(width: 20, height: 20)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                Text(publication.displayName)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+            }
+            .foregroundColor(isSelected ? .white : .blue)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                Capsule()
+                    .fill(isSelected ? Color.blue : Color.clear)
+            )
+            .overlay(
+                Capsule()
+                    .stroke(Color.blue, lineWidth: 1.5)
+            )
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -310,7 +325,7 @@ struct ManageAccountSection: View {
         } message: {
             Text("Esta acción no se puede deshacer. Todos tus datos serán eliminados permanentemente.")
         }
-    }    
+    }
     
     @MainActor
     private func handleDeleteAccount() async {
@@ -333,4 +348,3 @@ struct ManageAccountSection: View {
     }
    
 }
-
