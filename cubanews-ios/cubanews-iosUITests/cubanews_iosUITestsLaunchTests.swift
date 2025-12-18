@@ -37,11 +37,6 @@ final class cubanews_iosUITestsLaunchTests: XCTestCase {
             return
         }
 
-        // Fallback to Google button for environments where the test button isn't shown
-        let googleButton = app.buttons["Continue with Google"]
-        if googleButton.waitForExistence(timeout: 5) {
-            googleButton.tap()
-        }
     }
     
     /// Navigates to the specified tab

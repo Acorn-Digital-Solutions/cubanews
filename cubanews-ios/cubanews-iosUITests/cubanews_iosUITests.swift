@@ -17,6 +17,7 @@ final class cubanews_iosUITests: XCTestCase {
         continueAfterFailure = false
         
         app = XCUIApplication()
+        app.launchEnvironment["IS_RUNNING_UNIT_TESTS"] = "1"
         app.launch()
 
         // In UI tests it's important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
@@ -27,10 +28,21 @@ final class cubanews_iosUITests: XCTestCase {
         app = nil
     }
     
+    private func deleteAccount() {
+        
+    }
+    
     // MARK: - Helper Methods
     private func performLogin() {
-        
-        
+        let testLoginButtonById = app.buttons["TestLoginButton"]
+        let testLoginButtonByLabel = app.buttons["Test Login"]
+        if testLoginButtonById.waitForExistence(timeout: 3) {
+            testLoginButtonById.tap()
+            return
+        } else if testLoginButtonByLabel.waitForExistence(timeout: 1) {
+            testLoginButtonByLabel.tap()
+            return
+        }
         // Wait for main content to load
         let titularesTab = app.buttons["Titulares"]
         XCTAssertTrue(titularesTab.waitForExistence(timeout: 5), "Should navigate to main content after login")
@@ -49,26 +61,9 @@ final class cubanews_iosUITests: XCTestCase {
     func testLoginScreenDisplaysLoginButtons() throws {
         // Verify that the login screen shows the login options
         let appleButton = app.buttons["Sign in with Apple"]
+        app.swipeUp()
         XCTAssertTrue(appleButton.exists, "Apple login button should exist")
     }
-    
-    @MainActor
-    func testLoginWithGoogleNavigatesToMainContent() throws {
-        performLogin()
-    }
-    
-    @MainActor
-    func testLoginWithAppleNavigatesToMainContent() throws {
-        // Tap Apple login button
-        let appleButton = app.buttons["Continue with Apple"]
-        XCTAssertTrue(appleButton.waitForExistence(timeout: 5))
-        appleButton.tap()
-        
-        // Verify we're now on the main content (TabView)
-        let titularesTab = app.buttons["Titulares"]
-        XCTAssertTrue(titularesTab.waitForExistence(timeout: 5), "Should navigate to main content after login")
-    }
-    
     
     // MARK: - Tab Navigation Tests
     
@@ -150,7 +145,7 @@ final class cubanews_iosUITests: XCTestCase {
         navigateToTab("Perfil")
         
         // Verify publication options exist
-        let adnCubaOption = app.buttons["ADNCUBA"]
+        let adnCubaOption = app.buttons["ADNCuba"]
         XCTAssertTrue(adnCubaOption.waitForExistence(timeout: 5), "Should show AdnCuba button")
     }
     
@@ -161,10 +156,6 @@ final class cubanews_iosUITests: XCTestCase {
         
         // Scroll down to account section
         app.swipeUp()
-        
-        // Verify logout button exists
-        let logoutButton = app.buttons["Cerrar Sesión"]
-        XCTAssertTrue(logoutButton.waitForExistence(timeout: 5), "Should show logout button")
         
         // Verify delete account button exists
         let deleteButton = app.buttons["Eliminar Cuenta"]

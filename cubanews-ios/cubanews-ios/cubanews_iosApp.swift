@@ -83,13 +83,21 @@ struct RootView: View {
         // If running under UI tests and a special flag is present, create a fake
         // UserPreferences object so the app behaves as if the user is already
         // authenticated. This avoids tapping the real sign-in button in UI tests.
-        if ProcessInfo.processInfo.environment["UITEST_FAKE_LOGIN"] == "1" {
-            // Only insert if none exist
-            if (try? modelContext.fetch(FetchDescriptor<UserPreferences>()))?.first == nil {
-                let fake = UserPreferences(id: "default", preferredPublications: [], userEmail: "test@example.com", userFullName: "UI Test", appleUserID: "uitest-user")
-                modelContext.insert(fake)
-                try? modelContext.save()
-                NSLog("➡️ \(Self.TAG) Inserted fake UserPreferences for UI tests")
+        if ProcessInfo.processInfo.environment["IS_RUNNING_UNIT_TESTS"] == "1" {
+            do {
+                try modelContext.fetch(FetchDescriptor<UserPreferences>())
+                    .forEach { modelContext.delete($0) }
+                
+                try modelContext.fetch(FetchDescriptor<SavedItem>())
+                    .forEach { modelContext.delete($0) }
+                
+                try modelContext.fetch(FetchDescriptor<CachedFeedItem>())
+                    .forEach { modelContext.delete($0) }
+                
+                try modelContext.save()
+                NSLog("✅ Local user data deleted")
+            } catch {
+                NSLog("❌ Failed to delete account: \(error)")
             }
         }
 

@@ -14,10 +14,10 @@
          contextName = "closure #1 in FeedCacheStore.loadAll():FeedCacheStore.swift">
          <PersistentStrings>
             <PersistentString
-               value = "storage.allKeys">
+               value = "storage.existsObject(forKey: &quot;all_item_ids&quot;)">
             </PersistentString>
             <PersistentString
-               value = "storage.existsObject(forKey: &quot;all_item_ids&quot;)">
+               value = "storage.allKeys">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -26,6 +26,14 @@
          <PersistentStrings>
             <PersistentString
                value = "self.items">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "cubanews_iosUITests.testLoginScreenDisplaysLoginButtons():cubanews_iosUITests.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "appleButton.exists">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
