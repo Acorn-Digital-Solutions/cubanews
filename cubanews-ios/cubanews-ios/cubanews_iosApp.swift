@@ -50,7 +50,7 @@ struct RootView: View {
     
     private var isAuthenticated: Bool {
         NSLog("➡️ \(Self.TAG) Checking authentication status")
-        return userPreferences?.appleUserID != nil
+        return userPreferences?.appleUserID != UserPreferences.defaultID
     }
     
     var body: some View {
