@@ -42,6 +42,7 @@ struct RootView: View {
     @StateObject private var cubanewsViewModel = CubanewsViewModel.shared
     @Query private var preferences: [UserPreferences]
     @State private var isLoadingPreferences: Bool = true
+    @Environment(\.modelContext) private var modelContext
         
     private var userPreferences: UserPreferences? {
         return preferences.first
@@ -78,6 +79,20 @@ struct RootView: View {
         if remaining > 0 {
             try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
         }
+
+        // If running under UI tests and a special flag is present, create a fake
+        // UserPreferences object so the app behaves as if the user is already
+        // authenticated. This avoids tapping the real sign-in button in UI tests.
+        if ProcessInfo.processInfo.environment["UITEST_FAKE_LOGIN"] == "1" {
+            // Only insert if none exist
+            if (try? modelContext.fetch(FetchDescriptor<UserPreferences>()))?.first == nil {
+                let fake = UserPreferences(id: "default", preferredPublications: [], userEmail: "test@example.com", userFullName: "UI Test", appleUserID: "uitest-user")
+                modelContext.insert(fake)
+                try? modelContext.save()
+                NSLog("➡️ \(Self.TAG) Inserted fake UserPreferences for UI tests")
+            }
+        }
+
         isLoadingPreferences = false
     }
 

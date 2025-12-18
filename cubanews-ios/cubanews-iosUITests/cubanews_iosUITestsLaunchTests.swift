@@ -8,18 +8,36 @@ import XCTest
 
 final class cubanews_iosUITestsLaunchTests: XCTestCase {
 
+    // Shared app instance for all tests so we can set launchEnvironment once
+    var app: XCUIApplication!
+
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true
     }
 
     override func setUpWithError() throws {
         continueAfterFailure = false
+        // Initialize the shared app and set the test flag so the app under test sees it
+        app = XCUIApplication()
+        app.launchEnvironment["IS_RUNNING_UNIT_TESTS"] = "1"
     }
     
     // MARK: - Helper Methods
     
-    /// Performs login using the Google button
+    /// Performs login using the Test Login button when available, otherwise falls back to the Google button
     private func performLogin(app: XCUIApplication) {
+        // First try the test-only button (accessibilityIdentifier: TestLoginButton)
+        let testLoginButtonById = app.buttons["TestLoginButton"]
+        let testLoginButtonByLabel = app.buttons["Test Login"]
+        if testLoginButtonById.waitForExistence(timeout: 3) {
+            testLoginButtonById.tap()
+            return
+        } else if testLoginButtonByLabel.waitForExistence(timeout: 1) {
+            testLoginButtonByLabel.tap()
+            return
+        }
+
+        // Fallback to Google button for environments where the test button isn't shown
         let googleButton = app.buttons["Continue with Google"]
         if googleButton.waitForExistence(timeout: 5) {
             googleButton.tap()
@@ -44,7 +62,6 @@ final class cubanews_iosUITestsLaunchTests: XCTestCase {
 
     @MainActor
     func testLaunch() throws {
-        let app = XCUIApplication()
         app.launch()
 
         // Take a screenshot of the launch screen (Login View)
@@ -53,7 +70,6 @@ final class cubanews_iosUITestsLaunchTests: XCTestCase {
     
     @MainActor
     func testLaunchToFeedView() throws {
-        let app = XCUIApplication()
         app.launch()
         
         // Login to the app
@@ -69,7 +85,6 @@ final class cubanews_iosUITestsLaunchTests: XCTestCase {
     
     @MainActor
     func testLaunchToSavedStoriesView() throws {
-        let app = XCUIApplication()
         app.launch()
         
         // Login to the app
@@ -84,7 +99,6 @@ final class cubanews_iosUITestsLaunchTests: XCTestCase {
     
     @MainActor
     func testLaunchToProfileView() throws {
-        let app = XCUIApplication()
         app.launch()
         
         // Login to the app

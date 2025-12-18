@@ -28,12 +28,8 @@ final class cubanews_iosUITests: XCTestCase {
     }
     
     // MARK: - Helper Methods
-    
-    /// Performs login using the Google button and waits for the main content to appear
     private func performLogin() {
-        let googleButton = app.buttons["Continue with Google"]
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5), "Google login button should exist")
-        googleButton.tap()
+        
         
         // Wait for main content to load
         let titularesTab = app.buttons["Titulares"]
@@ -52,13 +48,8 @@ final class cubanews_iosUITests: XCTestCase {
     @MainActor
     func testLoginScreenDisplaysLoginButtons() throws {
         // Verify that the login screen shows the login options
-        let googleButton = app.buttons["Continue with Google"]
-        let appleButton = app.buttons["Continue with Apple"]
-        let facebookButton = app.buttons["Continue with Facebook"]
-        
-        XCTAssertTrue(googleButton.waitForExistence(timeout: 5), "Google login button should exist")
+        let appleButton = app.buttons["Sign in with Apple"]
         XCTAssertTrue(appleButton.exists, "Apple login button should exist")
-        XCTAssertTrue(facebookButton.exists, "Facebook login button should exist")
     }
     
     @MainActor
@@ -78,17 +69,6 @@ final class cubanews_iosUITests: XCTestCase {
         XCTAssertTrue(titularesTab.waitForExistence(timeout: 5), "Should navigate to main content after login")
     }
     
-    @MainActor
-    func testLoginWithFacebookNavigatesToMainContent() throws {
-        // Tap Facebook login button
-        let facebookButton = app.buttons["Continue with Facebook"]
-        XCTAssertTrue(facebookButton.waitForExistence(timeout: 5))
-        facebookButton.tap()
-        
-        // Verify we're now on the main content (TabView)
-        let titularesTab = app.buttons["Titulares"]
-        XCTAssertTrue(titularesTab.waitForExistence(timeout: 5), "Should navigate to main content after login")
-    }
     
     // MARK: - Tab Navigation Tests
     

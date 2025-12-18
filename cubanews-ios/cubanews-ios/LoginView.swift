@@ -12,11 +12,19 @@ struct LoginView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var preferences: [UserPreferences]
     private static let TAG = "cubanews_iosApp"
-    
+
+    // Detect test environment: XCTest presence or custom env var
+    private var isRunningTests: Bool {
+        if ProcessInfo.processInfo.environment["IS_RUNNING_UNIT_TESTS"] == "1" { return true }
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil { return true }
+        if NSClassFromString("XCTest") != nil { return true }
+        return false
+    }
+
     var body: some View {
         VStack(spacing: 30) {
             Spacer()
-            
+
             // App Logo/Title
             VStack(spacing: 10) {
                 Image("cubanewsIdentity")
@@ -24,12 +32,33 @@ struct LoginView: View {
                     .renderingMode(.original)
                     .frame(width: 250, height: 250)
                 Text("Cuba News").font(.largeTitle).fontWeight(.bold)
-                    
+
             }
             .padding(.bottom, 50)
-            
+
             // Login Buttons
             VStack(spacing: 16) {
+                // Test-only login button: only visible while running tests
+                if isRunningTests {
+                    Button("Test Login") {
+                        // Create or update a simple test UserPreferences to simulate login
+                        if let existing = preferences.first {
+                            existing.userEmail = existing.userEmail ?? "test@example.com"
+                            existing.userFullName = existing.userFullName ?? "Joe Test"
+                            existing.appleUserID = existing.appleUserID ?? "uitest-user"
+                            try? modelContext.save()
+                            NSLog("➡️ \(Self.TAG) Test Login: updated existing UserPreferences")
+                        } else {
+                            let prefs = UserPreferences(userEmail: "test@example.com", userFullName: "UI Test", appleUserID: "uitest-user")
+                            modelContext.insert(prefs)
+                            try? modelContext.save()
+                            NSLog("➡️ \(Self.TAG) Test Login: created UserPreferences")
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .accessibilityIdentifier("TestLoginButton")
+                }
+                
                 // Apple Login Button
                 SignInWithAppleButton(
                     .signIn,
