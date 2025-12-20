@@ -46,8 +46,7 @@ struct ProfileView: View {
         }
         return text
     }
-    
-    
+        
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -102,6 +101,10 @@ struct ProfileView: View {
                             .padding(.vertical)
                         }
                         .padding(.bottom, 20)
+                        
+                        Divider()
+                        
+                        CreateServiceSection().padding(.bottom, 20)
                         
                         Divider()
                         
@@ -285,6 +288,34 @@ struct AccountDeletedView: View {
     }
 }
 
+struct CreateServiceSection: View {
+    
+    @State private var showCreateServiceDrawer = false
+    var body: some View {
+        Text("Servicios").font(.headline)
+            .padding(.horizontal)
+        Text("Anuncia to negocio en nuestro catalogo de gratis")
+            .foregroundColor(.gray)
+            .font(.subheadline)
+            .padding(.horizontal)
+        
+        Button(action: {
+            showCreateServiceDrawer = true
+        }) {
+            Text("Crear Servicio")
+                .font(.body)
+                .fontWeight(.light)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.blue)
+                )
+        }
+        .padding(.horizontal)
+    }
+}
 
 struct ManageAccountSection: View {
     @State private var showingDeleteAlert = false
