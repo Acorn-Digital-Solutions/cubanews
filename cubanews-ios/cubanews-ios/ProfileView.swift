@@ -13,6 +13,7 @@ struct ProfileView: View {
     @Query private var preferences: [UserPreferences]
     @State private var selectedPublications: Set<String> = []
     @State private var userFullName: String = "Usuario Anónimo"
+    private static let TAG = "ProfileView"
     
     // Keep publications as NewsSourceName so we can show icon and displayName
     let publications: [NewsSourceName] = NewsSourceName.allCases.filter { $0 != .unknown }
@@ -155,10 +156,11 @@ struct ProfileView: View {
     }
     
     private func loadPreferences() {
-        NSLog("xxx - loadPreferences() called - preferences.count: \(preferences.count)")
+        print("➡️ \(Self.TAG) - loadPreferences() called - preferences.count: \(preferences.count)")
         // Sync from preferences to state
         selectedPublications.removeAll()
         if let userPrefs = preferences.first {
+            print("➡️ \(Self.TAG) - UserID:  \(userPrefs.id)")
             NSLog("Found preferences with \(userPrefs.preferredPublications.count) publications")
             selectedPublications = Set(userPrefs.preferredPublications)
             NSLog("selectedPublications now contains: \(Array(selectedPublications))")

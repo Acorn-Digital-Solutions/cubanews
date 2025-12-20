@@ -14,8 +14,9 @@ final class UserPreferences {
     var appleUserID: String?
     var userEmail: String?
     var userFullName: String?
+    public static let defaultID = "default"
     
-    init(id: String = "default", preferredPublications: [String] = [], userEmail: String? = nil, userFullName: String? = nil, appleUserID: String? = nil) {
+    init(id: String = defaultID, preferredPublications: [String] = [], userEmail: String? = nil, userFullName: String? = nil, appleUserID: String? = nil) {
         self.id = id
         self.preferredPublications = preferredPublications
         self.userEmail = userEmail
