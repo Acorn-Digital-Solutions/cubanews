@@ -16,16 +16,29 @@ enum ServiceStatus: String, Codable, CaseIterable {
 }
 
 struct Service: Identifiable, Equatable {
-    var id: UUID = UUID();
-    var description: String;
-    var phoneNumber: String;
-    var businessName: String;
-    var image: Image?;
-    var imageLink: String?;
+    var id: String = UUID().uuidString;
+    var description: String = "";
+    var phoneNumber: String = "";
+    var businessName: String = "";
+    var imageStorageURI: String = "";
     var ownerID: String;
-    var status: ServiceStatus;
-    var expirationDate: Date;
-    var createdAt: Date;
+    var status: ServiceStatus = .inReview;
+    var expirationDate: Double;
+    var createdAt: Double = 0;
+    
+    func toFirebaseDocument() -> [String: Any] {
+        return [
+            "id": id,
+            "description": description,
+            "phoneNumber": phoneNumber,
+            "businessName": businessName,
+            "imageStorageURI": imageStorageURI,
+            "ownerID": ownerID,
+            "status": status.rawValue,
+            "expirationDate": expirationDate,
+            "createdAt": createdAt
+        ]
+    }
 }
 
 @available(iOS 17, *)

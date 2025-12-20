@@ -11,8 +11,14 @@ import SwiftData
 class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    print("➡️ AppDelegate: Configuring Firebase")
+    NSLog("➡️ Firebase: Configuring Firebase")
     FirebaseApp.configure()
+    if let app = FirebaseApp.app() {
+        NSLog("✅ Firebase default app initialized: \(app.name)")
+    } else {
+        NSLog("❌ Firebase default app is NIL")
+    }
+    
     return true
   }
 }
