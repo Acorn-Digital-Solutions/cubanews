@@ -1,6 +1,6 @@
 "use client";
 
-import { Container, Typography, Divider, Chip, Box, Stack } from "@mui/joy";
+import { Container, Typography, Divider, Chip, Box, Stack, FormControl, Input, Button } from "@mui/joy";
 import CopyrightIcon from "@mui/icons-material/Copyright";
 import Image from "next/image";
 
@@ -101,6 +101,38 @@ export default function About() {
         <Typography level="body-md" sx={{ mb: 1 }}>
           Signed, The Cuba News team
         </Typography>
+
+        <Typography level="h2" sx={{ mb: 1, mt: 2 }}>
+          Privacy
+        </Typography>
+
+        <Typography level="body-lg" sx={{ mb: 1 }}>
+          Cubanews keeps your personal data, email address and name as well as usage data safe and won't share it with any third party.
+          You can read our full privacy policy <a href="https://www.freeprivacypolicy.com/live/38c1b534-4ac4-4b6d-8c68-71f89805459f">here</a>
+        </Typography>
+
+        <form onSubmit={handleSubmit}>
+          <FormControl>
+            <Input
+              sx={{ "--Input-decoratorChildHeight": "45px" }}
+              placeholder="email@email.com"
+              type="email"
+              required
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              endDecorator={
+                <Button
+                  variant="solid"
+                  color="primary"
+                  type="submit"
+                  sx={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+                >
+                  Dar de baja y borrar mis datos
+                </Button>
+              }
+            />
+          </FormControl>
+        </form>
       </Stack>
 
       <Divider sx={{ m: 4 }}>
