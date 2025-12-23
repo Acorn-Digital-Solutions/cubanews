@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SubscriptionStatus } from "@/app/interfaces";
 import cubanewsApp from "@/app/cubanewsApp";
+import { ok } from "assert";
 
 interface SubscribeResponse {
   banter: string;
@@ -25,6 +26,10 @@ export async function POST(
       { status: 400, statusText: "Bad Parameters" }
     );
   }
+
+  if (operation === "delete") {
+  }
+
   const status =
     operation === "subscribe"
       ? SubscriptionStatus.SUBSCRIBED
@@ -67,4 +72,10 @@ export async function GET(
     banter: "All good",
     content: { email, status: entry.status },
   });
+}
+
+export async function DELETE(request: NextRequest) {
+  const email = request.nextUrl.searchParams.get("email");
+  db.deleteFrom("subscriptions").where("email", "=", email).execute();
+  return NextResponse.json({ banter: "All good" }, { status: 200 });
 }
