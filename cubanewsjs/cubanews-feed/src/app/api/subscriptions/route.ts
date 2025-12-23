@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { SubscriptionStatus } from "@/app/interfaces";
 import cubanewsApp from "@/app/cubanewsApp";
 import { ok } from "assert";
+import { getLogger } from "nodemailer/lib/shared";
 
 interface SubscribeResponse {
   banter: string;
@@ -74,8 +75,13 @@ export async function GET(
   });
 }
 
-export async function DELETE(request: NextRequest) {
+export function DELETE(request: NextRequest) {
   const email = request.nextUrl.searchParams.get("email");
-  db.deleteFrom("subscriptions").where("email", "=", email).execute();
+  db.deleteFrom("subscriptions")
+    .where("email", "=", email)
+    .execute()
+    .then(() => {
+      console.log(`Deleted all records for ${email}`);
+    });
   return NextResponse.json({ banter: "All good" }, { status: 200 });
 }
