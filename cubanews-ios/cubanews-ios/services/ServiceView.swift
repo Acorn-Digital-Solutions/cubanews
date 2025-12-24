@@ -11,8 +11,9 @@ import UIKit
 @available(iOS 17, *)
 struct ServiceView: View {
     let service: Service
+    let canEdit: Bool
     @Environment(\.openURL) private var openURL
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top, spacing: 12) {
@@ -80,14 +81,31 @@ struct ServiceView: View {
                 }
 
                 Spacer()
-
-                Button {
-                    shareService()
-                } label: {
-                    Image(systemName: "square.and.arrow.up")
-                        .foregroundColor(.blue)
+                
+                if canEdit {
+                    HStack(spacing: 12) {
+                        Button {
+                            editService()
+                        } label: {
+                            Image(systemName: "pencil")
+                                .foregroundColor(.blue)
+                        }
+                        Button {
+                            deleteService()
+                        } label: {
+                            Image(systemName: "trash")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                } else {
+                    Button {
+                        shareService()
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                            .foregroundColor(.blue)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
         }
         .padding()
@@ -152,6 +170,13 @@ struct ServiceView: View {
         guard !service.imageStorageURI.isEmpty else { return nil }
         return URL(string: service.imageStorageURI)
     }
+    
+    private func editService() {
+    }
+    
+    private func deleteService() {
+        
+    }
 }
 
 @available(iOS 17, *)
@@ -168,7 +193,7 @@ struct ServiceView_Previews: PreviewProvider {
             expirationDate: Date().addingTimeInterval(60*60*24*30).timeIntervalSince1970,
             createdAt: Date().addingTimeInterval(-60*60*24*7).timeIntervalSince1970
         )
-        ServiceView(service: mock)
+        ServiceView(service: mock, canEdit: false)
             .padding()
             .previewLayout(.sizeThatFits)
     }

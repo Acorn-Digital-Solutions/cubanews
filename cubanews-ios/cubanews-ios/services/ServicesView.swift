@@ -76,7 +76,7 @@ struct ServicesView: View {
                     let displayed = showMyServices ? myServices : services
                     LazyVStack(spacing: 12) {
                         ForEach(displayed) { service in
-                            ServiceView(service: service)
+                            ServiceView(service: service, canEdit: showMyServices)
                                 .padding(.horizontal)
                                 .onAppear {
                                     if showMyServices {
