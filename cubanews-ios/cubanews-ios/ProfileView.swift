@@ -107,10 +107,6 @@ struct ProfileView: View {
                         
                         Divider()
                         
-                        CreateServiceSection().padding(.bottom, 20)
-                        
-                        Divider()
-                        
                         Text("Acerca de CubaNews")
                             .font(.headline)
                             .padding(.horizontal)
@@ -290,42 +286,6 @@ struct AccountDeletedView: View {
         .padding()
     }
 }
-
-struct CreateServiceSection: View {
-    @State private var showCreateServiceDrawer = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Servicios")
-                .font(.headline)
-                .padding(.horizontal)
-
-            Text("Anuncia tu negocio en nuestro catálogo gratis")
-                .foregroundColor(.gray)
-                .font(.subheadline)
-                .padding(.horizontal)
-
-            Button {
-                showCreateServiceDrawer = true
-            } label: {
-                Text("Crear Servicio")
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.blue)
-                    )
-            }
-            .padding(.horizontal)
-        }
-        .fullScreenCover(isPresented: $showCreateServiceDrawer) {
-            CreateServiceView()
-        }
-    }
-}
-
-
 
 struct CreateServiceView: View {
     @Environment(\.dismiss) private var dismiss

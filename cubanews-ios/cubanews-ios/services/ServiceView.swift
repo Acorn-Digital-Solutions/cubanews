@@ -12,6 +12,8 @@ import UIKit
 struct ServiceView: View {
     let service: Service
     let canEdit: Bool
+    let editService: () -> Void = {}
+    let deleteService: () -> Void = {}
     @Environment(\.openURL) private var openURL
     
     var body: some View {
@@ -169,13 +171,6 @@ struct ServiceView: View {
     private func imageURL() -> URL? {
         guard !service.imageStorageURI.isEmpty else { return nil }
         return URL(string: service.imageStorageURI)
-    }
-    
-    private func editService() {
-    }
-    
-    private func deleteService() {
-        
     }
 }
 
