@@ -12,8 +12,8 @@ import UIKit
 struct ServiceView: View {
     let service: Service
     let canEdit: Bool
-    let editService: () -> Void = {}
-    let deleteService: () -> Void = {}
+    let editService: () -> Void
+    let deleteService: () -> Void
     @Environment(\.openURL) private var openURL
     
     var body: some View {
@@ -188,7 +188,7 @@ struct ServiceView_Previews: PreviewProvider {
             expirationDate: Date().addingTimeInterval(60*60*24*30).timeIntervalSince1970,
             createdAt: Date().addingTimeInterval(-60*60*24*7).timeIntervalSince1970
         )
-        ServiceView(service: mock, canEdit: false)
+        ServiceView(service: mock, canEdit: false, editService: {}, deleteService: {})
             .padding()
             .previewLayout(.sizeThatFits)
     }
