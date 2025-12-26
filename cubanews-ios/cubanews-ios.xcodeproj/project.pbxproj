@@ -41,9 +41,30 @@
 		1FF5F5BE2E9C245B001C9A75 /* cubanews-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "cubanews-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1F7072F72EF6F2BC0026D623 /* Exceptions for "cubanews-ios" folder in "cubanews-iosTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"GoogleService-Info.plist",
+			);
+			target = 1FF5F5B32E9C245B001C9A75 /* cubanews-iosTests */;
+		};
+		1F7072F82EF6F2BC0026D623 /* Exceptions for "cubanews-ios" folder in "cubanews-iosUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"GoogleService-Info.plist",
+			);
+			target = 1FF5F5BD2E9C245B001C9A75 /* cubanews-iosUITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1FF5F5A92E9C245A001C9A75 /* cubanews-ios */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1F7072F72EF6F2BC0026D623 /* Exceptions for "cubanews-ios" folder in "cubanews-iosTests" target */,
+				1F7072F82EF6F2BC0026D623 /* Exceptions for "cubanews-ios" folder in "cubanews-iosUITests" target */,
+			);
 			path = "cubanews-ios";
 			sourceTree = "<group>";
 		};

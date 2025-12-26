@@ -6,6 +6,9 @@
 import SwiftUI
 import SwiftData
 import AuthenticationServices
+import FirebaseCore
+import FirebaseFirestore
+import FirebaseAuth
 
 @available(iOS 17, *)
 struct ProfileView: View {
@@ -13,7 +16,7 @@ struct ProfileView: View {
     @Query private var preferences: [UserPreferences]
     @State private var selectedPublications: Set<String> = []
     @State private var userFullName: String = "Usuario Anónimo"
-    private static let TAG = "ProfileView"
+    public static let TAG = "ProfileView"
     
     // Keep publications as NewsSourceName so we can show icon and displayName
     let publications: [NewsSourceName] = NewsSourceName.allCases.filter { $0 != .unknown }
@@ -46,8 +49,7 @@ struct ProfileView: View {
         }
         return text
     }
-    
-    
+        
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -285,6 +287,101 @@ struct AccountDeletedView: View {
     }
 }
 
+struct CreateServiceView: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    @State private var service = Service(
+        description: "",
+        phoneNumber: "",
+        businessName: "",
+        ownerID: Auth.auth().currentUser?.uid ?? "",
+        status: .inReview,
+        expirationDate: 0,
+        createdAt: Date().timeIntervalSince1970
+    )
+    @State private var expirationDate = Date()
+
+    @State private var isSaving = false
+    @State private var errorMessage: String?
+
+    private let db = Firestore.firestore(database: "prod")
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Negocio")) {
+                    TextField("Nombre del negocio", text: $service.businessName)
+                    TextField("Teléfono", text: $service.phoneNumber)
+                        .keyboardType(.phonePad)
+                }
+
+                Section(header: Text("Descripción")) {
+                    TextEditor(text: $service.description)
+                        .frame(height: 120)
+                }
+
+                Section(header: Text("Expiración")) {
+                    DatePicker(
+                        "Fecha",
+                        selection: $expirationDate,
+                        displayedComponents: .date
+                    )
+                }
+
+                if let errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                }
+            }
+            .navigationTitle("Crear Servicio")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancelar") {
+                        dismiss()
+                    }
+                }
+
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Guardar") {
+                        saveService()
+                    }
+                    .disabled(!isFormValid || isSaving)
+                }
+            }
+        }
+    }
+
+    private var isFormValid: Bool {
+        !service.businessName.isEmpty &&
+        !service.description.isEmpty &&
+        !service.phoneNumber.isEmpty
+    }
+
+    private func saveService() {
+        isSaving = true
+        errorMessage = nil
+        service.createdAt = Date().timeIntervalSince1970
+        service.expirationDate = expirationDate.timeIntervalSince1970
+
+        Task {
+            do {
+                NSLog("Firebase writing service")
+                NSLog("🔥 Firebase apps:", FirebaseApp.allApps ?? [:])
+                NSLog("🔥 Firebase User: \(Auth.auth().currentUser?.uid ?? "")")
+                try await db
+                    .collection("services")
+                    .document(service.id)
+                    .setData(service.toFirebaseDocument())
+                isSaving = false
+                dismiss()
+            } catch {
+                isSaving = false
+                errorMessage = error.localizedDescription
+                NSLog("ProfileView Error writing service: \(error)")
+            }
+        }
+    }
+}
 
 struct ManageAccountSection: View {
     @State private var showingDeleteAlert = false
