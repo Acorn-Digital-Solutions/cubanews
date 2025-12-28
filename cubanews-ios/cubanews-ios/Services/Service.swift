@@ -19,7 +19,8 @@ struct ContactInfo: Equatable {
     var emailAddress: String = "";
     var phoneNumber: String = "";
     var websiteURL: String = "";
-    var socialMediaURL: String = "";
+    var facebook: String = "";
+    var instagram: String = "";
     var location: String = "";
 }
 
@@ -28,7 +29,7 @@ struct Service: Identifiable, Equatable {
     var description: String = "";
     var businessName: String = "";
     var contactInfo: ContactInfo = ContactInfo();
-    var ownerID: String;
+    var ownerID: String = Auth.auth().currentUser?.uid ?? "";
     var status: ServiceStatus = .inReview;
     var expirationDate: Double = 0;
     var createdAt: Double = 0;

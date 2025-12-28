@@ -10,6 +10,8 @@ import SwiftUI
 @available(iOS 17, *)
 struct ServiceView: View {
     let service: Service
+    let viewModel: ServicesViewModel
+    
     @Environment(\.openURL) private var openURL
     
     private func statusInfo() -> (String, Color) {
@@ -36,12 +38,12 @@ struct ServiceView: View {
     
     private var contactInfoPreview: some View {
         let contactInfo = service.contactInfo
-        return HStack(alignment: .top, spacing: 12) {
+        return HStack(alignment: .top, spacing: 14) {
             if (!contactInfo.emailAddress.isEmpty) {
                 Button {
                     if let url = URL(string: "mailto:\(contactInfo.emailAddress)") {
-                                openURL(url)
-                            }
+                        openURL(url)
+                    }
                 } label: {
                     Label("", systemImage: "envelope.fill").font(.caption)
                 }
@@ -58,14 +60,32 @@ struct ServiceView: View {
                 .buttonStyle(.plain)
             }
             
-            if (!contactInfo.socialMediaURL.isEmpty) {
+            if (!contactInfo.facebook.isEmpty) {
                 Button {
-                    if let url = URL(string: contactInfo.socialMediaURL) {
+                    if let url = URL(string: contactInfo.facebook) {
                         openURL(url)
                     }
                 } label: {
-                    Image(systemName: "link")
-                        .font(.caption)
+                    Image("facebook")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 14, height: 20)
+                            .accessibilityLabel("Facebook")
+                }
+                .buttonStyle(.plain)
+            }
+            
+            if (!contactInfo.instagram.isEmpty) {
+                Button {
+                    if let url = URL(string: contactInfo.instagram) {
+                        openURL(url)
+                    }
+                } label: {
+                    Image("instagram")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 14, height: 20)
+                            .accessibilityLabel("Instagram")
                 }
                 .buttonStyle(.plain)
             }
@@ -108,7 +128,25 @@ struct ServiceView: View {
                 .foregroundColor(.secondary)
                 .lineLimit(3)
             
-            contactInfoPreview
+            HStack(spacing: 12) {
+                contactInfoPreview
+                Spacer()
+                if (viewModel.showMyServices) {
+                    Button {
+                        viewModel.editService(service)
+                    } label: {
+                        Image(systemName: "pencil")
+                            .foregroundColor(.blue)
+                    }
+                    Button {
+                        viewModel.deleteService(service)
+                    } label: {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
+                    }
+                }
+            }
+            
         }
         .padding()
         .background(Color(.systemGray5).opacity(0.3))
@@ -119,20 +157,19 @@ struct ServiceView: View {
 }
 
 #Preview {
-    if #available(iOS 17, *) {
-        ServiceView(service: Service(
-            id: UUID().uuidString,
-            description: "Authentic Cuban coffee and pastries served daily. Come enjoy our espresso and pastelitos.",
-            businessName: "Café Habana",
-            contactInfo: ContactInfo(
-                emailAddress: "contact@cafehabana.com",
-                phoneNumber: "11549123456789",
-                websiteURL: "http://www.cafehabana.com",
-                socialMediaURL: "http://www.instagram.com/cafehabana",
-                location: "203, Calle 23, Miami, Florida, USA"
-            ),
-            ownerID: "sasdad",
-            status: .approved
-        ))
-    }
+    ServiceView(service: Service(
+        id: UUID().uuidString,
+        description: "Authentic Cuban coffee and pastries served daily. Come enjoy our espresso and pastelitos.",
+        businessName: "Café Habana",
+        contactInfo: ContactInfo(
+            emailAddress: "contact@cafehabana.com",
+            phoneNumber: "11549123456789",
+            websiteURL: "http://www.cafehabana.com",
+            facebook: "http://www.facebook.com/cafehabana",
+            instagram: "http://www.instagram.com/cafehabana",
+            location: "203, Calle 23, Miami, Florida, USA"
+        ),
+        ownerID: "sasdad",
+        status: .approved
+    ), viewModel: MockServicesViewModel(editMode: true))
 }

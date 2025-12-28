@@ -300,21 +300,13 @@ struct ManageAccountSection: View {
             
             HStack(spacing: 2) {
                 // Delete Account Button
-                Button(action: {
+                Button("Eliminar Cuenta") {
                     showingDeleteAlert = true
-                }) {
-                    Text("Eliminar Cuenta")
-                        .font(.body)
-                        .fontWeight(.light)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.red)
-                        )
                 }
                 .padding(.horizontal)
+                .buttonStyle(.bordered)
+                .tint(.red)
+                .frame(maxWidth: .infinity)
             }
         }
         .alert("¿Eliminar Cuenta?", isPresented: $showingDeleteAlert) {
