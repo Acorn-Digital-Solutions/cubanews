@@ -55,36 +55,33 @@ struct ServicesView: View {
     
     @ViewBuilder
     private var myServicesSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            LazyVStack(spacing: 8) {
-                ForEach(viewModel.myServices) { service in
-                    ServiceView(
-                        service: service,
-                        viewModel: viewModel
-                    )
-                    .padding(.horizontal)
-                    .onAppear {
-                        if service == viewModel.myServices.last {
-                            Task { await viewModel.loadMyServices() }
-                        }
-                    }
-                }
-
-                if viewModel.myServices.isEmpty {
-                    VStack(spacing: 12) {
-                        Button(action: {
-                            viewModel.editMode.toggle()
-                        }) {
-                            Label("Crear servicio", systemImage: "plus")
-                                .padding(.vertical, 10)
-                                .padding(.horizontal, 16)
-                                .background(RoundedRectangle(cornerRadius: 10).fill(Color.blue))
-                                .foregroundColor(.white)
-                        }
+        LazyVStack(spacing: 8) {
+            ForEach(viewModel.myServices) { service in
+                ServiceView(
+                    service: service,
+                    viewModel: viewModel
+                )
+                .padding(.horizontal)
+                .onAppear {
+                    if service == viewModel.myServices.last {
+                        Task { await viewModel.loadMyServices() }
                     }
                 }
             }
-            .padding(.horizontal)
+
+            if viewModel.myServices.isEmpty {
+                VStack(spacing: 12) {
+                    Button(action: {
+                        viewModel.editMode.toggle()
+                    }) {
+                        Label("Crear servicio", systemImage: "plus")
+                            .padding(.vertical, 10)
+                            .padding(.horizontal, 16)
+                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.blue))
+                            .foregroundColor(.white)
+                    }
+                }
+            }
         }
     }
     
