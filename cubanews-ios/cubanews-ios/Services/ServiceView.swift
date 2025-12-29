@@ -20,7 +20,7 @@ struct ServiceView: View {
             return (ServiceStatus.inReview.rawValue, .orange)
         case .approved:
             return (ServiceStatus.approved.rawValue, .green)
-        case .rejected:
+        case .rejected, .expired:
             return (ServiceStatus.rejected.rawValue, .red)
         }
     }
@@ -119,8 +119,10 @@ struct ServiceView: View {
                     .font(.headline)
                     .foregroundColor(.primary)
                     .lineLimit(2)
-                Spacer()
-                statusBadge
+                if viewModel.showMyServices {
+                    Spacer()
+                    statusBadge
+                }
             }.frame(maxWidth: .infinity, alignment: .leading)
             
             Text(service.description)
@@ -139,7 +141,9 @@ struct ServiceView: View {
                             .foregroundColor(.blue)
                     }
                     Button {
-                        viewModel.deleteService(service)
+                        Task {
+                            await viewModel.deleteService(service)
+                        }
                     } label: {
                         Image(systemName: "trash")
                             .foregroundColor(.red)
