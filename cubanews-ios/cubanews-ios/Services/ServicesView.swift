@@ -5,10 +5,12 @@
 //  Created by Sergio Navarrete on 26/12/2025.
 //
 import SwiftUI
+import SwiftData
 
 @available(iOS 17, *)
 struct ServicesView: View {
     @ObservedObject private var viewModel: ServicesViewModel
+    @Query private var preferences: [UserPreferences]
     
     init(useMockViewModel: Bool = false) {
         if (useMockViewModel) {
@@ -49,6 +51,11 @@ struct ServicesView: View {
             ForEach(viewModel.services) { service in
                 ServiceView(service: service, viewModel: viewModel)
                     .padding(.horizontal)
+                    .onAppear {
+                        if service == viewModel.services.last {
+                            Task { await viewModel.loadServices()  }
+                        }
+                    }
             }
         }
     }
@@ -106,7 +113,10 @@ struct ServicesView: View {
             ZStack(alignment: .bottomTrailing) {
                 ScrollView {
                     VStack(spacing: 12) {
-                        topToggleBar
+                        NewsHeader(header: "Servicios")
+                        if preferences.first?.advertiseServices == true {
+                            topToggleBar
+                        }
                         if (viewModel.showMyServices) {
                             myServicesSection
                         } else {
@@ -115,7 +125,7 @@ struct ServicesView: View {
                     }
                     .padding(.vertical, 12)
                 }
-                if (viewModel.showMyServices) {
+                if (viewModel.showMyServices && preferences.first?.advertiseServices == true) {
                     floatingAddButton
                 }
             }
@@ -165,8 +175,8 @@ struct ServiceEditSheet: View {
                     TextField("Número de teléfono", text: $service.contactInfo.phoneNumber)
                     TextField("Email", text: $service.contactInfo.emailAddress)
                     TextField("Web", text: $service.contactInfo.websiteURL)
-                    TextField("Instagram", text: $service.contactInfo.websiteURL)
-                    TextField("Facebook", text: $service.contactInfo.websiteURL)
+                    TextField("Instagram", text: $service.contactInfo.instagram)
+                    TextField("Facebook", text: $service.contactInfo.facebook)
                 }
                 
                 Section(header: Text("Ubicacion")) {

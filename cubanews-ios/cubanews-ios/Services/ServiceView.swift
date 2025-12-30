@@ -45,7 +45,7 @@ struct ServiceView: View {
                         openURL(url)
                     }
                 } label: {
-                    Label("", systemImage: "envelope.fill").font(.caption)
+                    Label("", systemImage: "envelope.fill").font(.title3)
                 }
                 .buttonStyle(.plain)
             }
@@ -55,7 +55,7 @@ struct ServiceView: View {
                     dial(number: contactInfo.phoneNumber)
                 } label: {
                     Label("", systemImage: "phone.fill")
-                        .font(.caption)
+                        .font(.title3)
                 }
                 .buttonStyle(.plain)
             }
@@ -69,7 +69,7 @@ struct ServiceView: View {
                     Image("facebook")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 14, height: 20)
+                            .frame(width: 20, height: 20)
                             .accessibilityLabel("Facebook")
                 }
                 .buttonStyle(.plain)
@@ -84,8 +84,9 @@ struct ServiceView: View {
                     Image("instagram")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 14, height: 20)
+                            .frame(width: 23, height: 23)
                             .accessibilityLabel("Instagram")
+                            .padding(.horizontal, 3)
                 }
                 .buttonStyle(.plain)
             }
@@ -96,8 +97,8 @@ struct ServiceView: View {
                         openURL(url)
                     }
                 } label: {
-                    Label("", systemImage: "globe")
-                        .font(.caption)
+                    Label("", systemImage: "globe.fill")
+                        .font(.title3)
                 }
                 .buttonStyle(.plain)
             }
@@ -112,6 +113,14 @@ struct ServiceView: View {
         openURL(url)
     }
     
+    private func truncateToWords(_ text: String, maxWords: Int) -> String {
+        let words = text.split(separator: " ")
+        if words.count <= maxWords {
+            return text
+        }
+        return words.prefix(maxWords).joined(separator: " ") + "..."
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top, spacing: 12) {
@@ -119,16 +128,21 @@ struct ServiceView: View {
                     .font(.headline)
                     .foregroundColor(.primary)
                     .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
                 if viewModel.showMyServices {
                     Spacer()
                     statusBadge
                 }
             }.frame(maxWidth: .infinity, alignment: .leading)
             
-            Text(service.description)
+            Text(truncateToWords(service.description, maxWords: 50))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-                .lineLimit(3)
+                .lineLimit(4)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Spacer(minLength: 0)
             
             HStack(spacing: 12) {
                 contactInfoPreview
@@ -153,6 +167,7 @@ struct ServiceView: View {
             
         }
         .padding()
+        .frame(height: 150)
         .background(Color(.systemGray5).opacity(0.3))
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.2), radius: 1, x: 0, y: 1)

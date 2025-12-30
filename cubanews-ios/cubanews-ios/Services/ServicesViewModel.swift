@@ -24,23 +24,26 @@ class ServicesViewModel: ObservableObject {
     
     public init() {
         Task {
-            await loadNextPage()
+            services = []
+            myServices = []
+            await loadServices()
             await loadMyServices()
         }
     }
     
     private var lastDocument: DocumentSnapshot?
     private var isLoading = false
-    private var hasMoreData = true
 
-    func loadServices(_ page: Int = 0, pageSize: Int = 25) async {
-        NSLog("Firebase ServicesViewModel Loading services page \(page)...")
+    func loadServices() async {
         isLoading = true
         
-        let query = db.collection("services")
+        var query = db.collection("services")
             .whereField("status", isEqualTo: ServiceStatus.approved.rawValue)
             .order(by: "createdAt", descending: true)
-            .limit(to: pageSize)
+            .limit(to: 25)
+        if let lastDoc = lastDocument {
+            query = query.start(afterDocument: lastDoc)
+        }
         do {
             let snapshot = try await query.getDocuments()
             guard !snapshot.documents.isEmpty else {
@@ -53,15 +56,9 @@ class ServicesViewModel: ObservableObject {
             }
             DispatchQueue.main.async {
                 self.isLoading = false
-                if page == 0 {
-                    self.services = newServices
-                } else {
-                    self.services.append(contentsOf: newServices)
-                }
-
+                self.services.append(contentsOf: newServices)
                 // Update cursor and state
                 self.lastDocument = snapshot.documents.last
-                self.hasMoreData = newServices.count == pageSize
                 self.isLoading = false
             }
             NSLog("Firebase ServicesViewModel Loaded \(newServices.count) services.")
@@ -69,49 +66,12 @@ class ServicesViewModel: ObservableObject {
         } catch {
             NSLog("Firebase ServicesViewModel Error loading my services: \(error)")
         }
-//            .documents.compactMap { doc -> Service? in
-//            try? doc.data(as: Service.self)
-//        }
-//        // For page > 0, start after last document
-//        if page > 0, let lastDoc = lastDocument {
-//            query = query.start(afterDocument: lastDoc)
-//        }
-//        
-//        query.addSnapshotListener { [weak self] snapshot, error in
-//            guard let self = self, let snapshot = snapshot else {
-//                self?.isLoading = false
-//                return
-//            }
-//            
-//            let newServices = snapshot.documents.compactMap { doc -> Service? in
-//                try? doc.data(as: Service.self)
-//            }
-//            
-//            DispatchQueue.main.async {
-//                if page == 0 {
-//                    self.services = newServices
-//                } else {
-//                    self.services.append(contentsOf: newServices)
-//                }
-//                
-//                // Update cursor and state
-//                self.lastDocument = snapshot.documents.last
-//                self.hasMoreData = newServices.count == pageSize
-//                self.isLoading = false
-//            }
-//        }
-    }
-
-    func loadNextPage() async {
-        let nextPage = lastDocument == nil ? 0 : 1
-        await loadServices(nextPage, pageSize: 25)
     }
     
     func loadMyServices() async {
         let query = db.collection("services")
             .whereField("ownerID", isEqualTo: Auth.auth().currentUser?.uid ?? "")
             .order(by: "createdAt", descending: true)
-            .limit(to: 25)
         
         do {
             let snapshot = try await query.getDocuments()
@@ -124,8 +84,7 @@ class ServicesViewModel: ObservableObject {
                 return try? doc.data(as: Service.self)
             }
             DispatchQueue.main.async {
-                self.isLoading = false
-                self.myServices.append(contentsOf: newServices)
+                self.myServices = newServices
             }
             NSLog("Firebase ServicesViewModel Loaded \(newServices.count) services.")
         } catch {
@@ -139,17 +98,22 @@ class ServicesViewModel: ObservableObject {
     }
     
     func saveService(updated: Service) {
+        var mutableService = updated
+        mutableService.lastUpdatedAt = Date().timeIntervalSince1970
+        let index = myServices.firstIndex(where: { $0.id == updated.id }) ?? -1
+        if index < 0 {
+            mutableService.createdAt = Date().timeIntervalSince1970
+        }
         do {
-            try db.collection("services").document(updated.id).setData(from: updated)
+            try db.collection("services").document(mutableService.id).setData(from: mutableService)
         } catch {
             NSLog("Firebase ServicesViewModel Error saving service: \(error)")
             return
         }
-        let index = myServices.firstIndex(where: { $0.id == updated.id }) ?? -1
         if index < 0 {
-            myServices.append(updated)
+            myServices.append(mutableService)
         } else {
-            myServices[index] = updated
+            myServices[index] = mutableService
         }
         selectedService = Service()
     }
@@ -185,7 +149,7 @@ class MockServicesViewModel: ServicesViewModel {
     }
     
     /// Loads a page of services. This is a stub that returns a sample array.
-    override func loadServices(_ page: Int = 0, pageSize: Int = 10) async {
+    override func loadServices() async {
         // TODO: implement Firestore query and pagination
         services = [
             Service(description: "Descripción del servicio de prueba 1",
