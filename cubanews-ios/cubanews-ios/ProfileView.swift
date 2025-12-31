@@ -13,6 +13,7 @@ struct ProfileView: View {
     @Query private var preferences: [UserPreferences]
     @State private var selectedPublications: Set<String> = []
     @State private var userFullName: String = "Usuario Anónimo"
+    @State private var advertiseServices: Bool = false
     private static let TAG = "ProfileView"
     
     // Keep publications as NewsSourceName so we can show icon and displayName
@@ -105,6 +106,24 @@ struct ProfileView: View {
                         
                         Divider()
                         
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Servicios")
+                                .font(.headline)
+                                .padding(.horizontal)
+                            
+                            Toggle(isOn: $advertiseServices) {
+                                Text("Anunciar mis servicios en CubaNews")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.horizontal)
+                            .onChange(of: advertiseServices) { oldValue, newValue in
+                                saveAdvertiseServicesPreference(newValue)
+                            }
+                        }
+                        
+                        Divider()
+                        
                         Text("Acerca de CubaNews")
                             .font(.headline)
                             .padding(.horizontal)
@@ -165,6 +184,7 @@ struct ProfileView: View {
             selectedPublications = Set(userPrefs.preferredPublications)
             NSLog("selectedPublications now contains: \(Array(selectedPublications))")
             userFullName = userPrefs.userFullName ?? "Usuario Anónimo"
+            advertiseServices = userPrefs.advertiseServices
         } else {
             NSLog("No preferences found - creating defaults...")
             // Create default preferences if none exist
@@ -201,6 +221,32 @@ struct ProfileView: View {
         } else {
             NSLog("  -> Creating new UserPreferences")
             let newPrefs = UserPreferences(preferredPublications: Array(selectedPublications))
+            modelContext.insert(newPrefs)
+            do {
+                try modelContext.save()
+                NSLog("  -> New preferences saved successfully")
+            } catch {
+                NSLog("  -> Error saving new preferences: \(error)")
+            }
+        }
+    }
+    
+    private func saveAdvertiseServicesPreference(_ newValue: Bool) {
+        NSLog("saveAdvertiseServicesPreference: \(newValue)")
+        
+        if let userPrefs = preferences.first {
+            NSLog("  -> Updating existing UserPreferences")
+            userPrefs.advertiseServices = newValue
+            do {
+                try modelContext.save()
+                NSLog("  -> Saved advertiseServices successfully")
+            } catch {
+                NSLog("  -> Error saving advertiseServices: \(error)")
+            }
+        } else {
+            NSLog("  -> Creating new UserPreferences with advertiseServices")
+            let newPrefs = UserPreferences(preferredPublications: [])
+            newPrefs.advertiseServices = newValue
             modelContext.insert(newPrefs)
             do {
                 try modelContext.save()
@@ -300,21 +346,13 @@ struct ManageAccountSection: View {
             
             HStack(spacing: 2) {
                 // Delete Account Button
-                Button(action: {
+                Button("Eliminar Cuenta") {
                     showingDeleteAlert = true
-                }) {
-                    Text("Eliminar Cuenta")
-                        .font(.body)
-                        .fontWeight(.light)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.red)
-                        )
                 }
                 .padding(.horizontal)
+                .buttonStyle(.bordered)
+                .tint(.red)
+                .frame(maxWidth: .infinity)
             }
         }
         .alert("¿Eliminar Cuenta?", isPresented: $showingDeleteAlert) {
@@ -349,4 +387,16 @@ struct ManageAccountSection: View {
         }
     }
    
+}
+
+
+
+#Preview("ProfileView") {
+    NavigationStack {
+        if #available(iOS 17, *) {
+            ProfileView()
+        } else {
+            Text("ProfileView requires iOS 17 or later.")
+        }
+    }
 }

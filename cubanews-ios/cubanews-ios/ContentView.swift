@@ -18,11 +18,16 @@ struct ContentView: View {
                 SavedStoriesView().tabItem {
                     Label("Guardados", systemImage: "bookmark.fill")
                 }
+                
+                ServicesView().tabItem {
+                        Label("Servicios", systemImage: "square.grid.2x2.fill")
+                    }
 
                 ProfileView()
                     .tabItem {
                         Label("Perfil", systemImage: "person.fill")
                     }
+                
             }
         }
 }
