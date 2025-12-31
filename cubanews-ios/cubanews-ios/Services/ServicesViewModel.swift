@@ -113,6 +113,9 @@ class ServicesViewModel: ObservableObject {
         }
         do {
             try db.collection("services").document(mutableService.id).setData(from: mutableService)
+            Task {
+                await loadServices()
+            }
         } catch {
             NSLog("Firebase ServicesViewModel Error saving service: \(error)")
             return
