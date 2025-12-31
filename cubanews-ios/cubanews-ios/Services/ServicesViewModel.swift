@@ -39,7 +39,10 @@ class ServicesViewModel: ObservableObject {
     }
 
     func loadServices() async {
-        self.isLoading = true
+        await MainActor.run {
+            self.isLoading = true
+        }
+        
         var query = db.collection("services")
             .whereField("status", isEqualTo: ServiceStatus.approved.rawValue)
             .order(by: "createdAt", descending: true)
@@ -51,6 +54,9 @@ class ServicesViewModel: ObservableObject {
             let snapshot = try await query.getDocuments()
             guard !snapshot.documents.isEmpty else {
                 NSLog("Firebase ServicesViewModel No more services to load.")
+                await MainActor.run {
+                    self.isLoading = false
+                }
                 return
             }
             let newServices = snapshot.documents.compactMap { doc -> Service? in
@@ -58,15 +64,20 @@ class ServicesViewModel: ObservableObject {
                 return try? doc.data(as: Service.self)
             }
             
-            self.services.append(contentsOf: newServices)
-            self.lastDocument = snapshot.documents.last
-            self.isLoading = false
-            self.filteredServices = self.services
+            await MainActor.run {
+                self.services.append(contentsOf: newServices)
+                self.lastDocument = snapshot.documents.last
+                self.isLoading = false
+                self.filteredServices = self.services
+            }
             
             NSLog("Firebase ServicesViewModel Loaded \(newServices.count) services.")
             
         } catch {
             NSLog("Firebase ServicesViewModel Error loading my services: \(error)")
+            await MainActor.run {
+                self.isLoading = false
+            }
         }
     }
     
@@ -85,7 +96,9 @@ class ServicesViewModel: ObservableObject {
                 NSLog("Firebase ServicesViewModel Loaded service doc: \(doc.data())")
                 return try? doc.data(as: Service.self)
             }
-            self.myServices = newServices
+            await MainActor.run {
+                self.myServices = newServices
+            }
             NSLog("Firebase ServicesViewModel Loaded \(newServices.count) services.")
         } catch {
             NSLog("Firebase ServicesViewModel Error loading my services: \(error)")
