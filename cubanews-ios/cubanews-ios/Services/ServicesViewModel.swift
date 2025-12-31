@@ -24,15 +24,6 @@ class ServicesViewModel: ObservableObject {
     private let db = Firestore.firestore(database: "prod")
     private var currentQuery: Query? = nil
     
-    public init() {
-        Task {
-            services = []
-            myServices = []
-            await loadServices()
-            await loadMyServices()
-        }
-    }
-    
     private var lastDocument: DocumentSnapshot?
     private var isLoading = false
     

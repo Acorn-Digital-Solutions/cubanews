@@ -30,6 +30,10 @@ struct ServicesView: View {
                 .cornerRadius(8)
                 .onSubmit {
                     viewModel.performSearch()
+                }.onChange(of: viewModel.searchText) { newValue in
+                    if newValue.isEmpty {
+                        viewModel.performSearch()
+                    }
                 }
             
             Button {
@@ -66,8 +70,6 @@ struct ServicesView: View {
                 }
             }
             .toggleStyle(CapsuleCheckboxToggleStyle())
-            .onChange(of: viewModel.showMyServices) {
-            }
             Spacer()
         }
         .padding(.horizontal)
@@ -167,6 +169,11 @@ struct ServicesView: View {
                         viewModel.cancelEdit()
                     }
                 )
+            }
+        }.onAppear() {
+            Task {
+                await viewModel.loadServices()
+                await viewModel.loadMyServices()
             }
         }
     }
