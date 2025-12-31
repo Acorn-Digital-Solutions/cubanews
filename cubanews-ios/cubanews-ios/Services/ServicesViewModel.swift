@@ -19,6 +19,7 @@ class ServicesViewModel: ObservableObject {
     @Published var editMode: Bool = false
     @Published var showMyServices: Bool = false
     @Published var filteredServices: [Service] = []
+    @Published var searchText: String = ""
     
     private let db = Firestore.firestore(database: "prod")
     private var currentQuery: Query? = nil
@@ -35,12 +36,13 @@ class ServicesViewModel: ObservableObject {
     private var lastDocument: DocumentSnapshot?
     private var isLoading = false
     
-    func performSearch(_ searchText: String) {
+    func performSearch() {
         guard !searchText.isEmpty else {
-            filteredServices = services
+            filteredServices = showMyServices ? myServices : services
             return
         }
-        filteredServices = services.filter { service in
+        let servicesToFilter = showMyServices ? myServices : services
+        filteredServices = servicesToFilter.filter { service in
             service.businessName.lowercased().contains(searchText.lowercased()) ||
             service.description.lowercased().contains(searchText.lowercased()) ||
             service.contactInfo.location.lowercased().contains(searchText.lowercased())

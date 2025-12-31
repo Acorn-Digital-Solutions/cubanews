@@ -12,6 +12,7 @@ struct ServiceView: View {
     let service: Service
     let viewModel: ServicesViewModel
     
+    @State private var showDetailSheet = false
     @Environment(\.openURL) private var openURL
     
     private func statusInfo() -> (String, Color) {
@@ -122,55 +123,65 @@ struct ServiceView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .top, spacing: 12) {
-                Text(service.businessName)
-                    .font(.headline)
-                    .foregroundColor(.primary)
-                    .lineLimit(2)
+        Button {
+            showDetailSheet = true
+        } label: {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(alignment: .top, spacing: 12) {
+                    Text(service.businessName)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if viewModel.showMyServices {
+                        Spacer()
+                        statusBadge
+                    }
+                }.frame(maxWidth: .infinity, alignment: .leading)
+                
+                Text(truncateToWords(service.description, maxWords: 50))
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .lineLimit(4)
                     .fixedSize(horizontal: false, vertical: true)
-                if viewModel.showMyServices {
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Spacer(minLength: 0)
+                
+                HStack(spacing: 12) {
+                    contactInfoPreview
                     Spacer()
-                    statusBadge
-                }
-            }.frame(maxWidth: .infinity, alignment: .leading)
-            
-            Text(truncateToWords(service.description, maxWords: 50))
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .lineLimit(4)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            Spacer(minLength: 0)
-            
-            HStack(spacing: 12) {
-                contactInfoPreview
-                Spacer()
-                if (viewModel.showMyServices) {
-                    Button {
-                        viewModel.editService(service)
-                    } label: {
-                        Image(systemName: "pencil")
-                            .foregroundColor(.blue)
-                    }
-                    Button {
-                        Task {
-                            await viewModel.deleteService(service)
+                    if (viewModel.showMyServices) {
+                        Button {
+                            viewModel.editService(service)
+                        } label: {
+                            Image(systemName: "pencil")
+                                .foregroundColor(.blue)
                         }
-                    } label: {
-                        Image(systemName: "trash")
-                            .foregroundColor(.red)
+                        .buttonStyle(.plain)
+                        Button {
+                            Task {
+                                await viewModel.deleteService(service)
+                            }
+                        } label: {
+                            Image(systemName: "trash")
+                                .foregroundColor(.red)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
+                
             }
-            
+            .padding()
+            .frame(height: 150)
+            .background(Color(.systemGray5).opacity(0.3))
+            .cornerRadius(12)
+            .shadow(color: Color.black.opacity(0.2), radius: 1, x: 0, y: 1)
         }
-        .padding()
-        .frame(height: 150)
-        .background(Color(.systemGray5).opacity(0.3))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.2), radius: 1, x: 0, y: 1)
+        .buttonStyle(.plain)
+        .sheet(isPresented: $showDetailSheet) {
+            ServiceDetailSheet(service: .constant(service))
+        }
     }
     
 }

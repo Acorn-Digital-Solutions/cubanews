@@ -11,7 +11,6 @@ import SwiftData
 struct ServicesView: View {
     @ObservedObject private var viewModel: ServicesViewModel
     @Query private var preferences: [UserPreferences]
-    @State private var searchText: String = ""
     
     init(useMockViewModel: Bool = false) {
         if (useMockViewModel) {
@@ -24,19 +23,19 @@ struct ServicesView: View {
     @ViewBuilder
     private var searchBar: some View {
         HStack(spacing: 12) {
-            TextField("Buscar servicios...", text: $searchText)
+            TextField("Buscar servicios...", text: $viewModel.searchText)
                 .padding(.vertical, 10)
                 .padding(.horizontal, 12)
                 .background(Color(UIColor.systemGray6))
                 .cornerRadius(8)
-                .onChange(of: searchText) { newValue in
-                    if newValue.isEmpty {
-                        viewModel.performSearch("")
-                    }
+                .onSubmit {
+                    viewModel.performSearch()
                 }
             
             Button {
-                viewModel.performSearch(searchText)
+                viewModel.performSearch()
+                // Dismiss keyboard
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
             } label: {
                 Image(systemName: "magnifyingglass")
                     .font(.system(size: 16, weight: .semibold))
@@ -170,6 +169,231 @@ struct ServicesView: View {
                 )
             }
         }
+    }
+}
+
+struct ServiceDetailSheet: View {
+    @Binding var service: Service
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.openURL) var openURL
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    // Business Name
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(service.businessName)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        
+                        if service.status != .approved {
+                            HStack {
+                                Circle()
+                                    .fill(statusColor(for: service.status))
+                                    .frame(width: 8, height: 8)
+                                Text(service.status.rawValue)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                    
+                    Divider()
+                    
+                    // Description
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Descripción")
+                            .font(.headline)
+                            .foregroundColor(.secondary)
+                        
+                        Text(service.description)
+                            .font(.body)
+                    }
+                    
+                    // Contact Information
+                    if hasContactInfo() {
+                        Divider()
+                        
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Información de Contacto")
+                                .font(.headline)
+                                .foregroundColor(.secondary)
+                            
+                            VStack(spacing: 12) {
+                                if !service.contactInfo.phoneNumber.isEmpty {
+                                    ContactRow(
+                                        icon: "phone.fill",
+                                        label: "Teléfono",
+                                        value: service.contactInfo.phoneNumber,
+                                        action: {
+                                            dial(number: service.contactInfo.phoneNumber)
+                                        }
+                                    )
+                                }
+                                
+                                if !service.contactInfo.emailAddress.isEmpty {
+                                    ContactRow(
+                                        icon: "envelope.fill",
+                                        label: "Email",
+                                        value: service.contactInfo.emailAddress,
+                                        action: {
+                                            if let url = URL(string: "mailto:\(service.contactInfo.emailAddress)") {
+                                                openURL(url)
+                                            }
+                                        }
+                                    )
+                                }
+                                
+                                if !service.contactInfo.websiteURL.isEmpty {
+                                    ContactRow(
+                                        icon: "globe",
+                                        label: "Sitio Web",
+                                        value: service.contactInfo.websiteURL,
+                                        action: {
+                                            if let url = URL(string: service.contactInfo.websiteURL) {
+                                                openURL(url)
+                                            }
+                                        }
+                                    )
+                                }
+                                
+                                if !service.contactInfo.instagram.isEmpty {
+                                    ContactRow(
+                                        icon: "camera.fill",
+                                        label: "Instagram",
+                                        value: service.contactInfo.instagram,
+                                        action: {
+                                            if let url = URL(string: service.contactInfo.instagram) {
+                                                openURL(url)
+                                            }
+                                        }
+                                    )
+                                }
+                                
+                                if !service.contactInfo.facebook.isEmpty {
+                                    ContactRow(
+                                        icon: "f.circle.fill",
+                                        label: "Facebook",
+                                        value: service.contactInfo.facebook,
+                                        action: {
+                                            if let url = URL(string: service.contactInfo.facebook) {
+                                                openURL(url)
+                                            }
+                                        }
+                                    )
+                                }
+                                
+                                if !service.contactInfo.location.isEmpty {
+                                    ContactRow(
+                                        icon: "mappin.circle.fill",
+                                        label: "Ubicación",
+                                        value: service.contactInfo.location,
+                                        action: nil
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Expiration Date
+                    if service.expirationDate > 0 {
+                        Divider()
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Fecha de Expiración")
+                                .font(.headline)
+                                .foregroundColor(.secondary)
+                            
+                            Text(Date(timeIntervalSince1970: service.expirationDate), style: .date)
+                                .font(.body)
+                        }
+                    }
+                }
+                .padding()
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title3)
+                            .foregroundColor(.gray)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func hasContactInfo() -> Bool {
+        return !service.contactInfo.phoneNumber.isEmpty ||
+               !service.contactInfo.emailAddress.isEmpty ||
+               !service.contactInfo.websiteURL.isEmpty ||
+               !service.contactInfo.instagram.isEmpty ||
+               !service.contactInfo.facebook.isEmpty ||
+               !service.contactInfo.location.isEmpty
+    }
+    
+    private func statusColor(for status: ServiceStatus) -> Color {
+        switch status {
+        case .approved:
+            return .green
+        case .inReview:
+            return .orange
+        case .rejected:
+            return .red
+        case .expired:
+            return .gray
+        }
+    }
+    
+    private func dial(number: String) {
+        let cleanNumber = number.replacingOccurrences(of: " ", with: "")
+        if let url = URL(string: "tel://\(cleanNumber)") {
+            openURL(url)
+        }
+    }
+}
+
+struct ContactRow: View {
+    let icon: String
+    let label: String
+    let value: String
+    let action: (() -> Void)?
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 18))
+                .foregroundColor(.blue)
+                .frame(width: 24)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(label)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                if let action = action {
+                    Button(action: action) {
+                        Text(value)
+                            .font(.body)
+                            .foregroundColor(.blue)
+                            .multilineTextAlignment(.leading)
+                    }
+                    .buttonStyle(.plain)
+                } else {
+                    Text(value)
+                        .font(.body)
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.leading)
+                }
+            }
+            
+            Spacer()
+        }
+        .padding(.vertical, 4)
     }
 }
 
