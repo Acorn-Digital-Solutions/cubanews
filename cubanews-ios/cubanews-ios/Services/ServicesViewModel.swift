@@ -106,6 +106,7 @@ class ServicesViewModel: ObservableObject {
     func saveService(updated: Service) {
         var mutableService = updated
         mutableService.lastUpdatedAt = Date().timeIntervalSince1970
+        mutableService.status = .inReview
         let index = myServices.firstIndex(where: { $0.id == updated.id }) ?? -1
         if index < 0 {
             mutableService.createdAt = Date().timeIntervalSince1970
