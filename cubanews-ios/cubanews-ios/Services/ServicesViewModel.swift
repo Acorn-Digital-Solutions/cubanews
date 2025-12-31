@@ -115,9 +115,6 @@ class ServicesViewModel: ObservableObject {
         }
         do {
             try db.collection("services").document(mutableService.id).setData(from: mutableService)
-            Task {
-                await loadServices()
-            }
         } catch {
             NSLog("Firebase ServicesViewModel Error saving service: \(error)")
             return
@@ -126,6 +123,8 @@ class ServicesViewModel: ObservableObject {
             myServices.append(mutableService)
         } else {
             myServices[index] = mutableService
+            self.filteredServices.removeAll { $0.id == mutableService.id }
+            self.services.removeAll { $0.id == mutableService.id }
         }
         selectedService = Service()
     }
