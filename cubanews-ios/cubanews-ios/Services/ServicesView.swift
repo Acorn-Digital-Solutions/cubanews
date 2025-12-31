@@ -11,6 +11,7 @@ import SwiftData
 struct ServicesView: View {
     @ObservedObject private var viewModel: ServicesViewModel
     @Query private var preferences: [UserPreferences]
+    @State private var searchText: String = ""
     
     init(useMockViewModel: Bool = false) {
         if (useMockViewModel) {
@@ -18,7 +19,34 @@ struct ServicesView: View {
         } else {
             self.viewModel = ServicesViewModel()
         }
-        
+    }
+    
+    @ViewBuilder
+    private var searchBar: some View {
+        HStack(spacing: 12) {
+            TextField("Buscar servicios...", text: $searchText)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 12)
+                .background(Color(UIColor.systemGray6))
+                .cornerRadius(8)
+                .onChange(of: searchText) { newValue in
+                    if newValue.isEmpty {
+                        viewModel.performSearch("")
+                    }
+                }
+            
+            Button {
+                viewModel.performSearch(searchText)
+            } label: {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 44, height: 44)
+                    .background(Color.blue)
+                    .cornerRadius(8)
+            }
+        }
+        .padding(.horizontal)
     }
     
     @ViewBuilder
@@ -48,7 +76,7 @@ struct ServicesView: View {
     @ViewBuilder
     private var publicServicesSection: some View {
         LazyVStack(spacing: 12) {
-            ForEach(viewModel.services) { service in
+            ForEach(viewModel.filteredServices) { service in
                 ServiceView(service: service, viewModel: viewModel)
                     .padding(.horizontal)
                     .onAppear {
@@ -114,6 +142,7 @@ struct ServicesView: View {
                 ScrollView {
                     VStack(spacing: 12) {
                         NewsHeader(header: "Servicios")
+                        searchBar
                         if preferences.first?.advertiseServices == true {
                             topToggleBar
                         }
@@ -233,3 +262,4 @@ struct CapsuleCheckboxToggleStyle: ToggleStyle {
         ServicesView(useMockViewModel: true)
     }
 }
+

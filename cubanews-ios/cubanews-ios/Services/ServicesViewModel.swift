@@ -18,6 +18,7 @@ class ServicesViewModel: ObservableObject {
     @Published var selectedService: Service = Service()
     @Published var editMode: Bool = false
     @Published var showMyServices: Bool = false
+    @Published var filteredServices: [Service] = []
     
     private let db = Firestore.firestore(database: "prod")
     private var currentQuery: Query? = nil
@@ -33,14 +34,25 @@ class ServicesViewModel: ObservableObject {
     
     private var lastDocument: DocumentSnapshot?
     private var isLoading = false
+    
+    func performSearch(_ searchText: String) {
+        guard !searchText.isEmpty else {
+            filteredServices = services
+            return
+        }
+        filteredServices = services.filter { service in
+            service.businessName.lowercased().contains(searchText.lowercased()) ||
+            service.description.lowercased().contains(searchText.lowercased()) ||
+            service.contactInfo.location.lowercased().contains(searchText.lowercased())
+        }
+    }
 
     func loadServices() async {
         isLoading = true
-        
         var query = db.collection("services")
             .whereField("status", isEqualTo: ServiceStatus.approved.rawValue)
             .order(by: "createdAt", descending: true)
-            .limit(to: 25)
+            .limit(to: 50)
         if let lastDoc = lastDocument {
             query = query.start(afterDocument: lastDoc)
         }
@@ -60,6 +72,7 @@ class ServicesViewModel: ObservableObject {
                 // Update cursor and state
                 self.lastDocument = snapshot.documents.last
                 self.isLoading = false
+                self.filteredServices = self.services
             }
             NSLog("Firebase ServicesViewModel Loaded \(newServices.count) services.")
             
@@ -184,6 +197,7 @@ class MockServicesViewModel: ServicesViewModel {
                     ownerID: Auth.auth().currentUser?.uid ?? "123serer",
                     status: .rejected)
         ]
+        filteredServices = services
     }
     
     override func loadMyServices() async {
