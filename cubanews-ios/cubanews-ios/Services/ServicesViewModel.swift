@@ -12,7 +12,6 @@ import FirebaseFirestore
 @available(iOS 17, *)
 @MainActor
 class ServicesViewModel: ObservableObject {
-    // Singleton instance
     @Published var services: [Service] = []
     @Published var myServices: [Service] = []
     @Published var selectedService: Service = Service()
@@ -22,7 +21,6 @@ class ServicesViewModel: ObservableObject {
     @Published var searchText: String = ""
     
     private let db = Firestore.firestore(database: "prod")
-    private var currentQuery: Query? = nil
     
     private var lastDocument: DocumentSnapshot?
     private var isLoading = false
@@ -41,7 +39,7 @@ class ServicesViewModel: ObservableObject {
     }
 
     func loadServices() async {
-        isLoading = true
+        self.isLoading = true
         var query = db.collection("services")
             .whereField("status", isEqualTo: ServiceStatus.approved.rawValue)
             .order(by: "createdAt", descending: true)
@@ -59,14 +57,12 @@ class ServicesViewModel: ObservableObject {
                 NSLog("Firebase ServicesViewModel Loaded service doc: \(doc.data())")
                 return try? doc.data(as: Service.self)
             }
-            DispatchQueue.main.async {
-                self.isLoading = false
-                self.services.append(contentsOf: newServices)
-                // Update cursor and state
-                self.lastDocument = snapshot.documents.last
-                self.isLoading = false
-                self.filteredServices = self.services
-            }
+            
+            self.services.append(contentsOf: newServices)
+            self.lastDocument = snapshot.documents.last
+            self.isLoading = false
+            self.filteredServices = self.services
+            
             NSLog("Firebase ServicesViewModel Loaded \(newServices.count) services.")
             
         } catch {
@@ -89,18 +85,11 @@ class ServicesViewModel: ObservableObject {
                 NSLog("Firebase ServicesViewModel Loaded service doc: \(doc.data())")
                 return try? doc.data(as: Service.self)
             }
-            DispatchQueue.main.async {
-                self.myServices = newServices
-            }
+            self.myServices = newServices
             NSLog("Firebase ServicesViewModel Loaded \(newServices.count) services.")
         } catch {
             NSLog("Firebase ServicesViewModel Error loading my services: \(error)")
         }
-    }
-    
-    enum ServicesError: Error {
-        case notImplemented
-        case parseFailed
     }
     
     func saveService(updated: Service) {
@@ -160,7 +149,6 @@ class MockServicesViewModel: ServicesViewModel {
     
     /// Loads a page of services. This is a stub that returns a sample array.
     override func loadServices() async {
-        // TODO: implement Firestore query and pagination
         services = [
             Service(description: "Descripción del servicio de prueba 1",
                     businessName: "Servicio de Prueba 1",

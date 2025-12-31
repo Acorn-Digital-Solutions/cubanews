@@ -35,15 +35,15 @@ struct ContactInfo: Equatable, Codable {
 }
 
 struct Service: Identifiable, Equatable, Codable {
-    var id: String = UUID().uuidString;
-    var description: String = "";
-    var businessName: String = "";
-    var contactInfo: ContactInfo = ContactInfo();
-    var ownerID: String = Auth.auth().currentUser?.uid ?? "";
-    var status: ServiceStatus = .inReview;
-    var expirationDate: Double = 0;
-    var createdAt: Double = 0;
-    var lastUpdatedAt: Double = 0;
+    var id: String = UUID().uuidString
+    var description: String = ""
+    var businessName: String = ""
+    var contactInfo: ContactInfo = ContactInfo()
+    var ownerID: String = Auth.auth().currentUser?.uid ?? ""
+    var status: ServiceStatus = .inReview
+    var expirationDate: Double = 0
+    var createdAt: Double = 0
+    var lastUpdatedAt: Double = 0
     
     enum CodingKeys: String, CodingKey {
         case id
