@@ -4,7 +4,6 @@ import "moment/locale/es"; // Import Spanish locale
 import cubanewsApp from "@/app/cubanewsApp";
 import { NewsItem } from "@/app/interfaces";
 import { chromium, Browser, Page as PlaywrightPage } from "playwright";
-import * as fs from "fs";
 
 // Set the locale to Spanish
 moment.locale("es");
@@ -92,11 +91,19 @@ async function postUsingPlayright(headless: boolean = true) {
 
       // Handle cookie consent if present
       try {
-        await page.waitForSelector('button:has-text("Allow all cookies")', {
-          timeout: 3000,
+        console.log("Looking for cookie consent dialog...");
+        // Try multiple selectors for the "Allow all cookies" button
+        // const cookieButton = page.getByText("Allow all cookies").first();
+        const acceptButton = page.getByRole("button", {
+          name: /allow all cookies/i,
         });
-        await page.click('button:has-text("Allow all cookies")');
+        if (
+          await acceptButton.isVisible({ timeout: 5000 }).catch(() => false)
+        ) {
+          await acceptButton.click();
+        }
         console.log("Accepted cookies");
+        await page.waitForTimeout(1000);
       } catch (e) {
         console.log("No cookie banner found or already accepted");
       }
@@ -133,8 +140,10 @@ async function postUsingPlayright(headless: boolean = true) {
         return;
       }
       console.log("Login successful!");
+
+      // Cookies are now hardcoded, no need to save
     } else {
-      console.log("Already logged in using saved cookies!");
+      console.log("Already logged in using hardcoded cookies!");
     }
 
     // Navigate to the Facebook Business page
@@ -149,6 +158,13 @@ async function postUsingPlayright(headless: boolean = true) {
     // Wait for the composer to load
     console.log("Waiting for post composer...");
     await page.waitForTimeout(3000);
+
+    const closeButton = page.getByRole("button", {
+      name: /close/i,
+    });
+    if (await closeButton.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await closeButton.click();
+    }
 
     // Find and fill the contenteditable text area
     console.log("Looking for text field...");
