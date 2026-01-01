@@ -105,8 +105,8 @@
       "type": "node-terminal"
     },
     {
-      "command": "cd cubanews-feed; npm run start:local:dev",
-      "name": "Run npm start:local:dev",
+      "command": "cd cubanews-feed; npm run start:postToFB:playwright:headed",
+      "name": "Run npm postToFB",
       "request": "launch",
       "type": "node-terminal"
     }
