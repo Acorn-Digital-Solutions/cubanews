@@ -189,6 +189,7 @@ async function postUsingPlayright(headless: boolean = true) {
       .join("\n");
     const postFooter = "Ver más en https://cubanews.icu";
     const postContent = `${postHeader}\n\n${postBody}\n${postFooter}`;
+
     console.log(
       `-----------------------\n${postContent}\n-----------------------`
     );
@@ -197,6 +198,10 @@ async function postUsingPlayright(headless: boolean = true) {
     await textField.fill(postContent);
     // Wait a bit to see the content
     await page.waitForTimeout(2000);
+
+    // Doing this to add link photo to post
+    await page.getByRole("button", { name: "More features" }).click();
+    await page.waitForTimeout(5000);
 
     // Find and click the publish button
     console.log("Looking for publish button...");
