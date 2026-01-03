@@ -4,6 +4,8 @@ import "moment/locale/es"; // Import Spanish locale
 import cubanewsApp from "@/app/cubanewsApp";
 import { NewsItem } from "@/app/interfaces";
 import { chromium, Browser, Page as PlaywrightPage } from "playwright";
+import { readFile, writeFile } from "fs/promises";
+import { homedir } from "os";
 
 // Set the locale to Spanish
 moment.locale("es");
@@ -53,21 +55,29 @@ async function postUsingPlayright(headless: boolean = true) {
   }
 
   let browser: Browser | null = null;
+  browser = await chromium.launch({
+    headless: headless,
+    slowMo: headless ? 0 : 100, // Slow down actions when visible for easier viewing
+  });
+
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 720 },
+    userAgent:
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+  });
 
   try {
     console.log(
       `Launching browser in ${headless ? "headless" : "headed"} mode...`
     );
-    browser = await chromium.launch({
-      headless: headless,
-      slowMo: headless ? 0 : 100, // Slow down actions when visible for easier viewing
-    });
 
-    const context = await browser.newContext({
-      viewport: { width: 1280, height: 720 },
-      userAgent:
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    });
+    // Load Facebook cookies from file
+    const cookiesPath = `${homedir()}/fb_cookies.json`;
+    const cookiesData = await readFile(cookiesPath, "utf-8");
+    const cookies = JSON.parse(cookiesData);
+
+    await context.addCookies(cookies);
+    console.log(`Loaded ${cookies.length} cookies from ${cookiesPath}`);
 
     const page = await context.newPage();
     // Navigate to Facebook
@@ -133,6 +143,12 @@ async function postUsingPlayright(headless: boolean = true) {
       // Check if login was successful
       const currentUrl = page.url();
       console.log("URL after login attempt:", currentUrl);
+      if (currentUrl.includes("two_step_verification")) {
+        console.error("Two-step verification required, cannot proceed.");
+        // Take a screenshot for debugging
+        await page.screenshot({ path: "two-step-verification.png" });
+        await page.waitForTimeout(30000);
+      }
       if (currentUrl.includes("login") || currentUrl.includes("checkpoint")) {
         console.error("Login failed or requires additional verification");
         // Take a screenshot for debugging
@@ -247,6 +263,17 @@ async function postUsingPlayright(headless: boolean = true) {
     throw error;
   } finally {
     if (browser) {
+      // Save updated cookies before closing
+      try {
+        const updatedCookies = await context.cookies();
+        const cookiesPath = `${homedir()}/fb_cookies.json`;
+        await writeFile(cookiesPath, JSON.stringify(updatedCookies, null, 2));
+        console.log(
+          `Saved ${updatedCookies.length} updated cookies to ${cookiesPath}`
+        );
+      } catch (e) {
+        console.error("Failed to save cookies:", e);
+      }
       await browser.close();
       console.log("Browser closed");
     }
