@@ -144,6 +144,7 @@ export class CubanewsRSSCrawler {
         });
       }
       console.log(JSON.stringify(articles, null, 2));
+      await browser.close();
       return articles;
     } catch (error: any) {
       console.error("Error fetching RSS feed", { error: error.message });
