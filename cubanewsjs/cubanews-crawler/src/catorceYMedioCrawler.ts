@@ -3,6 +3,7 @@ import { NewsSourceName, getNewsSourceByName } from "./crawlerUtils.js";
 import moment from "moment";
 import { Page } from "playwright";
 import log from "@apify/log";
+import Parser from "rss-parser";
 
 export default class CatorceYMedioCrawler extends CubanewsCrawler {
   constructor() {
