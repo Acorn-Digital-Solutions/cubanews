@@ -6,6 +6,7 @@ export enum NewsSourceName {
   ELTOQUE = "eltoque",
   CUBANET = "cubanet",
   PERIODICO_CUBANO = "periodicocubano",
+  DIRECTORIO_CUBANO = "directoriocubano",
 }
 
 export interface NewsSource {
@@ -13,6 +14,4 @@ export interface NewsSource {
   startUrls: Set<string>;
   rssFeed?: string;
   datasetName: string;
-  imageSelector?: string;
-  cookiesConsentSelector?: string;
 }
