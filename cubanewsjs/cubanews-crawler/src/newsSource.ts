@@ -1,3 +1,5 @@
+import Parser from "rss-parser";
+
 export enum NewsSourceName {
   ADNCUBA = "adncuba",
   CATORCEYMEDIO = "catorceymedio",
@@ -12,6 +14,7 @@ export enum NewsSourceName {
 export interface NewsSource {
   name: NewsSourceName;
   startUrls: Set<string>;
-  rssFeed?: string;
+  rssFeed: string;
   datasetName: string;
+  parser: Parser;
 }
