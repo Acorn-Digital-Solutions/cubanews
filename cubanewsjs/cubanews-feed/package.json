@@ -44,7 +44,8 @@
     "react-dom": "^18.2.0",
     "server-only": "^0.0.1",
     "sharp": "^0.34.2",
-    "swr": "^2.3.3"
+    "swr": "^2.3.3",
+    "rss-parser": "^3.13.0"
   },
   "devDependencies": {
     "@types/facebook-nodejs-business-sdk": "^22.0.0",

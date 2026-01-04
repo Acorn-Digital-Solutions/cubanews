@@ -1,5 +1,4 @@
 import Parser from "rss-parser";
-import { RSSArticle } from "./rssArticle.js";
 import {
   connectStorageEmulator,
   FirebaseStorage,
@@ -7,9 +6,9 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
-import { firebaseConfig } from "./firebaseConfig.js";
 import { initializeApp } from "firebase/app";
-import { NewsSource, NewsSourceName } from "./newsSource.js";
+import { NewsSource, RSSArticle, NewsSourceName } from "./interfaces";
+import { firebaseConfig } from "./interfaces/firebaseConfig";
 
 abstract class CubanewsRSSCrawler {
   protected newsSource: NewsSource;
@@ -29,7 +28,7 @@ abstract class CubanewsRSSCrawler {
     }
   }
 
-  abstract tryGetMediaImage(item: any): string | null;
+  protected abstract tryGetMediaImage(item: any): string | null;
 
   async getRSSContent(
     uploadImages: boolean = true,

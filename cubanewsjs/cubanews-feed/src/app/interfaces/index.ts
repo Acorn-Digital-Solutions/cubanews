@@ -1,3 +1,5 @@
+import Parser from "rss-parser";
+
 export type ResponseError = {
   message: string;
 };
@@ -51,6 +53,8 @@ export enum NewsSourceName {
   CIBERCUBA = "cibercuba",
   ELTOQUE = "eltoque",
   CUBANET = "cubanet",
+  PERIODICO_CUBANO = "periodicocubano",
+  DIRECTORIO_CUBANO = "directoriocubano",
 }
 
 export enum NewsSourceDisplayName {
@@ -101,3 +105,24 @@ export type ResolveNewsletterSubscriptionData = {
   email: string;
   dontShowAgain: boolean;
 };
+
+export interface RSSArticle {
+  title: string;
+  link: string;
+  pubDate: string;
+  author: string;
+  categories: string[];
+  contentSnippet: string;
+  content: string;
+  guid: string;
+  isoDate: string;
+  image: string | null;
+}
+
+export interface NewsSource {
+  name: NewsSourceName;
+  startUrls: Set<string>;
+  rssFeed: string;
+  datasetName: string;
+  parser: Parser;
+}

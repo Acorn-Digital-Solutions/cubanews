@@ -11,6 +11,10 @@ import { xOfEachSource } from "./feedStrategies";
 import { exec } from "child_process";
 import { newsItemToFeedTable } from "@/local/localFeedLib";
 import cubanewsApp from "@/app/cubanewsApp";
+import {
+  CatorceYMedioRSSCrawler,
+  CibercubaRSSCrawler,
+} from "@/app/cubanewsRRSCrawler";
 
 export type RefreshFeedResult = {
   datasetName: string;
@@ -38,16 +42,6 @@ export async function GET(
       return NextResponse.json(
         {
           banter: "Dry Run. Refreshing cubanews feed",
-        },
-        { status: 200 }
-      );
-    }
-
-    if (request.nextUrl.searchParams.get("local")) {
-      exec("/home/sergio/github/cubanews/cubanewsjs/cubanews-crawler/run.sh");
-      return NextResponse.json(
-        {
-          banter: "Refreshing cubanews feed from Local Sources.",
         },
         { status: 200 }
       );
@@ -147,23 +141,83 @@ async function getFeed(
 }
 
 async function refreshFeed(): Promise<Array<RefreshFeedResult>> {
-  const datasetCollectionClient = client.datasets();
-  const listDatasets = await datasetCollectionClient.list();
-  const newsSourcesSet = new Set(
-    Object.values(NewsSourceName).map((s) => s.toLocaleLowerCase() + "-dataset")
+  const catorceYMedioRSSCrawler = new CatorceYMedioRSSCrawler();
+  const cibercubaRSSCrawler = new CibercubaRSSCrawler();
+  const feedRefreshDate = new Date();
+
+  const results: RefreshFeedResult[] = [];
+
+  // Process CatorceYMedio articles
+  const catorceArticles = await catorceYMedioRSSCrawler.getRSSContent();
+  const catorceNewsItems = catorceArticles.map((article) =>
+    rssArticleToNewsItem(article, NewsSourceName.CATORCEYMEDIO)
   );
-  // Include only the news sources with propper crawlers.
-  const datasets = listDatasets.items.filter(
-    (dataset) => dataset && dataset.name && newsSourcesSet.has(dataset.name)
+  const catorceResult = await insertArticlesToFeed(
+    catorceNewsItems,
+    feedRefreshDate,
+    NewsSourceName.CATORCEYMEDIO
   );
-  const currentDate = new Date();
-  const feedRefreshResult = await Promise.all(
-    datasets.map((dataset) => {
-      console.log("Refreshing dataset: ", dataset.name);
-      return refreshFeedDataset(dataset, currentDate);
-    })
+  results.push(catorceResult);
+
+  // Process Cibercuba articles
+  const cibercubaArticles = await cibercubaRSSCrawler.getRSSContent();
+  const cibercubaNewsItems = cibercubaArticles.map((article) =>
+    rssArticleToNewsItem(article, NewsSourceName.CIBERCUBA)
   );
-  return feedRefreshResult;
+  const cibercubaResult = await insertArticlesToFeed(
+    cibercubaNewsItems,
+    feedRefreshDate,
+    NewsSourceName.CIBERCUBA
+  );
+  results.push(cibercubaResult);
+
+  return results;
+}
+
+function rssArticleToNewsItem(article: any, source: NewsSourceName): NewsItem {
+  return {
+    id: 0, // Will be assigned by database
+    title: article.title,
+    source: source,
+    url: article.link,
+    updated: new Date(article.pubDate).getTime(),
+    isoDate: article.isoDate,
+    feedts: null,
+    content: article.contentSnippet || article.content,
+    tags: article.categories || [],
+    score: 0,
+    interactions: { feedid: 0, view: 0, like: 0, share: 0 },
+    aiSummary: "",
+    image: article.image || "",
+  };
+}
+
+async function insertArticlesToFeed(
+  newsItems: NewsItem[],
+  feedRefreshDate: Date,
+  sourceName: NewsSourceName
+): Promise<RefreshFeedResult> {
+  const validItems = newsItems.filter((newsItem) => isNewsItemValid(newsItem));
+  const values = await Promise.all(
+    validItems.map((x) => newsItemToFeedTable(x, feedRefreshDate) as any)
+  );
+
+  if (values.length === 0) {
+    return {
+      datasetName: sourceName,
+      insertedRows: 0,
+    };
+  }
+
+  const insertResult = await db
+    .insertInto("feed")
+    .values(values)
+    .executeTakeFirst();
+
+  return {
+    datasetName: sourceName,
+    insertedRows: insertResult.numInsertedOrUpdatedRows?.valueOf() as bigint,
+  };
 }
 
 async function refreshFeedDataset(
