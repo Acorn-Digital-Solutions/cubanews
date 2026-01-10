@@ -14,10 +14,19 @@ struct ProfileView: View {
     @State private var selectedPublications: Set<String> = []
     @State private var userFullName: String = "Usuario Anónimo"
     @State private var advertiseServices: Bool = false
+    
     private static let TAG = "ProfileView"
     
     // Keep publications as NewsSourceName so we can show icon and displayName
     let publications: [NewsSourceName] = NewsSourceName.allCases.filter { $0 != .unknown }
+    
+    private var userPreferences: UserPreferences? {
+        return preferences.first
+    }
+    
+    private var isAuthenticated: Bool {
+        return userPreferences?.appleUserID != nil && userPreferences?.appleUserID != UserPreferences.defaultID
+    }
     
     // Inline linked privacy text
     private var privacyAttributedText: AttributedString {
@@ -54,94 +63,21 @@ struct ProfileView: View {
             VStack(spacing: 0) {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
+                        NewsHeader(header: "Perfil")
                         // User name at the top
-                        HStack(spacing: 16) {
-                            Image(systemName: "person.circle.fill")
-                                .font(.system(size: 40))
-                                .foregroundColor(.blue)
-                            
-                            Text(userFullName)
-                                .font(.title)
-                                .fontWeight(.bold)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
-                        .padding(.top, 20)
-                        
+                        AccountSectionView()
                         Divider()
-                        
-                        // Preferences Section
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Preferencias")
-                                .font(.headline)
-                                .padding(.horizontal)
-                            
-                            Text("Selecciona tus fuentes de noticias preferidas para personalizar tu feed")
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                                .padding(.horizontal)
-                            
-                            // Display publications in a 2-column grid (two pills per row)
-                            let columns = [
-                                GridItem(.flexible(), spacing: 10),
-                                GridItem(.flexible(), spacing: 10)
-                            ]
-                            
-                            LazyVGrid(columns: columns, alignment: .leading, spacing: 10) {
-                                ForEach(publications, id: \.self) { publication in
-                                    PreferencePillButton(
-                                        publication: publication,
-                                        isSelected: selectedPublications.contains(publication.rawValue),
-                                        onToggle: {
-                                            togglePreference(publication)
-                                        }
-                                    )
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                }
-                            }
-                            .padding(.horizontal)
-                            .padding(.vertical)
-                        }
-                        .padding(.bottom, 20)
-                        
+                        PreferencesSectionView()
                         Divider()
-                        
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Servicios")
-                                .font(.headline)
-                                .padding(.horizontal)
-                            
-                            Toggle(isOn: $advertiseServices) {
-                                Text("Anunciar mis servicios en CubaNews")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(.horizontal)
-                            .onChange(of: advertiseServices) { oldValue, newValue in
-                                saveAdvertiseServicesPreference(newValue)
-                            }
+                        if (isAuthenticated) {
+                            ServicesSectionView(advertiseServices: $advertiseServices)
+                            Divider()
                         }
-                        
-                        Divider()
-                        
-                        Text("Acerca de CubaNews")
-                            .font(.headline)
-                            .padding(.horizontal)
-                        
-                        // Privacy Section
-                        Text(misionAttributedText)
-                            .font(.subheadline)
-                            .padding(.horizontal)
-                        
-                        // Inline link for "política de privacidad"
-                        Text(privacyAttributedText)
-                            .font(.subheadline)
-                            .padding(.horizontal)
-                        
+                        AboutSectionView()
                         Divider()
                         
                         // Account Management Section
-                        ManageAccountSection()
+                        ManageAccountSectionView()
                             .padding(.bottom, 20)
                         
                         Spacer()
@@ -165,6 +101,7 @@ struct ProfileView: View {
             .navigationBarTitleDisplayMode(.large)
         }
         .onAppear {
+            NSLog("➡️ AccountSectionView Checking authentication status \(preferences.first?.appleUserID ?? UserPreferences.defaultID)")
             NSLog("ProfileView appeared")
             loadPreferences()
         }
@@ -191,69 +128,6 @@ struct ProfileView: View {
             let newPrefs = UserPreferences(preferredPublications: [])
             modelContext.insert(newPrefs)
             try? modelContext.save()
-        }
-    }
-    
-    private func togglePreference(_ publication: NewsSourceName) {
-        let key = publication.rawValue
-        NSLog("togglePreference: \(key)")
-        
-        if selectedPublications.contains(key) {
-            selectedPublications.remove(key)
-            NSLog("  -> Removed \(key)")
-        } else {
-            selectedPublications.insert(key)
-            NSLog("  -> Added \(key)")
-        }
-        
-        NSLog("  -> selectedPublications now: \(Array(selectedPublications))")
-        
-        // Save to SwiftData (store rawValue strings to keep compatibility)
-        if let userPrefs = preferences.first {
-            NSLog("  -> Updating existing UserPreferences")
-            userPrefs.preferredPublications = Array(selectedPublications)
-            do {
-                try modelContext.save()
-                NSLog("  -> Saved successfully")
-            } catch {
-                NSLog("  -> Error saving: \(error)")
-            }
-        } else {
-            NSLog("  -> Creating new UserPreferences")
-            let newPrefs = UserPreferences(preferredPublications: Array(selectedPublications))
-            modelContext.insert(newPrefs)
-            do {
-                try modelContext.save()
-                NSLog("  -> New preferences saved successfully")
-            } catch {
-                NSLog("  -> Error saving new preferences: \(error)")
-            }
-        }
-    }
-    
-    private func saveAdvertiseServicesPreference(_ newValue: Bool) {
-        NSLog("saveAdvertiseServicesPreference: \(newValue)")
-        
-        if let userPrefs = preferences.first {
-            NSLog("  -> Updating existing UserPreferences")
-            userPrefs.advertiseServices = newValue
-            do {
-                try modelContext.save()
-                NSLog("  -> Saved advertiseServices successfully")
-            } catch {
-                NSLog("  -> Error saving advertiseServices: \(error)")
-            }
-        } else {
-            NSLog("  -> Creating new UserPreferences with advertiseServices")
-            let newPrefs = UserPreferences(preferredPublications: [])
-            newPrefs.advertiseServices = newValue
-            modelContext.insert(newPrefs)
-            do {
-                try modelContext.save()
-                NSLog("  -> New preferences saved successfully")
-            } catch {
-                NSLog("  -> Error saving new preferences: \(error)")
-            }
         }
     }
 }
@@ -330,65 +204,6 @@ struct AccountDeletedView: View {
         .padding()
     }
 }
-
-
-struct ManageAccountSection: View {
-    @State private var showingDeleteAlert = false
-    @Environment(\.modelContext) private var modelContext
-    @Query private var preferences: [UserPreferences]
-    @State private var showDeletedConfirmation = false
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Maneja tu Cuenta")
-                .font(.headline)
-                .padding(.horizontal)
-            
-            HStack(spacing: 2) {
-                // Delete Account Button
-                Button("Eliminar Cuenta") {
-                    showingDeleteAlert = true
-                }
-                .padding(.horizontal)
-                .buttonStyle(.bordered)
-                .tint(.red)
-                .frame(maxWidth: .infinity)
-            }
-        }
-        .alert("¿Eliminar Cuenta?", isPresented: $showingDeleteAlert) {
-            Button("Cancelar", role: .cancel) { }
-            Button("Eliminar", role: .destructive) {
-                Task {
-                    await handleDeleteAccount()
-                }
-            }
-        } message: {
-            Text("Esta acción no se puede deshacer. Todos tus datos serán eliminados permanentemente.")
-        }
-    }
-    
-    @MainActor
-    private func handleDeleteAccount() async {
-        guard preferences.first != nil else { return }
-        do {
-            try modelContext.fetch(FetchDescriptor<UserPreferences>())
-                .forEach { modelContext.delete($0) }
-            
-            try modelContext.fetch(FetchDescriptor<SavedItem>())
-                .forEach { modelContext.delete($0) }
-            
-            try modelContext.fetch(FetchDescriptor<CachedFeedItem>())
-                .forEach { modelContext.delete($0) }
-            
-            try modelContext.save()
-            NSLog("✅ Local user data deleted")
-        } catch {
-            NSLog("❌ Failed to delete account: \(error)")
-        }
-    }
-   
-}
-
 
 
 #Preview("ProfileView") {

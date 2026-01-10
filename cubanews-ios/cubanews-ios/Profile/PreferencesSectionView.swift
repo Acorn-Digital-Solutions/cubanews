@@ -7,7 +7,7 @@
 import SwiftUI
 import SwiftData
 
-struct PreferenceSectionView: View {
+struct PreferencesSectionView: View {
     
     // Keep publications as NewsSourceName so we can show icon and displayName
     let publications: [NewsSourceName] = NewsSourceName.allCases.filter { $0 != .unknown }
@@ -87,3 +87,8 @@ struct PreferenceSectionView: View {
         .padding(.bottom, 20)
     }
 }
+
+#Preview {
+    PreferencesSectionView()
+}
+

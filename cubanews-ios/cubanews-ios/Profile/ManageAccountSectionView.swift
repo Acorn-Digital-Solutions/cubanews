@@ -7,7 +7,7 @@
 import SwiftUI
 import SwiftData
 
-struct ManageAccountSection: View {
+struct ManageAccountSectionView: View {
     @State private var showingDeleteAlert = false
     @Environment(\.modelContext) private var modelContext
     @Query private var preferences: [UserPreferences]
@@ -65,7 +65,7 @@ struct ManageAccountSection: View {
 }
 
 #Preview {
-    ManageAccountSection()
+    ManageAccountSectionView()
         .modelContainer(for: [UserPreferences.self, SavedItem.self, CachedFeedItem.self], inMemory: true)
 }
 
