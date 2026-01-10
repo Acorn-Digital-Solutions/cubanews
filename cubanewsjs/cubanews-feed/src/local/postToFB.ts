@@ -4,8 +4,10 @@ import "moment/locale/es"; // Import Spanish locale
 import cubanewsApp from "@/app/cubanewsApp";
 import { NewsItem } from "@/app/interfaces";
 import { chromium, Browser, Page as PlaywrightPage } from "playwright";
-import { readFile, writeFile } from "fs/promises";
+import { readFile, writeFile, rename } from "fs/promises";
 import { homedir } from "os";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { existsSync } from "fs";
 
 // Set the locale to Spanish
 moment.locale("es");
@@ -320,6 +322,63 @@ function main(dryRun = false) {
     .catch((error: any) => {
       console.error("Failed to retrieve feed, Error: ", error);
     });
+}
+
+function uploadLogsToS3() {
+  return new Promise<void>(async (resolve, reject) => {
+    try {
+      const logFilePath = `${homedir()}/cubanews-crawler.log`;
+
+      // Check if log file exists
+      if (!existsSync(logFilePath)) {
+        console.log(`Log file not found at ${logFilePath}`);
+        resolve();
+        return;
+      }
+
+      // Read the log file content
+      const logContent = await readFile(logFilePath, "utf-8");
+
+      // Get today's date for the filename suffix
+      const dateStr = moment().format("YYYY-MM-DD");
+      const s3FileName = `cubanews-crawler-${dateStr}.log`;
+
+      // Configure AWS S3 client
+      const s3Client = new S3Client({
+        region: process.env.AWS_REGION || "us-east-1",
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
+        },
+      });
+
+      const bucketName = process.env.AWS_S3_BUCKET_NAME || "cubanews";
+
+      // Upload to S3
+      console.log(
+        `Uploading log file to S3 bucket: ${bucketName}/${s3FileName}`
+      );
+      const uploadCommand = new PutObjectCommand({
+        Bucket: bucketName,
+        Key: s3FileName,
+        Body: logContent,
+        ContentType: "text/plain",
+      });
+
+      await s3Client.send(uploadCommand);
+      console.log(`Successfully uploaded log file to S3: ${s3FileName}`);
+
+      // Rename the local file with date suffix
+      const renamedLogPath = `${homedir()}/cubanews-crawler-${dateStr}.log`;
+      await rename(logFilePath, renamedLogPath);
+      console.log(`Renamed local log file to: ${renamedLogPath}`);
+
+      resolve();
+    } catch (error) {
+      console.error("Error uploading logs to S3:", error);
+      reject(error);
+    }
+  });
 }
 
 const args = process.argv.slice(2); // skip node and script path

@@ -20,6 +20,7 @@
     "start:postToFB:playwright:headed": "ENV_FILE='.env.development.local' tsx src/local/postToFB.ts -- --playwright --headed"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.962.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fontsource/inter": "^5.2.6",
