@@ -238,7 +238,7 @@ async function postUsingPlayright(headless: boolean = true) {
     await publishButton.waitFor({ state: "visible", timeout: 10000 });
 
     console.log("Clicking publish button...");
-    // await publishButton.click();
+    await publishButton.click();
 
     console.log("Post published!");
 
