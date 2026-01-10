@@ -61,7 +61,7 @@ async function postUsingPlayright(headless: boolean = true) {
   });
 
   const context = await browser.newContext({
-    viewport: { width: 1280, height: 720 },
+    viewport: { width: 1920, height: 1080 },
     userAgent:
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
   });
@@ -216,8 +216,19 @@ async function postUsingPlayright(headless: boolean = true) {
     await page.waitForTimeout(2000);
 
     // Doing this to add link photo to post
-    await page.getByRole("button", { name: "More features" }).click();
-    await page.waitForTimeout(5000);
+    await page
+      .getByText(
+        "Share photos or a video. Instagram posts can't exceed 10 photos."
+      )
+      .click();
+    await page.waitForTimeout(3000);
+
+    let v = await page
+      .getByRole("button", {
+        name: "Click to remove this feature from your post.",
+      })
+      .isVisible();
+    console.log("Is link preview added?", v);
 
     // Find and click the publish button
     console.log("Looking for publish button...");
@@ -227,7 +238,7 @@ async function postUsingPlayright(headless: boolean = true) {
     await publishButton.waitFor({ state: "visible", timeout: 10000 });
 
     console.log("Clicking publish button...");
-    await publishButton.click();
+    // await publishButton.click();
 
     console.log("Post published!");
 
