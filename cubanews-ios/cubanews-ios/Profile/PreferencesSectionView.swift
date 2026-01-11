@@ -85,6 +85,15 @@ struct PreferencesSectionView: View {
             .padding(.vertical)
         }
         .padding(.bottom, 20)
+        .onAppear {
+            // Load saved preferences from database when view appears
+            if let savedPreferences = preferences.first?.preferredPublications {
+                selectedPublications = Set(savedPreferences)
+                NSLog("PreferencesSectionView loaded \(savedPreferences.count) saved preferences")
+            } else {
+                NSLog("PreferencesSectionView: No saved preferences found")
+            }
+        }
     }
 }
 
