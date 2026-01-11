@@ -15,6 +15,7 @@ struct ServiceView: View {
     @Query private var preferences: [UserPreferences]
     
     @State private var showDetailSheet = false
+    @State private var showDeleteConfirmation = false
     @Environment(\.openURL) private var openURL
     
     private func statusInfo() -> (String, Color) {
@@ -166,9 +167,7 @@ struct ServiceView: View {
                         }
                         .buttonStyle(.plain)
                         Button {
-                            Task {
-                                await viewModel.deleteService(service)
-                            }
+                            showDeleteConfirmation = true
                         } label: {
                             Image(systemName: "trash")
                                 .foregroundColor(.red)
@@ -187,6 +186,16 @@ struct ServiceView: View {
         .buttonStyle(.plain)
         .sheet(isPresented: $showDetailSheet) {
             ServiceDetailSheet(service: .constant(service))
+        }
+        .alert("Eliminar Servicio", isPresented: $showDeleteConfirmation) {
+            Button("Cancelar", role: .cancel) { }
+            Button("Eliminar", role: .destructive) {
+                Task {
+                    await viewModel.deleteService(service)
+                }
+            }
+        } message: {
+            Text("¿Está seguro que desea eliminar '\(service.businessName)'? Esta acción no se puede deshacer.")
         }
     }
     
