@@ -101,7 +101,7 @@ struct ProfileView: View {
             .navigationBarTitleDisplayMode(.large)
         }
         .onAppear {
-            NSLog("➡️ AccountSectionView Checking authentication status \(preferences.first?.appleUserID ?? UserPreferences.defaultID)")
+            NSLog("➡️ \(Self.TAG) Checking authentication status \(preferences.first?.appleUserID ?? UserPreferences.defaultID)")
             NSLog("ProfileView appeared")
             loadPreferences()
         }
