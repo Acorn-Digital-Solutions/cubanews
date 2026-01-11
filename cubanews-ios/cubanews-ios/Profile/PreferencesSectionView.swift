@@ -85,6 +85,24 @@ struct PreferencesSectionView: View {
             .padding(.vertical)
         }
         .padding(.bottom, 20)
+        .onAppear {
+            // Load saved preferences from database when view appears
+            if let userPrefs = preferences.first {
+                selectedPublications = Set(userPrefs.preferredPublications)
+                NSLog("PreferencesSectionView loaded \(userPrefs.preferredPublications.count) saved preferences")
+            } else {
+                NSLog("PreferencesSectionView: No saved preferences found, creating defaults")
+                // Create default preferences if none exist
+                let newPrefs = UserPreferences(preferredPublications: [])
+                modelContext.insert(newPrefs)
+                do {
+                    try modelContext.save()
+                    NSLog("PreferencesSectionView: Default preferences created successfully")
+                } catch {
+                    NSLog("PreferencesSectionView: Error creating default preferences: \(error)")
+                }
+            }
+        }
     }
 }
 
