@@ -24,7 +24,7 @@ struct AboutSectionView: View {
     }
     
     private var misionAttributedText: AttributedString {
-        var text = AttributedString("La mision de CubaNews es amplificar el mensaje de la prensa independiente cubana . Ver más en nuestra web cubanews.icu")
+        var text = AttributedString("La misión de CubaNews es amplificar el mensaje de la prensa independiente cubana . Ver más en nuestra web cubanews.icu")
         // Base color for non-link text
         text.foregroundColor = .gray
         if let range = text.range(of: "cubanews.icu"),
