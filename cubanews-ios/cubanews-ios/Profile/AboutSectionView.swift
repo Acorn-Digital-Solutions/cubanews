@@ -10,7 +10,7 @@ struct AboutSectionView: View {
     
     // Inline linked privacy text
     private var privacyAttributedText: AttributedString {
-        var text = AttributedString("Cubanews no comparte informacion de sus usuarios con terceros. Consulta nuestra política de privacidad para más detalles.")
+        var text = AttributedString("Cubanews no comparte información de sus usuarios con terceros. Consulta nuestra política de privacidad para más detalles.")
         // Base color for non-link text
         text.foregroundColor = .gray
         if let range = text.range(of: "política de privacidad"),
