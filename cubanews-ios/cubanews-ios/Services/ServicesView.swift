@@ -20,6 +20,22 @@ struct ServicesView: View {
         }
     }
     
+    private var userPreferences: UserPreferences? {
+        return preferences.first
+    }
+    
+    private var isAuthenticated: Bool {
+        return userPreferences?.appleUserID != nil && userPreferences?.appleUserID != UserPreferences.defaultID
+    }
+    
+    private var showMyServices: Bool {
+        return isAuthenticated && userPreferences?.advertiseServices != nil && userPreferences?.advertiseServices == true
+    }
+    
+    var advertiseServices: Bool {
+        return (preferences.first?.advertiseServices) != nil && preferences.first?.advertiseServices == true
+    }
+    
     @ViewBuilder
     private var searchBar: some View {
         HStack(spacing: 12) {
@@ -30,7 +46,8 @@ struct ServicesView: View {
                 .cornerRadius(8)
                 .onSubmit {
                     viewModel.performSearch()
-                }.onChange(of: viewModel.searchText) { newValue in
+                }
+                .onChange(of: viewModel.searchText) { oldValue, newValue in
                     if newValue.isEmpty {
                         viewModel.performSearch()
                     }
@@ -144,10 +161,10 @@ struct ServicesView: View {
                     VStack(spacing: 12) {
                         NewsHeader(header: "Servicios")
                         searchBar
-                        if preferences.first?.advertiseServices == true {
+                        if (advertiseServices) {
                             topToggleBar
                         }
-                        if (viewModel.showMyServices) {
+                        if (advertiseServices && viewModel.showMyServices) {
                             myServicesSection
                         } else {
                             publicServicesSection
@@ -155,7 +172,7 @@ struct ServicesView: View {
                     }
                     .padding(.vertical, 12)
                 }
-                if (viewModel.showMyServices && preferences.first?.advertiseServices == true) {
+                if (viewModel.showMyServices && advertiseServices) {
                     floatingAddButton
                 }
             }

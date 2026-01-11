@@ -56,12 +56,8 @@ struct RootView: View {
         Group {
             if isLoadingPreferences {
                 AppLaunchView()
-            } else if isAuthenticated {
-                ContentView()
-                    .environmentObject(cubanewsViewModel)
             } else {
-                LoginView()
-                    .environmentObject(cubanewsViewModel)
+                ContentView().environmentObject(cubanewsViewModel)
             }
         }
         .task {
