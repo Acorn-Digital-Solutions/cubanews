@@ -1,5 +1,5 @@
 //
-//  PreferenceSectionView.swift
+//  PreferencesSectionView.swift
 //  cubanews-ios
 //
 //  Created by Sergio Navarrete on 10/01/2026.
