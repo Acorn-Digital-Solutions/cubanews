@@ -53,7 +53,7 @@ struct PreferencesSectionView: View {
     }
     
     var body: some View {
-        return VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Preferencias")
                 .font(.headline)
                 .padding(.horizontal)
