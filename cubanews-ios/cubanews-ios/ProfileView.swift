@@ -69,7 +69,7 @@ struct ProfileView: View {
                         Divider()
                         PreferencesSectionView()
                         Divider()
-                        if (isAuthenticated) {
+                        if isAuthenticated {
                             ServicesSectionView(advertiseServices: $advertiseServices)
                             Divider()
                         }
