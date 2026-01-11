@@ -17,9 +17,6 @@ struct ProfileView: View {
     
     private static let TAG = "ProfileView"
     
-    // Keep publications as NewsSourceName so we can show icon and displayName
-    let publications: [NewsSourceName] = NewsSourceName.allCases.filter { $0 != .unknown }
-    
     private var userPreferences: UserPreferences? {
         return preferences.first
     }
