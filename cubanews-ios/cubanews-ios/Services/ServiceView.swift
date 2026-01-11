@@ -6,11 +6,13 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @available(iOS 17, *)
 struct ServiceView: View {
     let service: Service
     let viewModel: ServicesViewModel
+    @Query private var preferences: [UserPreferences]
     
     @State private var showDetailSheet = false
     @Environment(\.openURL) private var openURL
@@ -122,6 +124,10 @@ struct ServiceView: View {
         return words.prefix(maxWords).joined(separator: " ") + "..."
     }
     
+    var advertiseServices: Bool {
+        return (preferences.first?.advertiseServices) != nil && preferences.first?.advertiseServices == true
+    }
+    
     var body: some View {
         Button {
             showDetailSheet = true
@@ -133,7 +139,7 @@ struct ServiceView: View {
                         .foregroundColor(.primary)
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
-                    if viewModel.showMyServices {
+                    if (advertiseServices && viewModel.showMyServices) {
                         Spacer()
                         statusBadge
                     }
@@ -151,7 +157,7 @@ struct ServiceView: View {
                 HStack(spacing: 12) {
                     contactInfoPreview
                     Spacer()
-                    if (viewModel.showMyServices) {
+                    if (advertiseServices && viewModel.showMyServices) {
                         Button {
                             viewModel.editService(service)
                         } label: {
