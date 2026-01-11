@@ -46,7 +46,8 @@ struct ServicesView: View {
                 .cornerRadius(8)
                 .onSubmit {
                     viewModel.performSearch()
-                }.onChange(of: viewModel.searchText) { newValue in
+                }
+                .onChange(of: viewModel.searchText) { oldValue, newValue in
                     if newValue.isEmpty {
                         viewModel.performSearch()
                     }
