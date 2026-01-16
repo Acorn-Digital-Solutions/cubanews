@@ -216,20 +216,23 @@ async function insertArticlesToFeed(
   sourceName: NewsSourceName,
 ): Promise<RefreshFeedResult> {
   const validItems = newsItems.filter((newsItem) => isNewsItemValid(newsItem));
-  const values = await Promise.all(
-    validItems.map((x) => newsItemToFeedTable(x, feedRefreshDate) as any),
-  );
 
-  if (values.length === 0) {
+  if (validItems.length === 0) {
     return {
       datasetName: sourceName,
       insertedRows: 0,
     };
   }
 
+  const values = await Promise.all(
+    validItems.map((x) => newsItemToFeedTable(x, feedRefreshDate) as any),
+  );
+
+  // Use onConflict to ignore duplicates based on URL - database handles it in one query
   const insertResult = await db
     .insertInto("feed")
     .values(values)
+    .onConflict((oc) => oc.column("url").doNothing())
     .executeTakeFirst();
 
   return {
