@@ -18,6 +18,7 @@ export function applyFeedUpsertOnConflict<T>(
     oc.column("url").doUpdateSet({
       feedts: (eb) => eb.ref("excluded.feedts"),
       feedisodate: (eb) => eb.ref("excluded.feedisodate"),
+      source: (eb) => eb.ref("excluded.source"),
       title: (eb) => eb.ref("excluded.title"),
       content: (eb) => eb.ref("excluded.content"),
       updated: (eb) => eb.ref("excluded.updated"),
