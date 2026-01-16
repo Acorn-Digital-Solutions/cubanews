@@ -55,6 +55,8 @@ export enum NewsSourceName {
   CUBANET = "cubanet",
   PERIODICO_CUBANO = "periodicocubano",
   DIRECTORIO_CUBANO = "directoriocubano",
+  MARTI_NOTICIAS = "martinoticias",
+  CUBANOS_POR_EL_MUNDO = "cubanosporelmundo",
 }
 
 export enum NewsSourceDisplayName {
@@ -66,6 +68,8 @@ export enum NewsSourceDisplayName {
   CUBANET = "Cubanet",
   PERIODICO_CUBANO = "Periódico Cubano",
   DIRECTORIO_CUBANO = "Directorio Cubano",
+  MARTI_NOTICIAS = "Martí Noticias",
+  CUBANOS_POR_EL_MUNDO = "Cubanos por el Mundo",
   EMPTY = "",
 }
 
@@ -82,7 +86,7 @@ export enum SubscriptionStatus {
 }
 
 export function getNewsSourceDisplayName(
-  item: NewsItem
+  item: NewsItem,
 ): NewsSourceDisplayName {
   switch (item.source) {
     case NewsSourceName.ADNCUBA:

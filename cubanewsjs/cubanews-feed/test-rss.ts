@@ -1,11 +1,15 @@
 import {
+  AdnCubaRSSCrawler,
   CatorceYMedioRSSCrawler,
   CibercubaRSSCrawler,
+  CubanetRSSCrawler,
+  CubanosPorElMundoRSSCrawler,
   DirectorioCubanoRSSCrawler,
+  MartiNoticiasRSSCrawler,
 } from "@/app/cubanewsRSSCrawler";
 
 // Configuration
-const CRAWLER_TO_TEST = "all"; // Options: "catorce", "cibercuba", "directorio", "all"
+const CRAWLER_TO_TEST = "all"; // Options: "catorce", "cibercuba", "directorio", "adncuba", "marti", "cubanos", "cubanet", "all"
 const UPLOAD_IMAGES = false; // Set to false for testing without Firebase uploads
 const ARTICLE_LIMIT = 5; // Number of articles to fetch
 
@@ -73,6 +77,13 @@ async function testAllCrawlers(): Promise<void> {
     { instance: new CatorceYMedioRSSCrawler(), name: "14yMedio" },
     { instance: new CibercubaRSSCrawler(), name: "Cibercuba" },
     { instance: new DirectorioCubanoRSSCrawler(), name: "Directorio Cubano" },
+    { instance: new AdnCubaRSSCrawler(), name: "ADN Cuba" },
+    { instance: new MartiNoticiasRSSCrawler(), name: "Martí Noticias" },
+    {
+      instance: new CubanosPorElMundoRSSCrawler(),
+      name: "Cubanos por el Mundo",
+    },
+    { instance: new CubanetRSSCrawler(), name: "Cubanet" },
   ];
 
   for (const { instance, name } of crawlers) {
@@ -105,9 +116,25 @@ async function testRSS() {
           crawler = new DirectorioCubanoRSSCrawler();
           name = "Directorio Cubano";
           break;
+        case "adncuba":
+          crawler = new AdnCubaRSSCrawler();
+          name = "ADN Cuba";
+          break;
+        case "marti":
+          crawler = new MartiNoticiasRSSCrawler();
+          name = "Martí Noticias";
+          break;
+        case "cubanos":
+          crawler = new CubanosPorElMundoRSSCrawler();
+          name = "Cubanos por el Mundo";
+          break;
+        case "cubanet":
+          crawler = new CubanetRSSCrawler();
+          name = "Cubanet";
+          break;
         default:
           throw new Error(
-            `Unknown crawler: ${CRAWLER_TO_TEST}. Use: catorce, cibercuba, directorio, or all`,
+            `Unknown crawler: ${CRAWLER_TO_TEST}. Use: catorce, cibercuba, directorio, adncuba, marti, cubanos, cubanet, or all`,
           );
       }
 

@@ -246,3 +246,162 @@ export class DirectorioCubanoRSSCrawler extends CubanewsRSSCrawler {
     return imageUrl;
   }
 }
+
+export class AdnCubaRSSCrawler extends CubanewsRSSCrawler {
+  constructor(storage?: FirebaseStorage) {
+    super(
+      {
+        name: NewsSourceName.ADNCUBA,
+        startUrls: new Set(["https://adncuba.com/es"]),
+        rssFeed: "https://adncuba.com/es/rss.xml",
+        datasetName: NewsSourceName.ADNCUBA + "-dataset",
+        parser: new Parser({
+          customFields: {
+            item: [["dc:creator", "creator"]],
+          },
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            Accept: "application/rss+xml, application/xml, text/xml, */*",
+          },
+        }),
+      },
+      storage,
+    );
+  }
+
+  override tryGetMediaImage(item: any): string | null {
+    // ADN Cuba RSS feed does not include images in the feed
+    // Images would need to be scraped from the article page
+    return null;
+  }
+}
+
+export class MartiNoticiasRSSCrawler extends CubanewsRSSCrawler {
+  constructor(storage?: FirebaseStorage) {
+    super(
+      {
+        name: NewsSourceName.MARTI_NOTICIAS,
+        startUrls: new Set(["https://www.martinoticias.com"]),
+        rssFeed: "https://www.martinoticias.com/api/z_uqvl-vomx-tpevipt",
+        datasetName: NewsSourceName.MARTI_NOTICIAS + "-dataset",
+        parser: new Parser({
+          customFields: {
+            item: [],
+          },
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            Accept: "application/rss+xml, application/xml, text/xml, */*",
+          },
+        }),
+      },
+      storage,
+    );
+  }
+
+  override tryGetMediaImage(item: any): string | null {
+    // Marti Noticias uses enclosure field for images
+    if (item.enclosure?.url) {
+      return item.enclosure.url;
+    }
+    return null;
+  }
+}
+
+export class CubanosPorElMundoRSSCrawler extends CubanewsRSSCrawler {
+  constructor(storage?: FirebaseStorage) {
+    super(
+      {
+        name: NewsSourceName.CUBANOS_POR_EL_MUNDO,
+        startUrls: new Set(["https://cubanosporelmundo.com"]),
+        rssFeed: "http://cubanosporelmundo.com/feed/",
+        datasetName: NewsSourceName.CUBANOS_POR_EL_MUNDO + "-dataset",
+        parser: new Parser({
+          customFields: {
+            item: [
+              ["media:content", "media:content"],
+              ["media:thumbnail", "media:thumbnail"],
+              ["dc:creator", "creator"],
+            ],
+          },
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            Accept: "application/rss+xml, application/xml, text/xml, */*",
+          },
+        }),
+      },
+      storage,
+    );
+  }
+
+  override tryGetMediaImage(item: any): string | null {
+    let imageUrl: string | null = null;
+
+    // Try media:content field
+    if (item["media:content"]) {
+      const mediaContent = item["media:content"];
+      if (Array.isArray(mediaContent) && mediaContent.length > 0) {
+        imageUrl = mediaContent[0].$?.url || mediaContent[0];
+      } else if (typeof mediaContent === "object" && mediaContent.$?.url) {
+        imageUrl = mediaContent.$.url;
+      } else if (typeof mediaContent === "string") {
+        imageUrl = mediaContent;
+      }
+    }
+
+    // Try media:thumbnail field
+    if (!imageUrl && item["media:thumbnail"]) {
+      const mediaThumbnail = item["media:thumbnail"];
+      if (Array.isArray(mediaThumbnail) && mediaThumbnail.length > 0) {
+        imageUrl = mediaThumbnail[0].$?.url || mediaThumbnail[0];
+      } else if (typeof mediaThumbnail === "object" && mediaThumbnail.$?.url) {
+        imageUrl = mediaThumbnail.$.url;
+      } else if (typeof mediaThumbnail === "string") {
+        imageUrl = mediaThumbnail;
+      }
+    }
+
+    return imageUrl;
+  }
+}
+
+export class CubanetRSSCrawler extends CubanewsRSSCrawler {
+  constructor(storage?: FirebaseStorage) {
+    super(
+      {
+        name: NewsSourceName.CUBANET,
+        startUrls: new Set(["https://www.cubanet.org"]),
+        rssFeed: "https://www.cubanet.org/feed/",
+        datasetName: NewsSourceName.CUBANET + "-dataset",
+        parser: new Parser({
+          customFields: {
+            item: [["dc:creator", "creator"]],
+          },
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            Accept: "application/rss+xml, application/xml, text/xml, */*",
+          },
+        }),
+      },
+      storage,
+    );
+  }
+
+  override tryGetMediaImage(item: any): string | null {
+    // Cubanet RSS feed does not include images in media fields
+    // Try extracting from HTML description
+    let imageUrl: string | null = null;
+
+    const htmlContent = item.description || item.content || "";
+    const imgRegex = /<img[^>]+src=["']([^"']+)["']/i;
+    const match = htmlContent.match(imgRegex);
+    if (match && match[1]) {
+      imageUrl = match[1];
+    }
+
+    return imageUrl;
+  }
+}
