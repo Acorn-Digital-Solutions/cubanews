@@ -105,6 +105,10 @@ export function getNewsSourceDisplayName(
       return NewsSourceDisplayName.PERIODICO_CUBANO;
     case NewsSourceName.DIRECTORIO_CUBANO:
       return NewsSourceDisplayName.DIRECTORIO_CUBANO;
+    case NewsSourceName.MARTI_NOTICIAS:
+      return NewsSourceDisplayName.MARTI_NOTICIAS;
+    case NewsSourceName.CUBANOS_POR_EL_MUNDO:
+      return NewsSourceDisplayName.CUBANOS_POR_EL_MUNDO;
     default:
       return NewsSourceDisplayName.EMPTY;
   }

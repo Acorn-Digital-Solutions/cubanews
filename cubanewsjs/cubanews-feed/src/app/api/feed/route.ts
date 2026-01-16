@@ -11,8 +11,13 @@ import { xOfEachSource } from "./feedStrategies";
 import { newsItemToFeedTable } from "@/local/localFeedLib";
 import cubanewsApp from "@/app/cubanewsApp";
 import {
+  AdnCubaRSSCrawler,
   CatorceYMedioRSSCrawler,
   CibercubaRSSCrawler,
+  CubanetRSSCrawler,
+  CubanosPorElMundoRSSCrawler,
+  DirectorioCubanoRSSCrawler,
+  MartiNoticiasRSSCrawler,
 } from "@/app/cubanewsRSSCrawler";
 
 export type RefreshFeedResult = {
@@ -135,35 +140,54 @@ async function getFeed(
 }
 
 async function refreshFeed(): Promise<Array<RefreshFeedResult>> {
-  const catorceYMedioRSSCrawler = new CatorceYMedioRSSCrawler();
-  const cibercubaRSSCrawler = new CibercubaRSSCrawler();
   const feedRefreshDate = new Date();
-
+  const ARTICLE_LIMIT = 10;
   const results: RefreshFeedResult[] = [];
 
-  // Process CatorceYMedio articles
-  const catorceArticles = await catorceYMedioRSSCrawler.getRSSContent();
-  const catorceNewsItems = catorceArticles.map((article) =>
-    rssArticleToNewsItem(article, NewsSourceName.CATORCEYMEDIO),
-  );
-  const catorceResult = await insertArticlesToFeed(
-    catorceNewsItems,
-    feedRefreshDate,
-    NewsSourceName.CATORCEYMEDIO,
-  );
-  results.push(catorceResult);
+  // Define all crawlers with their corresponding NewsSourceName
+  const crawlers = [
+    {
+      crawler: new CatorceYMedioRSSCrawler(),
+      source: NewsSourceName.CATORCEYMEDIO,
+    },
+    { crawler: new CibercubaRSSCrawler(), source: NewsSourceName.CIBERCUBA },
+    {
+      crawler: new DirectorioCubanoRSSCrawler(),
+      source: NewsSourceName.DIRECTORIO_CUBANO,
+    },
+    { crawler: new AdnCubaRSSCrawler(), source: NewsSourceName.ADNCUBA },
+    {
+      crawler: new MartiNoticiasRSSCrawler(),
+      source: NewsSourceName.MARTI_NOTICIAS,
+    },
+    {
+      crawler: new CubanosPorElMundoRSSCrawler(),
+      source: NewsSourceName.CUBANOS_POR_EL_MUNDO,
+    },
+    { crawler: new CubanetRSSCrawler(), source: NewsSourceName.CUBANET },
+  ];
 
-  // Process Cibercuba articles
-  const cibercubaArticles = await cibercubaRSSCrawler.getRSSContent();
-  const cibercubaNewsItems = cibercubaArticles.map((article) =>
-    rssArticleToNewsItem(article, NewsSourceName.CIBERCUBA),
-  );
-  const cibercubaResult = await insertArticlesToFeed(
-    cibercubaNewsItems,
-    feedRefreshDate,
-    NewsSourceName.CIBERCUBA,
-  );
-  results.push(cibercubaResult);
+  // Process each crawler
+  for (const { crawler, source } of crawlers) {
+    try {
+      const articles = await crawler.getRSSContent(true, ARTICLE_LIMIT);
+      const newsItems = articles.map((article) =>
+        rssArticleToNewsItem(article, source),
+      );
+      const result = await insertArticlesToFeed(
+        newsItems,
+        feedRefreshDate,
+        source,
+      );
+      results.push(result);
+    } catch (error) {
+      console.error(`Error processing ${source}:`, error);
+      results.push({
+        datasetName: source,
+        insertedRows: 0,
+      });
+    }
+  }
 
   return results;
 }
