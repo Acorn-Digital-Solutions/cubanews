@@ -8,13 +8,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { ApifyClient, Dataset } from "apify-client";
 import { sql } from "kysely";
 import { xOfEachSource } from "./feedStrategies";
-import { exec } from "child_process";
 import { newsItemToFeedTable } from "@/local/localFeedLib";
 import cubanewsApp from "@/app/cubanewsApp";
 import {
   CatorceYMedioRSSCrawler,
   CibercubaRSSCrawler,
-} from "@/app/cubanewsRRSCrawler";
+} from "@/app/cubanewsRSSCrawler";
 
 export type RefreshFeedResult = {
   datasetName: string;
@@ -27,7 +26,7 @@ const client = new ApifyClient({
 });
 
 export async function GET(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<NextResponse<FeedResponseData | null>> {
   if (request.nextUrl.searchParams.get("refresh")) {
     if (request.headers.get("ADMIN_TOKEN") !== process.env.ADMIN_TOKEN) {
@@ -35,7 +34,7 @@ export async function GET(
         {
           banter: "You are not authorized to refresh the feed",
         },
-        { status: 401, statusText: "Unauthorized" }
+        { status: 401, statusText: "Unauthorized" },
       );
     }
     if (request.nextUrl.searchParams.get("dryrun")) {
@@ -43,7 +42,7 @@ export async function GET(
         {
           banter: "Dry Run. Refreshing cubanews feed",
         },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -55,13 +54,13 @@ export async function GET(
       {
         banter: "Refreshing cubanews feed",
       },
-      { status: 200 }
+      { status: 200 },
     );
   }
 
   const page = parseInt(request.nextUrl.searchParams.get("page") ?? "1");
   const pageSize = parseInt(
-    request.nextUrl.searchParams.get("pageSize") ?? "2"
+    request.nextUrl.searchParams.get("pageSize") ?? "2",
   );
 
   return getFeed(page, pageSize);
@@ -69,7 +68,7 @@ export async function GET(
 
 async function getFeed(
   page: number,
-  pageSize: number
+  pageSize: number,
 ): Promise<NextResponse<FeedResponseData | null>> {
   const latestFeedts = await db
     .selectFrom("feed")
@@ -81,7 +80,7 @@ async function getFeed(
       {
         banter: "No feeds available",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -105,7 +104,7 @@ async function getFeed(
     .where(
       "feedid",
       "in",
-      items.map((x) => x.id as number)
+      items.map((x) => x.id as number),
     )
     .groupBy("interaction")
     .groupBy("feedid")
@@ -131,7 +130,7 @@ async function getFeed(
         feed: Array.from(itemsMap.values()),
       },
     },
-    { status: 200 }
+    { status: 200 },
   );
 }
 
@@ -145,24 +144,24 @@ async function refreshFeed(): Promise<Array<RefreshFeedResult>> {
   // Process CatorceYMedio articles
   const catorceArticles = await catorceYMedioRSSCrawler.getRSSContent();
   const catorceNewsItems = catorceArticles.map((article) =>
-    rssArticleToNewsItem(article, NewsSourceName.CATORCEYMEDIO)
+    rssArticleToNewsItem(article, NewsSourceName.CATORCEYMEDIO),
   );
   const catorceResult = await insertArticlesToFeed(
     catorceNewsItems,
     feedRefreshDate,
-    NewsSourceName.CATORCEYMEDIO
+    NewsSourceName.CATORCEYMEDIO,
   );
   results.push(catorceResult);
 
   // Process Cibercuba articles
   const cibercubaArticles = await cibercubaRSSCrawler.getRSSContent();
   const cibercubaNewsItems = cibercubaArticles.map((article) =>
-    rssArticleToNewsItem(article, NewsSourceName.CIBERCUBA)
+    rssArticleToNewsItem(article, NewsSourceName.CIBERCUBA),
   );
   const cibercubaResult = await insertArticlesToFeed(
     cibercubaNewsItems,
     feedRefreshDate,
-    NewsSourceName.CIBERCUBA
+    NewsSourceName.CIBERCUBA,
   );
   results.push(cibercubaResult);
 
@@ -190,11 +189,11 @@ function rssArticleToNewsItem(article: any, source: NewsSourceName): NewsItem {
 async function insertArticlesToFeed(
   newsItems: NewsItem[],
   feedRefreshDate: Date,
-  sourceName: NewsSourceName
+  sourceName: NewsSourceName,
 ): Promise<RefreshFeedResult> {
   const validItems = newsItems.filter((newsItem) => isNewsItemValid(newsItem));
   const values = await Promise.all(
-    validItems.map((x) => newsItemToFeedTable(x, feedRefreshDate) as any)
+    validItems.map((x) => newsItemToFeedTable(x, feedRefreshDate) as any),
   );
 
   if (values.length === 0) {
@@ -217,7 +216,7 @@ async function insertArticlesToFeed(
 
 async function refreshFeedDataset(
   dataset: Dataset,
-  feedRefreshDate: Date
+  feedRefreshDate: Date,
 ): Promise<RefreshFeedResult> {
   if (!dataset || !dataset.name) {
     return { datasetName: "unknown", insertedRows: 0 };

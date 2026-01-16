@@ -12,7 +12,10 @@ import { firebaseConfig } from "./interfaces/firebaseConfig";
 
 abstract class CubanewsRSSCrawler {
   protected newsSource: NewsSource;
-  constructor(newsSource: NewsSource, private storage?: FirebaseStorage) {
+  constructor(
+    newsSource: NewsSource,
+    private storage?: FirebaseStorage,
+  ) {
     this.newsSource = newsSource;
     if (!storage) {
       const firebaseApp = initializeApp(firebaseConfig);
@@ -23,7 +26,7 @@ abstract class CubanewsRSSCrawler {
       console.info(
         `Storage Bucket: ${
           this.storage.app.options.storageBucket?.toString() ?? "<ERROR>"
-        }`
+        }`,
       );
     }
   }
@@ -32,7 +35,7 @@ abstract class CubanewsRSSCrawler {
 
   async getRSSContent(
     uploadImages: boolean = true,
-    limit: number = 50
+    limit: number = 50,
   ): Promise<RSSArticle[]> {
     try {
       // Configure parser to extract media fields from RSS
@@ -63,7 +66,7 @@ abstract class CubanewsRSSCrawler {
             const response = await fetch(imageUrl);
             if (!response.ok) {
               throw new Error(
-                `Failed to download image: ${response.status} ${response.statusText}`
+                `Failed to download image: ${response.status} ${response.statusText}`,
               );
             }
             const buffer = Buffer.from(await response.arrayBuffer());
@@ -82,7 +85,7 @@ abstract class CubanewsRSSCrawler {
           } catch (error: any) {
             console.error(
               `Error processing image for ${item.link}:`,
-              error.message
+              error.message,
             );
           }
         }
@@ -131,7 +134,7 @@ export class CatorceYMedioRSSCrawler extends CubanewsRSSCrawler {
           },
         }),
       },
-      storage
+      storage,
     );
   }
 
@@ -181,7 +184,7 @@ export class CibercubaRSSCrawler extends CubanewsRSSCrawler {
           },
         }),
       },
-      storage
+      storage,
     );
   }
 
