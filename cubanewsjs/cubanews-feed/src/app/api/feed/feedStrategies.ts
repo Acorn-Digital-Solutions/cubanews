@@ -33,7 +33,6 @@ function dbItemToNewsItem(dbitem: any): NewsItem {
  */
 export async function xOfEachSource(
   db: Kysely<Database>,
-  feedts: number,
   page: number,
   pageSize: number
 ): Promise<Array<NewsItem>> {
@@ -42,7 +41,7 @@ export async function xOfEachSource(
   FROM (
    SELECT *, ROW_NUMBER() OVER (PARTITION BY
    source ORDER BY updated desc) AS row_number
-   FROM feed where isodate is not null AND updated is not null AND feedts = ${feedts}
+   FROM feed where isodate is not null AND updated is not null AND isodate::timestamp >= NOW() - INTERVAL '48 hours'
   ) AS t
   WHERE t.row_number > ${pageSize * (page - 1)} AND t.row_number <= ${
     pageSize * page

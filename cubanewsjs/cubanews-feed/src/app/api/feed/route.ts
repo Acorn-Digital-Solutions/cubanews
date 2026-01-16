@@ -88,12 +88,7 @@ async function getFeed(
   // This strategy gets the top x news of every source.
   // X is the page size, if implemented page 2 would mean skipping the first x for each news source
   // and getting the following x. This is temporary until a better, ranked version of the feed is conceived.
-  const items = await xOfEachSource(
-    db,
-    latestFeedts.feedts as number,
-    page,
-    pageSize
-  );
+  const items = await xOfEachSource(db, page, pageSize);
 
   const itemsMap = new Map<number, NewsItem>();
   items.forEach((x) => {
