@@ -224,15 +224,36 @@ async function insertArticlesToFeed(
     };
   }
 
+  // Get existing URLs from the database for articles from the last 48 hours
+  const urls = validItems.map((item) => item.url);
+  const fortyEightHoursAgo = Date.now() - 48 * 60 * 60 * 1000;
+
+  const existingUrls = await db
+    .selectFrom("feed")
+    .select("url")
+    .where("url", "in", urls)
+    .where("updated", ">=", fortyEightHoursAgo)
+    .execute();
+
+  const existingUrlSet = new Set(existingUrls.map((row) => row.url));
+
+  // Filter out items that already exist in the database
+  const newItems = validItems.filter((item) => !existingUrlSet.has(item.url));
+
+  if (newItems.length === 0) {
+    return {
+      datasetName: sourceName,
+      insertedRows: 0,
+    };
+  }
+
   const values = await Promise.all(
-    validItems.map((x) => newsItemToFeedTable(x, feedRefreshDate) as any),
+    newItems.map((x) => newsItemToFeedTable(x, feedRefreshDate) as any),
   );
 
-  // Use onConflict to ignore duplicates based on URL - database handles it in one query
   const insertResult = await db
     .insertInto("feed")
     .values(values)
-    .onConflict((oc) => oc.column("url").doNothing())
     .executeTakeFirst();
 
   return {
