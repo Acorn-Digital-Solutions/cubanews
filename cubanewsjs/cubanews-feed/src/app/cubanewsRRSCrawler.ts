@@ -103,7 +103,7 @@ abstract class CubanewsRSSCrawler {
       console.log(JSON.stringify(articles, null, 2));
       return articles;
     } catch (error: any) {
-      console.error("Error fetching RSS feed", error);
+      console.error("Error fetching RSS feed:", error);
       throw error;
     }
   }
