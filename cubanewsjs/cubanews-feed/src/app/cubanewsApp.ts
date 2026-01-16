@@ -62,12 +62,7 @@ export class CubanewsApp {
       return [];
     }
 
-    const items = await xOfEachSource(
-      this.database,
-      latestFeedts.feedts as number,
-      1,
-      2
-    );
+    const items = await xOfEachSource(this.database, 1, 2);
     return items;
   }
 
@@ -79,12 +74,7 @@ export class CubanewsApp {
     if (!latestFeedts?.feedts) {
       return [];
     }
-    const items = await xOfEachSource(
-      this.database,
-      latestFeedts.feedts as number,
-      1,
-      1
-    );
+    const items = await xOfEachSource(this.database, 1, 1);
     return items;
   }
 
