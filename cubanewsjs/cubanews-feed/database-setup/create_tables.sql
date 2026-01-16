@@ -4,7 +4,7 @@ CREATE TABLE feed (
     feedisodate VARCHAR(25),
     source VARCHAR(100),
     title TEXT,
-    url TEXT UNIQUE,
+    url TEXT,
     content TEXT,
     updated BIGINT,
     isodate VARCHAR(25),
