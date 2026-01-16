@@ -82,7 +82,7 @@ abstract class CubanewsRSSCrawler {
           } catch (error: any) {
             console.error(
               `Error processing image for ${item.link}:`,
-              error.message
+              error
             );
           }
         }
@@ -103,7 +103,7 @@ abstract class CubanewsRSSCrawler {
       console.log(JSON.stringify(articles, null, 2));
       return articles;
     } catch (error: any) {
-      console.error("Error fetching RSS feed", { error: error.message });
+      console.error("Error fetching RSS feed", error);
       throw error;
     }
   }
