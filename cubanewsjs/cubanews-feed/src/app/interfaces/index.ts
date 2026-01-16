@@ -64,6 +64,8 @@ export enum NewsSourceDisplayName {
   CIBERCUBA = "Cibercuba",
   ELTOQUE = "elToque",
   CUBANET = "Cubanet",
+  PERIODICO_CUBANO = "Periódico Cubano",
+  DIRECTORIO_CUBANO = "Directorio Cubano",
   EMPTY = "",
 }
 
@@ -95,6 +97,10 @@ export function getNewsSourceDisplayName(
       return NewsSourceDisplayName.ELTOQUE;
     case NewsSourceName.CUBANET:
       return NewsSourceDisplayName.CUBANET;
+    case NewsSourceName.PERIODICO_CUBANO:
+      return NewsSourceDisplayName.PERIODICO_CUBANO;
+    case NewsSourceName.DIRECTORIO_CUBANO:
+      return NewsSourceDisplayName.DIRECTORIO_CUBANO;
     default:
       return NewsSourceDisplayName.EMPTY;
   }
