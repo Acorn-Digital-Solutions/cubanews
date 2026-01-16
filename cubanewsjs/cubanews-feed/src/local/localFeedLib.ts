@@ -10,6 +10,17 @@ import { getFeedScore } from "@/app/api/feed/feedScoreStrategies";
 /**
  * Configures the onConflict clause for feed insertions to handle duplicate URLs.
  * When a URL conflict occurs, updates the existing record with new data.
+ * 
+ * @param query - The Kysely insert query builder to configure
+ * @returns The configured query builder with onConflict clause
+ * 
+ * @remarks
+ * This function applies an UPSERT strategy using PostgreSQL's ON CONFLICT DO UPDATE.
+ * When a duplicate URL is detected, it updates the existing record with new values
+ * for all fields except the primary key (id) and the conflict column (url).
+ * 
+ * **Maintenance Note**: When new fields are added to the FeedTable schema, they must
+ * be added to the doUpdateSet clause below to ensure they are updated on conflict.
  */
 export function applyFeedUpsertOnConflict<T>(
   query: InsertQueryBuilder<Database, "feed", T>,
