@@ -8,7 +8,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { ApifyClient, Dataset } from "apify-client";
 import { sql } from "kysely";
 import { xOfEachSource } from "./feedStrategies";
-import { newsItemToFeedTable } from "@/local/localFeedLib";
+import {
+  newsItemToFeedTable,
+  applyFeedUpsertOnConflict,
+} from "@/local/localFeedLib";
 import cubanewsApp from "@/app/cubanewsApp";
 import {
   CatorceYMedioRSSCrawler,
@@ -203,23 +206,9 @@ async function insertArticlesToFeed(
     };
   }
 
-  const insertResult = await db
-    .insertInto("feed")
-    .values(values)
-    .onConflict((oc) =>
-      oc.column("url").doUpdateSet({
-        feedts: (eb) => eb.ref("excluded.feedts"),
-        feedisodate: (eb) => eb.ref("excluded.feedisodate"),
-        title: (eb) => eb.ref("excluded.title"),
-        content: (eb) => eb.ref("excluded.content"),
-        updated: (eb) => eb.ref("excluded.updated"),
-        isodate: (eb) => eb.ref("excluded.isodate"),
-        score: (eb) => eb.ref("excluded.score"),
-        tags: (eb) => eb.ref("excluded.tags"),
-        imageurl: (eb) => eb.ref("excluded.imageurl"),
-      }),
-    )
-    .executeTakeFirst();
+  const insertResult = await applyFeedUpsertOnConflict(
+    db.insertInto("feed").values(values),
+  ).executeTakeFirst();
 
   return {
     datasetName: sourceName,
@@ -241,23 +230,9 @@ async function refreshFeedDataset(
   const values = newsItems
     .filter((newsItem) => isNewsItemValid(newsItem))
     .map((x) => newsItemToFeedTable(x, feedRefreshDate) as any);
-  const insertResult = await db
-    .insertInto("feed")
-    .values(values)
-    .onConflict((oc) =>
-      oc.column("url").doUpdateSet({
-        feedts: (eb) => eb.ref("excluded.feedts"),
-        feedisodate: (eb) => eb.ref("excluded.feedisodate"),
-        title: (eb) => eb.ref("excluded.title"),
-        content: (eb) => eb.ref("excluded.content"),
-        updated: (eb) => eb.ref("excluded.updated"),
-        isodate: (eb) => eb.ref("excluded.isodate"),
-        score: (eb) => eb.ref("excluded.score"),
-        tags: (eb) => eb.ref("excluded.tags"),
-        imageurl: (eb) => eb.ref("excluded.imageurl"),
-      }),
-    )
-    .executeTakeFirst();
+  const insertResult = await applyFeedUpsertOnConflict(
+    db.insertInto("feed").values(values),
+  ).executeTakeFirst();
 
   return {
     datasetName: dataset.name as string,

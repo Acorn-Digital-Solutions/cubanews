@@ -4,8 +4,30 @@ import { NewsItem, NewsSourceName } from "@/app/interfaces";
 import { info } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { Kysely } from "kysely";
+import { InsertQueryBuilder, Kysely } from "kysely";
 import { getFeedScore } from "@/app/api/feed/feedScoreStrategies";
+
+/**
+ * Configures the onConflict clause for feed insertions to handle duplicate URLs.
+ * When a URL conflict occurs, updates the existing record with new data.
+ */
+export function applyFeedUpsertOnConflict<T>(
+  query: InsertQueryBuilder<Database, "feed", T>,
+): InsertQueryBuilder<Database, "feed", T> {
+  return query.onConflict((oc) =>
+    oc.column("url").doUpdateSet({
+      feedts: (eb) => eb.ref("excluded.feedts"),
+      feedisodate: (eb) => eb.ref("excluded.feedisodate"),
+      title: (eb) => eb.ref("excluded.title"),
+      content: (eb) => eb.ref("excluded.content"),
+      updated: (eb) => eb.ref("excluded.updated"),
+      isodate: (eb) => eb.ref("excluded.isodate"),
+      score: (eb) => eb.ref("excluded.score"),
+      tags: (eb) => eb.ref("excluded.tags"),
+      imageurl: (eb) => eb.ref("excluded.imageurl"),
+    }),
+  );
+}
 
 export async function newsItemToFeedTable(
   ni: NewsItem,
@@ -74,23 +96,9 @@ async function refreshFeedDataset(
     newsItems.map((x) => newsItemToFeedTable(x, feedRefreshDate) as any)
   );
   console.info(values);
-  const insertResult = await db
-    .insertInto("feed")
-    .values(values)
-    .onConflict((oc) =>
-      oc.column("url").doUpdateSet({
-        feedts: (eb) => eb.ref("excluded.feedts"),
-        feedisodate: (eb) => eb.ref("excluded.feedisodate"),
-        title: (eb) => eb.ref("excluded.title"),
-        content: (eb) => eb.ref("excluded.content"),
-        updated: (eb) => eb.ref("excluded.updated"),
-        isodate: (eb) => eb.ref("excluded.isodate"),
-        score: (eb) => eb.ref("excluded.score"),
-        tags: (eb) => eb.ref("excluded.tags"),
-        imageurl: (eb) => eb.ref("excluded.imageurl"),
-      }),
-    )
-    .executeTakeFirst();
+  const insertResult = await applyFeedUpsertOnConflict(
+    db.insertInto("feed").values(values),
+  ).executeTakeFirst();
 
   return {
     datasetName: datasetName,
