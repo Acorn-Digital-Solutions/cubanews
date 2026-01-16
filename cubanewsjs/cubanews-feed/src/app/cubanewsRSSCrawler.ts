@@ -83,10 +83,7 @@ abstract class CubanewsRSSCrawler {
             // Get public URL
             imagePath = `gs://cubanews-fbaad.firebasestorage.app/${storagePath}`;
           } catch (error: any) {
-            console.error(
-              `Error processing image for ${item.link}:`,
-              error.message,
-            );
+            console.error(`Error processing image for ${item.link}:`, error);
           }
         }
 
@@ -106,7 +103,7 @@ abstract class CubanewsRSSCrawler {
       console.log(JSON.stringify(articles, null, 2));
       return articles;
     } catch (error: any) {
-      console.error("Error fetching RSS feed", { error: error.message });
+      console.error("Error fetching RSS feed:", error);
       throw error;
     }
   }
