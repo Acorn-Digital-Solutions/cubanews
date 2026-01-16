@@ -26,6 +26,7 @@ export async function newsItemToFeedTable(
     url: ni.url,
     score: score,
     imageurl: ni.image,
+    tags: ni.tags.join(","),
   } as FeedTable;
 }
 
@@ -76,6 +77,19 @@ async function refreshFeedDataset(
   const insertResult = await db
     .insertInto("feed")
     .values(values)
+    .onConflict((oc) =>
+      oc.column("url").doUpdateSet({
+        feedts: (eb) => eb.ref("excluded.feedts"),
+        feedisodate: (eb) => eb.ref("excluded.feedisodate"),
+        title: (eb) => eb.ref("excluded.title"),
+        content: (eb) => eb.ref("excluded.content"),
+        updated: (eb) => eb.ref("excluded.updated"),
+        isodate: (eb) => eb.ref("excluded.isodate"),
+        score: (eb) => eb.ref("excluded.score"),
+        tags: (eb) => eb.ref("excluded.tags"),
+        imageurl: (eb) => eb.ref("excluded.imageurl"),
+      }),
+    )
     .executeTakeFirst();
 
   return {
