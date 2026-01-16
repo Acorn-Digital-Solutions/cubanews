@@ -199,3 +199,50 @@ export class CibercubaRSSCrawler extends CubanewsRSSCrawler {
     return imageUrl;
   }
 }
+
+export class DirectorioCubanoRSSCrawler extends CubanewsRSSCrawler {
+  constructor(storage?: FirebaseStorage) {
+    super(
+      {
+        name: NewsSourceName.DIRECTORIO_CUBANO,
+        startUrls: new Set(["https://www.directoriocubano.info/"]),
+        rssFeed: "https://www.directoriocubano.info/feed/",
+        datasetName: NewsSourceName.DIRECTORIO_CUBANO + "-dataset",
+        parser: new Parser({
+          customFields: {
+            item: [
+              ["dc:creator", "creator"],
+              ["content:encoded", "content"],
+            ],
+          },
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            Accept: "application/rss+xml, application/xml, text/xml, */*",
+          },
+        }),
+      },
+      storage,
+    );
+  }
+
+  override tryGetMediaImage(item: any): string | null {
+    // Directorio Cubano embeds images in the description field as HTML
+    let imageUrl: string | null = null;
+
+    // Try description first (RSS standard), then content:encoded field
+    const htmlContent = item.description || item.content || "";
+
+    if (htmlContent) {
+      // Extract image URL from HTML
+      // Example: <img width="300" height="176" src="https://www.directoriocubano.info/wp-content/uploads/..." />
+      const imgRegex = /<img[^>]+src="([^">]+)"/i;
+      const match = htmlContent.match(imgRegex);
+      if (match && match[1]) {
+        imageUrl = match[1];
+      }
+    }
+
+    return imageUrl;
+  }
+}
