@@ -1,3 +1,5 @@
+import Parser from "rss-parser";
+
 export type ResponseError = {
   message: string;
 };
@@ -51,6 +53,10 @@ export enum NewsSourceName {
   CIBERCUBA = "cibercuba",
   ELTOQUE = "eltoque",
   CUBANET = "cubanet",
+  PERIODICO_CUBANO = "periodicocubano",
+  DIRECTORIO_CUBANO = "directoriocubano",
+  MARTI_NOTICIAS = "martinoticias",
+  CUBANOS_POR_EL_MUNDO = "cubanosporelmundo",
 }
 
 export enum NewsSourceDisplayName {
@@ -60,6 +66,10 @@ export enum NewsSourceDisplayName {
   CIBERCUBA = "Cibercuba",
   ELTOQUE = "elToque",
   CUBANET = "Cubanet",
+  PERIODICO_CUBANO = "Periódico Cubano",
+  DIRECTORIO_CUBANO = "Directorio Cubano",
+  MARTI_NOTICIAS = "Martí Noticias",
+  CUBANOS_POR_EL_MUNDO = "Cubanos por el Mundo",
   EMPTY = "",
 }
 
@@ -76,7 +86,7 @@ export enum SubscriptionStatus {
 }
 
 export function getNewsSourceDisplayName(
-  item: NewsItem
+  item: NewsItem,
 ): NewsSourceDisplayName {
   switch (item.source) {
     case NewsSourceName.ADNCUBA:
@@ -91,6 +101,14 @@ export function getNewsSourceDisplayName(
       return NewsSourceDisplayName.ELTOQUE;
     case NewsSourceName.CUBANET:
       return NewsSourceDisplayName.CUBANET;
+    case NewsSourceName.PERIODICO_CUBANO:
+      return NewsSourceDisplayName.PERIODICO_CUBANO;
+    case NewsSourceName.DIRECTORIO_CUBANO:
+      return NewsSourceDisplayName.DIRECTORIO_CUBANO;
+    case NewsSourceName.MARTI_NOTICIAS:
+      return NewsSourceDisplayName.MARTI_NOTICIAS;
+    case NewsSourceName.CUBANOS_POR_EL_MUNDO:
+      return NewsSourceDisplayName.CUBANOS_POR_EL_MUNDO;
     default:
       return NewsSourceDisplayName.EMPTY;
   }
@@ -101,3 +119,24 @@ export type ResolveNewsletterSubscriptionData = {
   email: string;
   dontShowAgain: boolean;
 };
+
+export interface RSSArticle {
+  title: string;
+  link: string;
+  pubDate: string;
+  author: string;
+  categories: string[];
+  contentSnippet: string;
+  content: string;
+  guid: string;
+  isoDate: string;
+  image: string | null;
+}
+
+export interface NewsSource {
+  name: NewsSourceName;
+  startUrls: Set<string>;
+  rssFeed: string;
+  datasetName: string;
+  parser: Parser;
+}

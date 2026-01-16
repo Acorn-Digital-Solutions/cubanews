@@ -11,7 +11,10 @@ export enum NewsSourceName {
 export interface NewsSource {
   name: NewsSourceName;
   startUrls: Set<string>;
+  rssFeed: string;
   datasetName: string;
+  imageSelector?: string;
+  cookiesConsentSelector?: string;
 }
 
 export const newsSources = [
@@ -23,6 +26,7 @@ export const newsSources = [
   {
     name: NewsSourceName.CATORCEYMEDIO,
     startUrls: new Set(["https://www.14ymedio.com/cuba"]),
+    rssFeed: "https://www.14ymedio.com/rss/",
     datasetName: NewsSourceName.CATORCEYMEDIO + "-dataset",
   },
   {

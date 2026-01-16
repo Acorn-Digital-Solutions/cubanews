@@ -8,9 +8,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { ApifyClient, Dataset } from "apify-client";
 import { sql } from "kysely";
 import { xOfEachSource } from "./feedStrategies";
-import { exec } from "child_process";
 import { newsItemToFeedTable } from "@/local/localFeedLib";
 import cubanewsApp from "@/app/cubanewsApp";
+import {
+  AdnCubaRSSCrawler,
+  CatorceYMedioRSSCrawler,
+  CibercubaRSSCrawler,
+  CubanetRSSCrawler,
+  CubanosPorElMundoRSSCrawler,
+  DirectorioCubanoRSSCrawler,
+  MartiNoticiasRSSCrawler,
+} from "@/app/cubanewsRSSCrawler";
 
 export type RefreshFeedResult = {
   datasetName: string;
@@ -23,7 +31,7 @@ const client = new ApifyClient({
 });
 
 export async function GET(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<NextResponse<FeedResponseData | null>> {
   if (request.nextUrl.searchParams.get("refresh")) {
     if (request.headers.get("ADMIN_TOKEN") !== process.env.ADMIN_TOKEN) {
@@ -31,7 +39,7 @@ export async function GET(
         {
           banter: "You are not authorized to refresh the feed",
         },
-        { status: 401, statusText: "Unauthorized" }
+        { status: 401, statusText: "Unauthorized" },
       );
     }
     if (request.nextUrl.searchParams.get("dryrun")) {
@@ -39,17 +47,7 @@ export async function GET(
         {
           banter: "Dry Run. Refreshing cubanews feed",
         },
-        { status: 200 }
-      );
-    }
-
-    if (request.nextUrl.searchParams.get("local")) {
-      exec("/home/sergio/github/cubanews/cubanewsjs/cubanews-crawler/run.sh");
-      return NextResponse.json(
-        {
-          banter: "Refreshing cubanews feed from Local Sources.",
-        },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -61,13 +59,13 @@ export async function GET(
       {
         banter: "Refreshing cubanews feed",
       },
-      { status: 200 }
+      { status: 200 },
     );
   }
 
   const page = parseInt(request.nextUrl.searchParams.get("page") ?? "1");
   const pageSize = parseInt(
-    request.nextUrl.searchParams.get("pageSize") ?? "2"
+    request.nextUrl.searchParams.get("pageSize") ?? "2",
   );
 
   return getFeed(page, pageSize);
@@ -75,7 +73,7 @@ export async function GET(
 
 async function getFeed(
   page: number,
-  pageSize: number
+  pageSize: number,
 ): Promise<NextResponse<FeedResponseData | null>> {
   const latestFeedts = await db
     .selectFrom("feed")
@@ -87,19 +85,14 @@ async function getFeed(
       {
         banter: "No feeds available",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
   // This strategy gets the top x news of every source.
   // X is the page size, if implemented page 2 would mean skipping the first x for each news source
   // and getting the following x. This is temporary until a better, ranked version of the feed is conceived.
-  const items = await xOfEachSource(
-    db,
-    latestFeedts.feedts as number,
-    page,
-    pageSize
-  );
+  const items = await xOfEachSource(db, page, pageSize);
 
   const itemsMap = new Map<number, NewsItem>();
   items.forEach((x) => {
@@ -116,7 +109,7 @@ async function getFeed(
     .where(
       "feedid",
       "in",
-      items.map((x) => x.id as number)
+      items.map((x) => x.id as number),
     )
     .groupBy("interaction")
     .groupBy("feedid")
@@ -142,33 +135,136 @@ async function getFeed(
         feed: Array.from(itemsMap.values()),
       },
     },
-    { status: 200 }
+    { status: 200 },
   );
 }
 
 async function refreshFeed(): Promise<Array<RefreshFeedResult>> {
-  const datasetCollectionClient = client.datasets();
-  const listDatasets = await datasetCollectionClient.list();
-  const newsSourcesSet = new Set(
-    Object.values(NewsSourceName).map((s) => s.toLocaleLowerCase() + "-dataset")
+  const feedRefreshDate = new Date();
+  const ARTICLE_LIMIT = 10;
+  const results: RefreshFeedResult[] = [];
+
+  // Define all crawlers with their corresponding NewsSourceName
+  const crawlers = [
+    {
+      crawler: new CatorceYMedioRSSCrawler(),
+      source: NewsSourceName.CATORCEYMEDIO,
+    },
+    { crawler: new CibercubaRSSCrawler(), source: NewsSourceName.CIBERCUBA },
+    {
+      crawler: new DirectorioCubanoRSSCrawler(),
+      source: NewsSourceName.DIRECTORIO_CUBANO,
+    },
+    { crawler: new AdnCubaRSSCrawler(), source: NewsSourceName.ADNCUBA },
+    {
+      crawler: new MartiNoticiasRSSCrawler(),
+      source: NewsSourceName.MARTI_NOTICIAS,
+    },
+    {
+      crawler: new CubanosPorElMundoRSSCrawler(),
+      source: NewsSourceName.CUBANOS_POR_EL_MUNDO,
+    },
+    { crawler: new CubanetRSSCrawler(), source: NewsSourceName.CUBANET },
+  ];
+
+  // Process each crawler
+  for (const { crawler, source } of crawlers) {
+    try {
+      const articles = await crawler.getRSSContent(true, ARTICLE_LIMIT);
+      const newsItems = articles.map((article) =>
+        rssArticleToNewsItem(article, source),
+      );
+      const result = await insertArticlesToFeed(
+        newsItems,
+        feedRefreshDate,
+        source,
+      );
+      results.push(result);
+    } catch (error) {
+      console.error(`Error processing ${source}:`, error);
+      results.push({
+        datasetName: source,
+        insertedRows: 0,
+      });
+    }
+  }
+
+  return results;
+}
+
+function rssArticleToNewsItem(article: any, source: NewsSourceName): NewsItem {
+  return {
+    id: 0, // Will be assigned by database
+    title: article.title,
+    source: source,
+    url: article.link,
+    updated: new Date(article.pubDate).getTime(),
+    isoDate: article.isoDate,
+    feedts: null,
+    content: article.contentSnippet || article.content,
+    tags: article.categories || [],
+    score: 0,
+    interactions: { feedid: 0, view: 0, like: 0, share: 0 },
+    aiSummary: "",
+    image: article.image || "",
+  };
+}
+
+async function insertArticlesToFeed(
+  newsItems: NewsItem[],
+  feedRefreshDate: Date,
+  sourceName: NewsSourceName,
+): Promise<RefreshFeedResult> {
+  const validItems = newsItems.filter((newsItem) => isNewsItemValid(newsItem));
+
+  if (validItems.length === 0) {
+    return {
+      datasetName: sourceName,
+      insertedRows: 0,
+    };
+  }
+
+  // Get existing URLs from the database for articles from the last 48 hours
+  const urls = validItems.map((item) => item.url);
+  const fortyEightHoursAgo = Date.now() - 48 * 60 * 60 * 1000;
+
+  const existingUrls = await db
+    .selectFrom("feed")
+    .select("url")
+    .where("url", "in", urls)
+    .where("updated", ">=", fortyEightHoursAgo)
+    .execute();
+
+  const existingUrlSet = new Set(existingUrls.map((row) => row.url));
+
+  // Filter out items that already exist in the database
+  const newItems = validItems.filter((item) => !existingUrlSet.has(item.url));
+
+  if (newItems.length === 0) {
+    return {
+      datasetName: sourceName,
+      insertedRows: 0,
+    };
+  }
+
+  const values = await Promise.all(
+    newItems.map((x) => newsItemToFeedTable(x, feedRefreshDate) as any),
   );
-  // Include only the news sources with propper crawlers.
-  const datasets = listDatasets.items.filter(
-    (dataset) => dataset && dataset.name && newsSourcesSet.has(dataset.name)
-  );
-  const currentDate = new Date();
-  const feedRefreshResult = await Promise.all(
-    datasets.map((dataset) => {
-      console.log("Refreshing dataset: ", dataset.name);
-      return refreshFeedDataset(dataset, currentDate);
-    })
-  );
-  return feedRefreshResult;
+
+  const insertResult = await db
+    .insertInto("feed")
+    .values(values)
+    .executeTakeFirst();
+
+  return {
+    datasetName: sourceName,
+    insertedRows: insertResult.numInsertedOrUpdatedRows?.valueOf() as bigint,
+  };
 }
 
 async function refreshFeedDataset(
   dataset: Dataset,
-  feedRefreshDate: Date
+  feedRefreshDate: Date,
 ): Promise<RefreshFeedResult> {
   if (!dataset || !dataset.name) {
     return { datasetName: "unknown", insertedRows: 0 };

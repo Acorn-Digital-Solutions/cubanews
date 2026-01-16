@@ -17,7 +17,8 @@
     "start:postToFB": "tsx src/local/postToFB.ts",
     "start:postToFB:playwright": "tsx src/local/postToFB.ts -- --playwright",
     "start:postToFB:playwright:dev": "ENV_FILE='.env.development.local' tsx src/local/postToFB.ts -- --playwright",
-    "start:postToFB:playwright:headed": "ENV_FILE='.env.development.local' tsx src/local/postToFB.ts -- --playwright --headed"
+    "start:postToFB:playwright:headed": "ENV_FILE='.env.development.local' tsx src/local/postToFB.ts -- --playwright --headed",
+    "test-rss-crawler": "tsx test-rss.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -44,7 +45,8 @@
     "react-dom": "^18.2.0",
     "server-only": "^0.0.1",
     "sharp": "^0.34.2",
-    "swr": "^2.3.3"
+    "swr": "^2.3.3",
+    "rss-parser": "^3.13.0"
   },
   "devDependencies": {
     "@types/facebook-nodejs-business-sdk": "^22.0.0",
