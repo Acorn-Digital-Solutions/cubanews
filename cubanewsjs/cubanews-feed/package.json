@@ -18,7 +18,7 @@
     "start:postToFB:playwright": "tsx src/local/postToFB.ts -- --playwright",
     "start:postToFB:playwright:dev": "ENV_FILE='.env.development.local' tsx src/local/postToFB.ts -- --playwright",
     "start:postToFB:playwright:headed": "ENV_FILE='.env.development.local' tsx src/local/postToFB.ts -- --playwright --headed",
-    "test-rss-crawler": "tsx test-rss.ts"
+    "test-rss-crawler": "ENV_FILE='.env.local' tsx test-rss.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
