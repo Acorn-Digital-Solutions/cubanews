@@ -10,7 +10,7 @@ import { initializeApp } from "firebase/app";
 import { NewsSource, RSSArticle, NewsSourceName } from "./interfaces";
 import { firebaseConfig } from "./interfaces/firebaseConfig";
 
-const imageStorageFolder = process.env.STORAGE_IMAGE_FOLDER ?? "image";
+const imageStorageFolder = process.env.STORAGE_IMAGE_FOLDER ?? "images";
 
 abstract class CubanewsRSSCrawler {
   protected newsSource: NewsSource;
