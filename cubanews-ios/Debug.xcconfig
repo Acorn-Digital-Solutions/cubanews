@@ -1,0 +1,4 @@
+// Configuration settings for Debug environment
+
+// API endpoint for development
+CUBANEWS_API = http:/$()/localhost:3000/api

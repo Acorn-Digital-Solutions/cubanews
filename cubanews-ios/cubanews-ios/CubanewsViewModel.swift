@@ -209,7 +209,7 @@ final class CubanewsViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         NSLog("➡️ \(TAG): FetchingFeedItemsFromWeb_START")
-        let urlString = "https://www.cubanews.icu/api/feed?page=\(currentPage)&pageSize=\(pageSize)"
+        let urlString = "\(Config.CUBANEWS_API)/feed?page=\(currentPage)&pageSize=\(pageSize)"
         guard let url = URL(string: urlString) else { return }
 
         do {
