@@ -8,7 +8,8 @@ CREATE TABLE feed (
     content TEXT,
     updated BIGINT,
     isodate VARCHAR(25),
-    score DOUBLE PRECISION DEFAULT 0.0
+    score DOUBLE PRECISION DEFAULT 0.0,
+    imageurl TEXT
 );
 
 CREATE TABLE subscriptions (
