@@ -39,8 +39,8 @@
 		1FF5F5A72E9C245A001C9A75 /* cubanews-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "cubanews-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FF5F5B42E9C245B001C9A75 /* cubanews-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "cubanews-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FF5F5BE2E9C245B001C9A75 /* cubanews-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "cubanews-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		Debug.xcconfig = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
-		Release.xcconfig = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		Debug.xcconfig = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		Release.xcconfig = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
