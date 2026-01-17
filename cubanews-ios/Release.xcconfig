@@ -1,4 +1,4 @@
 // Configuration settings for Release environment
 
 // API endpoint for production
-CUBANEWS_API = https:/$()/www.cubanews.icu/api
+CUBANEWS_API = https://www.cubanews.icu/api
