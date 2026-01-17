@@ -10,8 +10,11 @@ import { initializeApp } from "firebase/app";
 import { NewsSource, RSSArticle, NewsSourceName } from "./interfaces";
 import { firebaseConfig } from "./interfaces/firebaseConfig";
 
+const imageStorageFolder = process.env.STORAGE_IMAGE_FOLDER ?? "images";
+
 abstract class CubanewsRSSCrawler {
   protected newsSource: NewsSource;
+  
   constructor(
     newsSource: NewsSource,
     private storage?: FirebaseStorage,
@@ -71,7 +74,7 @@ abstract class CubanewsRSSCrawler {
             }
             const buffer = Buffer.from(await response.arrayBuffer());
             // Upload image buffer to Firebase Storage
-            const storagePath = `images/${this.newsSource.name}/${imageName}`;
+            const storagePath = `${imageStorageFolder}/${this.newsSource.name}/${imageName}`;
             if (!this.storage) {
               throw new Error("Firebase storage is not initialized.");
             }

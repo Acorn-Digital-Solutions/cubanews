@@ -206,7 +206,7 @@ function rssArticleToNewsItem(article: any, source: NewsSourceName): NewsItem {
     score: 0,
     interactions: { feedid: 0, view: 0, like: 0, share: 0 },
     aiSummary: "",
-    image: article.image || "",
+    image: article.image || null,
   };
 }
 
