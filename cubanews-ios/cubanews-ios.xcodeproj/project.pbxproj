@@ -39,6 +39,8 @@
 		1FF5F5A72E9C245A001C9A75 /* cubanews-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "cubanews-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FF5F5B42E9C245B001C9A75 /* cubanews-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "cubanews-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FF5F5BE2E9C245B001C9A75 /* cubanews-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "cubanews-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		Debug.xcconfig = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		Release.xcconfig = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -305,6 +307,7 @@
 /* Begin XCBuildConfiguration section */
 		1FF5F5C62E9C245B001C9A75 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = Debug.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -370,6 +373,7 @@
 		};
 		1FF5F5C72E9C245B001C9A75 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = Release.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -439,6 +443,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = CubaNews;
+				INFOPLIST_KEY_CUBANEWS_API = "$(CUBANEWS_API)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -481,6 +486,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = CubaNews;
+				INFOPLIST_KEY_CUBANEWS_API = "$(CUBANEWS_API)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
