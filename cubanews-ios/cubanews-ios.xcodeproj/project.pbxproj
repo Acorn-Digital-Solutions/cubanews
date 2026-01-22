@@ -39,13 +39,26 @@
 		1FF5F5A72E9C245A001C9A75 /* cubanews-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "cubanews-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FF5F5B42E9C245B001C9A75 /* cubanews-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "cubanews-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FF5F5BE2E9C245B001C9A75 /* cubanews-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "cubanews-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		Debug.xcconfig = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
-		Release.xcconfig = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		Debug.xcconfig /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		Release.xcconfig /* Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1F25D83C2F21AFBB00AF8D7B /* Exceptions for "cubanews-ios" folder in "cubanews-ios" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1FF5F5A62E9C245A001C9A75 /* cubanews-ios */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1FF5F5A92E9C245A001C9A75 /* cubanews-ios */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1F25D83C2F21AFBB00AF8D7B /* Exceptions for "cubanews-ios" folder in "cubanews-ios" target */,
+			);
 			path = "cubanews-ios";
 			sourceTree = "<group>";
 		};
@@ -95,6 +108,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1F25D7EF2F21AADC00AF8D7B /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				Debug.xcconfig /* Debug.xcconfig */,
+				Release.xcconfig /* Release.xcconfig */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		1FF5F59E2E9C245A001C9A75 = {
 			isa = PBXGroup;
 			children = (
@@ -102,6 +124,7 @@
 				1FF5F5B72E9C245B001C9A75 /* cubanews-iosTests */,
 				1FF5F5C12E9C245B001C9A75 /* cubanews-iosUITests */,
 				1FF5F5A82E9C245A001C9A75 /* Products */,
+				1F25D7EF2F21AADC00AF8D7B /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -307,7 +330,7 @@
 /* Begin XCBuildConfiguration section */
 		1FF5F5C62E9C245B001C9A75 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = Debug.xcconfig;
+			baseConfigurationReference = Debug.xcconfig /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -373,7 +396,7 @@
 		};
 		1FF5F5C72E9C245B001C9A75 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = Release.xcconfig;
+			baseConfigurationReference = Release.xcconfig /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -438,10 +461,12 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "cubanews-ios/cubanews-ios.entitlements";
 				CODE_SIGN_STYLE = Automatic;
+				CUBANEWS_API = "http://localhost:3000/api";
 				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 2PUZ732K47;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "cubanews-ios/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = CubaNews;
 				INFOPLIST_KEY_CUBANEWS_API = "$(CUBANEWS_API)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
@@ -481,10 +506,12 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "cubanews-ios/cubanews-iosRelease.entitlements";
 				CODE_SIGN_STYLE = Automatic;
+				CUBANEWS_API = "https://www.cubanews.icu/api";
 				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 2PUZ732K47;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "cubanews-ios/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = CubaNews;
 				INFOPLIST_KEY_CUBANEWS_API = "$(CUBANEWS_API)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
