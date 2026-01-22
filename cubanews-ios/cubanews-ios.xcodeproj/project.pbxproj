@@ -455,6 +455,7 @@
 		};
 		1FF5F5C92E9C245B001C9A75 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = Debug.xcconfig /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -500,6 +501,7 @@
 		};
 		1FF5F5CA2E9C245B001C9A75 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = Debug.xcconfig /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -639,7 +641,7 @@
 				1FF5F5C72E9C245B001C9A75 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		1FF5F5C82E9C245B001C9A75 /* Build configuration list for PBXNativeTarget "cubanews-ios" */ = {
 			isa = XCConfigurationList;
@@ -648,7 +650,7 @@
 				1FF5F5CA2E9C245B001C9A75 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		1FF5F5CB2E9C245B001C9A75 /* Build configuration list for PBXNativeTarget "cubanews-iosTests" */ = {
 			isa = XCConfigurationList;
@@ -657,7 +659,7 @@
 				1FF5F5CD2E9C245B001C9A75 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		1FF5F5CE2E9C245B001C9A75 /* Build configuration list for PBXNativeTarget "cubanews-iosUITests" */ = {
 			isa = XCConfigurationList;
@@ -666,7 +668,7 @@
 				1FF5F5D02E9C245B001C9A75 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 

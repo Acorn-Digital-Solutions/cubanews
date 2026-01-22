@@ -12,6 +12,12 @@ enum NewsSourceName: String, Codable, CaseIterable {
     case CIBERCUBA
     case ELTOQUE
     case CUBANET
+    case ASERENOTICIAS
+    case CUBANOSPORELMUNDO
+    case DIRECTORIOCUBANO
+    case HAVANATIMES
+    case MARTINOTICIAS
+    case PERIODICOCUBANO
     case unknown
 
     init(from decoder: Decoder) throws {
@@ -23,12 +29,24 @@ enum NewsSourceName: String, Codable, CaseIterable {
     // Human-friendly display name in UpperCamelCase for UI pills
     var displayName: String {
         switch self {
-        case .ADNCUBA: return "ADNCuba"
+        case .ADNCUBA: return "ADN Cuba"
         case .CATORCEYMEDIO: return "14yMedio"
-        case .DIARIODECUBA: return "DiarioDeCuba"
-        case .CIBERCUBA: return "CiberCuba"
-        case .ELTOQUE: return "elTOQUE"
+        case .DIARIODECUBA: return "Diario De Cuba"
+        case .CIBERCUBA: return "Cibercuba"
+        case .ELTOQUE: return "el TOQUE"
         case .CUBANET: return "Cubanet"
+        case .ASERENOTICIAS:
+            return "Asere Noticias"
+        case .CUBANOSPORELMUNDO:
+            return "Cubanos por el Mundo"
+        case .DIRECTORIOCUBANO:
+            return "Directorio Cubano"
+        case .HAVANATIMES:
+            return "Havana Times"
+        case .MARTINOTICIAS:
+            return "Martí Noticias"
+        case .PERIODICOCUBANO:
+            return "Periódico Cubano"
         case .unknown: return "Unknown"
         }
     }
@@ -42,7 +60,20 @@ enum NewsSourceName: String, Codable, CaseIterable {
         case .CIBERCUBA: return "cibercuba"
         case .ELTOQUE: return "eltoque"
         case .CUBANET: return "cubanet"
-        case .unknown: return "cubanewsIdentity"
+        case .ASERENOTICIAS:
+            return "aserenoticias"
+        case .CUBANOSPORELMUNDO:
+            return "cubanosporelmundo"
+        case .DIRECTORIOCUBANO:
+            return "directoriocubano"
+        case .HAVANATIMES:
+            return "havanatimes"
+        case .MARTINOTICIAS:
+            return "martinoticias"
+        case .PERIODICOCUBANO:
+            return "periodicocubano"
+        case .unknown: 
+            return "cubanewsIdentity"
         }
     }
 }
