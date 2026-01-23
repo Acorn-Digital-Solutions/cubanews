@@ -81,9 +81,12 @@ struct ProfileView: View {
                         
                         // App version and copyright at the bottom
                         VStack(spacing: 8) {
-                            Text("Cubanews Version 0.0.1")
-                                .font(.caption)
-                                .foregroundColor(.gray)
+                            Group {
+                                let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+                                Text("Cubanews Version \(version)")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
                             
                             Text("© Acorn Digital Solutions 2025")
                                 .font(.caption)
@@ -212,3 +215,4 @@ struct AccountDeletedView: View {
         }
     }
 }
+
