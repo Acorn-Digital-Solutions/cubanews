@@ -27,30 +27,34 @@ type NewsItemProps = {
   item: NewsItem;
 };
 
-function getPublicationLogo(item: NewsItem) {
-  let imageLogoSrc = "";
-  switch (item.source) {
+function getImageLogoSrc(newsSourceName: NewsSourceName): string {
+  switch(newsSourceName) {
     case NewsSourceName.ADNCUBA:
-      imageLogoSrc = "/source_logos/adncuba1.webp";
-      break;
+      return "/source_logos/adncuba1.webp";
     case NewsSourceName.CATORCEYMEDIO:
-      imageLogoSrc = "/source_logos/14ymedio1.jpg";
-      break;
+      return "/source_logos/14ymedio1.jpg";
     case NewsSourceName.CIBERCUBA:
-      imageLogoSrc = "/source_logos/cibercuba1.png";
-      break;
+      return "/source_logos/cibercuba1.png";
     case NewsSourceName.DIARIODECUBA:
-      imageLogoSrc = "/source_logos/ddc1.webp";
-      break;
+      return "/source_logos/ddc1.webp";
     case NewsSourceName.ELTOQUE:
-      imageLogoSrc = "/source_logos/eltoque.png";
-      break;
+      return "/source_logos/eltoque.png";
     case NewsSourceName.CUBANET:
-      imageLogoSrc = "/source_logos/cubanet2.jpeg";
-      break;
-    default:
-      break;
+      return "/source_logos/cubanet2.jpeg";
+    case NewsSourceName.CUBANOS_POR_EL_MUNDO:
+      return "/source_logos/cubanosporelmundo.jpg";
+    case NewsSourceName.DIRECTORIO_CUBANO:
+      return "/source_logos/directoriocubano.png";
+    case NewsSourceName.MARTI_NOTICIAS:
+      return "/source_logos/martinoticias.png";
+    case NewsSourceName.PERIODICO_CUBANO:
+      return "/source_logos/periodicocubano.png";
   }
+
+}
+
+function getPublicationLogo(item: NewsItem) {
+  let imageLogoSrc = getImageLogoSrc(item.source);
   return (
     <Image width={20} height={20} alt="Publication Logo" src={imageLogoSrc} />
   );

@@ -38,14 +38,12 @@ struct FeedItemView: View {
         f.timeZone = TimeZone(secondsFromGMT: 0)
         return f
     }()
-
-    private static let displayDateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateStyle = .medium
-        f.timeStyle = .short
-        f.locale = .current
-        f.timeZone = .current
-        return f
+    
+    private static let relativeFormatter: RelativeDateTimeFormatter = {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.locale = Locale(identifier: "es")
+        formatter.unitsStyle = .full   // .short → "hace 5 min"
+        return formatter
     }()
 
     var body: some View {
@@ -57,14 +55,19 @@ struct FeedItemView: View {
                     .resizable()
                     .frame(width: 16, height: 16)
                     .clipShape(RoundedRectangle(cornerRadius: 4))
-                Text(item.source.rawValue.uppercased())
+                Text(item.source.displayName)
                     .font(.caption)
                     .fontWeight(.bold)
                     .foregroundColor(.secondary)
                 Spacer()
-                Text(Self.displayDateFormatter.string(from: Self.iso8601DateFormatter.date(from: item.isoDate) ?? Date()))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                Text(
+                    Self.relativeFormatter.localizedString(
+                        for: Self.iso8601DateFormatter.date(from: item.isoDate) ?? Date(),
+                        relativeTo: Date()
+                    )
+                )
+                .font(.caption)
+                .foregroundColor(.secondary)
             }
 
             // Image (if exists)

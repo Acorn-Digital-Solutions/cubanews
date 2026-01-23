@@ -9,7 +9,7 @@ import {
 } from "@/app/cubanewsRSSCrawler";
 
 // Configuration
-const CRAWLER_TO_TEST = "all"; // Options: "catorce", "cibercuba", "directorio", "adncuba", "marti", "cubanos", "cubanet", "all"
+const CRAWLER_TO_TEST = process.env.CRAWLER_TO_TEST ?? "all"; // Options: "catorce", "cibercuba", "directorio", "adncuba", "marti", "cubanos", "cubanet", "all"
 const UPLOAD_IMAGES = false; // Set to false for testing without Firebase uploads
 const ARTICLE_LIMIT = 5; // Number of articles to fetch
 
