@@ -70,27 +70,29 @@ struct FeedItemView: View {
                 .foregroundColor(.secondary)
             }
 
-            // Image (if exists)
-            if item.imageLoadingState == .LOADING {
-                ProgressView()
-                    .frame(height: 120)
-                    .frame(maxWidth: .infinity)
-                    .background(Color(.systemGray5))
-                    .cornerRadius(8)
-            } else if let imageData = item.imageBytes, let uiImage = UIImage(data: imageData) {
-                Button(action: {
-                    if let url = URL(string: item.url) {
-                        openURL(url)
-                    }
-                }) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFill()
+            if item.image != nil && item.image?.isEmpty == false {
+                // Image (if exists)
+                if item.imageLoadingState == .LOADING {
+                    ProgressView()
                         .frame(height: 120)
-                        .clipped()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(.systemGray5))
                         .cornerRadius(8)
+                } else if let imageData = item.imageBytes, let uiImage = UIImage(data: imageData) {
+                    Button(action: {
+                        if let url = URL(string: item.url) {
+                            openURL(url)
+                        }
+                    }) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: 120)
+                            .clipped()
+                            .cornerRadius(8)
+                    }
+                    .buttonStyle(PlainButtonStyle())
                 }
-                .buttonStyle(PlainButtonStyle())
             }
 
             // Title
