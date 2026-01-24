@@ -165,9 +165,13 @@ export default function NewsItemComponent({ item }: NewsItemProps) {
           </Link>
           <Stack direction="row" spacing={2} alignItems="flex-start">
             {item.image ? <NewsItemImage image={item.image} /> : <></>}
-            <Typography level="body-sm" flex={1}>
-              {item.content} ...
-            </Typography>
+            {item.content === null || item.content?.length === 0 ? (
+              <></>
+            ) : (
+              <Typography level="body-sm" flex={1}>
+                {item.content} ...
+              </Typography>
+            )}
           </Stack>
         </CardContent>
         <CardOverflow variant="soft" sx={{ bgcolor: "background.level1" }}>
