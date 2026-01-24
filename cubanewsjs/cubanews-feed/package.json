@@ -27,11 +27,13 @@
     "@fontsource/inter": "^5.2.6",
     "@mui/icons-material": "^7.1.1",
     "@mui/joy": "^5.0.0-beta.52",
+    "@types/cheerio": "^0.22.35",
     "@vercel/analytics": "^1.5.0",
     "@vercel/postgres": "^0.10.0",
     "@vercel/postgres-kysely": "^0.10.0",
     "@vercel/speed-insights": "^1.2.0",
     "apify-client": "^2.12.5",
+    "cheerio": "^1.2.0",
     "dotenv": "^16.5.0",
     "facebook-nodejs-business-sdk": "^23.0.0",
     "firebase": "^12.3.0",
@@ -44,10 +46,10 @@
     "playwright": "^1.57.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "rss-parser": "^3.13.0",
     "server-only": "^0.0.1",
     "sharp": "^0.34.2",
-    "swr": "^2.3.3",
-    "rss-parser": "^3.13.0"
+    "swr": "^2.3.3"
   },
   "devDependencies": {
     "@types/facebook-nodejs-business-sdk": "^22.0.0",

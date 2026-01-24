@@ -1,4 +1,5 @@
 import Parser from "rss-parser";
+import * as cheerio from "cheerio";
 import {
   connectStorageEmulator,
   FirebaseStorage,
@@ -14,7 +15,7 @@ const imageStorageFolder = process.env.STORAGE_IMAGE_FOLDER ?? "images";
 
 abstract class CubanewsRSSCrawler {
   protected newsSource: NewsSource;
-  
+
   constructor(
     newsSource: NewsSource,
     private storage?: FirebaseStorage,
@@ -35,6 +36,20 @@ abstract class CubanewsRSSCrawler {
   }
 
   protected abstract tryGetMediaImage(item: any): string | null;
+
+  private stripHtmlTags(html: string): string {
+    if (!html) return "";
+    // Remove HTML tags
+    return html
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#039;/g, "'")
+      .trim();
+  }
 
   async getRSSContent(
     uploadImages: boolean = true,
@@ -96,8 +111,8 @@ abstract class CubanewsRSSCrawler {
           pubDate: item.pubDate || "",
           author: item.creator || "",
           categories: item.categories || [],
-          contentSnippet: item.contentSnippet || "",
-          content: item.content || "",
+          contentSnippet: this.stripHtmlTags(item.contentSnippet || ""),
+          content: this.stripHtmlTags(item.content || ""),
           guid: item.guid || "",
           isoDate: item.isoDate || "",
           image: imagePath,
@@ -340,33 +355,7 @@ export class CubanosPorElMundoRSSCrawler extends CubanewsRSSCrawler {
   }
 
   override tryGetMediaImage(item: any): string | null {
-    let imageUrl: string | null = null;
-
-    // Try media:content field
-    if (item["media:content"]) {
-      const mediaContent = item["media:content"];
-      if (Array.isArray(mediaContent) && mediaContent.length > 0) {
-        imageUrl = mediaContent[0].$?.url || mediaContent[0];
-      } else if (typeof mediaContent === "object" && mediaContent.$?.url) {
-        imageUrl = mediaContent.$.url;
-      } else if (typeof mediaContent === "string") {
-        imageUrl = mediaContent;
-      }
-    }
-
-    // Try media:thumbnail field
-    if (!imageUrl && item["media:thumbnail"]) {
-      const mediaThumbnail = item["media:thumbnail"];
-      if (Array.isArray(mediaThumbnail) && mediaThumbnail.length > 0) {
-        imageUrl = mediaThumbnail[0].$?.url || mediaThumbnail[0];
-      } else if (typeof mediaThumbnail === "object" && mediaThumbnail.$?.url) {
-        imageUrl = mediaThumbnail.$.url;
-      } else if (typeof mediaThumbnail === "string") {
-        imageUrl = mediaThumbnail;
-      }
-    }
-
-    return imageUrl;
+    return null;
   }
 }
 
