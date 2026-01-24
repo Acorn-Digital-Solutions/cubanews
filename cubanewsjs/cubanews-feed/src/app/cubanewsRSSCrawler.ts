@@ -40,15 +40,9 @@ abstract class CubanewsRSSCrawler {
   private stripHtmlTags(html: string): string {
     if (!html) return "";
     // Remove HTML tags
-    return html
-      .replace(/<[^>]*>/g, "")
-      .replace(/&nbsp;/g, " ")
-      .replace(/&amp;/g, "&")
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
-      .replace(/&quot;/g, '"')
-      .replace(/&#039;/g, "'")
-      .trim();
+    // Use cheerio to parse HTML and extract text content
+    const $ = cheerio.load(html);
+    return $.root().text().trim();
   }
 
   async getRSSContent(
