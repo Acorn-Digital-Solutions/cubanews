@@ -34,7 +34,7 @@ function dbItemToNewsItem(dbitem: any): NewsItem {
 export async function xOfEachSource(
   db: Kysely<Database>,
   page: number,
-  pageSize: number
+  pageSize: number,
 ): Promise<Array<NewsItem>> {
   const query = sql<FeedTable>`
   SELECT *
@@ -56,7 +56,7 @@ export async function allSortedByUpdated(
   db: Kysely<Database>,
   feedts: number,
   page: number,
-  pageSize: number
+  pageSize: number,
 ): Promise<Array<NewsItem>> {
   const feeds = await db
     .selectFrom("feed")

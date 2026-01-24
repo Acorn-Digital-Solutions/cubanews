@@ -28,7 +28,7 @@ type NewsItemProps = {
 };
 
 function getImageLogoSrc(newsSourceName: NewsSourceName): string {
-  switch(newsSourceName) {
+  switch (newsSourceName) {
     case NewsSourceName.ADNCUBA:
       return "/source_logos/adncuba1.webp";
     case NewsSourceName.CATORCEYMEDIO:
@@ -50,7 +50,6 @@ function getImageLogoSrc(newsSourceName: NewsSourceName): string {
     case NewsSourceName.PERIODICO_CUBANO:
       return "/source_logos/periodicocubano.png";
   }
-
 }
 
 function getPublicationLogo(item: NewsItem) {
@@ -84,7 +83,7 @@ function getTagsSection(item: NewsItem): JSX.Element {
 
 export default function NewsItemComponent({ item }: NewsItemProps) {
   const [liked, setLiked] = useState(
-    item.id ? localStorage.getItem(item.id?.toString()) : false
+    item.id ? localStorage.getItem(item.id?.toString()) : false,
   );
   useEffect(() => {
     refreshLiked();
@@ -165,7 +164,7 @@ export default function NewsItemComponent({ item }: NewsItemProps) {
             </Typography>
           </Link>
           <Stack direction="row" spacing={2} alignItems="flex-start">
-            <NewsItemImage image={item.image} />
+            {item.image ? <NewsItemImage image={item.image} /> : <></>}
             <Typography level="body-sm" flex={1}>
               {item.content} ...
             </Typography>
