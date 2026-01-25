@@ -11,7 +11,7 @@ export enum NewsSourceName {
 export interface NewsSource {
   name: NewsSourceName;
   startUrls: Set<string>;
-  rssFeed: string;
+  rssFeed?: string;
   datasetName: string;
   imageSelector?: string;
   cookiesConsentSelector?: string;
