@@ -59,6 +59,8 @@ export enum NewsSourceName {
   DIRECTORIO_CUBANO = "directoriocubano",
   MARTI_NOTICIAS = "martinoticias",
   CUBANOS_POR_EL_MUNDO = "cubanosporelmundo",
+  // Special value used only for filtering crawlers / selecting all sources.
+  // It is not expected to appear in NewsItem.source or getNewsSourceDisplayName.
   ALL = "all",
 }
 
