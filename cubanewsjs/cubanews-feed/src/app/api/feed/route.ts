@@ -79,8 +79,8 @@ export async function GET(
         content: {
           timestamp: null,
           feed: [],
-          refreshResult: res,
         },
+        refreshResult: res,
       },
       { status: 200 },
     );
