@@ -52,9 +52,22 @@ export async function GET(
       );
     }
 
-    const rssSource = (request.nextUrl.searchParams.get("source") ??
-      "ALL") as NewsSourceName;
+    const sourceParam = request.nextUrl.searchParams.get("source") ?? "ALL";
 
+    const isValidSource =
+      Object.values(NewsSourceName).includes(sourceParam as NewsSourceName) ||
+      sourceParam === "ALL";
+
+    if (!isValidSource) {
+      return NextResponse.json(
+        {
+          banter: "Invalid source parameter",
+        },
+        { status: 400, statusText: "Bad Request" },
+      );
+    }
+
+    const rssSource = sourceParam as NewsSourceName;
     const res = await refreshFeed(rssSource).catch((error) => {
       console.error(error);
       return [];
