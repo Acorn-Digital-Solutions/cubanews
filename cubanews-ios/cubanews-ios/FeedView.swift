@@ -46,7 +46,7 @@ struct FeedView: View {
             viewModel.startFetch(reset: true)
         }
         .overlay {
-            if viewModel.isLoading {
+            if viewModel.refreshing {
                 VStack {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .blue))
@@ -56,7 +56,7 @@ struct FeedView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .transition(.opacity)
-                .animation(.easeInOut, value: viewModel.isLoading)
+                .animation(.easeInOut, value: viewModel.refreshing)
             }
         }
     }

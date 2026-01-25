@@ -108,6 +108,7 @@ final class CubanewsViewModel: ObservableObject {
     private let pageSize: Int = 2
 
     @Published var isLoading: Bool = false
+    @Published var refreshing: Bool = false
     @Published var savedItemIds: Set<Int64> = []
     @Published var allItemsIds: Set<Int64> = []
     @Published var latestNews: [FeedItem] = []
@@ -197,14 +198,22 @@ final class CubanewsViewModel: ObservableObject {
     }
 
     func startFetch(reset: Bool = false) {
+        // Prevent multiple simultaneous refreshes
         if reset {
+            guard !refreshing else { return }
             currentPage = 1
+            refreshing = true
         }
 
+        // Cancel any ongoing fetch
         fetchTask?.cancel()
         fetchTask = Task { [weak self] in
             guard let self else { return }
             await self.fetchFeedItems()
+            // Reset refreshing on the main actor after fetch completes
+            await MainActor.run {
+                self.refreshing = false
+            }
         }
     }
 
@@ -224,13 +233,13 @@ final class CubanewsViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         NSLog("➡️ \(TAG): FetchingFeedItemsFromWeb_START")
-        let urlString = "\(Config.CUBANEWS_API)/feed?page=\(currentPage)&pageSize=\(pageSize)"
+        let urlString = "\(Config.CUBANEWS_API.trimmingCharacters(in: .whitespacesAndNewlines))/feed?page=\(currentPage)&pageSize=\(pageSize)"
         guard let url = URL(string: urlString) else { return }
 
         do {
             let (data, response) = try await URLSession.shared.data(from: url)
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                print("❌ Invalid response from server \(urlString)")
+                NSLog("❌ \(TAG) Invalid response from server \(urlString)")
                 return
             }
 
