@@ -1,4 +1,5 @@
 import Parser from "rss-parser";
+import { RefreshFeedResult } from "../api/feed/route";
 
 export type ResponseError = {
   message: string;
@@ -28,6 +29,7 @@ export type NewsFeed = {
 export type FeedResponseData = {
   banter: string;
   content?: NewsFeed;
+  refreshResult?: Array<RefreshFeedResult>;
 };
 
 export type ImageResponseData = {
@@ -57,6 +59,7 @@ export enum NewsSourceName {
   DIRECTORIO_CUBANO = "directoriocubano",
   MARTI_NOTICIAS = "martinoticias",
   CUBANOS_POR_EL_MUNDO = "cubanosporelmundo",
+  ALL = "all",
 }
 
 export enum NewsSourceDisplayName {
