@@ -113,6 +113,7 @@ final class CubanewsViewModel: ObservableObject {
     @Published var latestNews: [FeedItem] = []
     @Published var moreNews: [FeedItem] = []
     @Published var selectedPublications: Set<String> = []
+    private var fetchTask: Task<Void, Never>?
 
     private let modelContext: ModelContext
 
@@ -193,7 +194,20 @@ final class CubanewsViewModel: ObservableObject {
         return a.isoDate > b.isoDate
     }
 
-    func fetchFeedItems() async {
+    func startFetch(reset: Bool = false) {
+        if reset {
+            currentPage = 1
+        }
+
+        fetchTask?.cancel()
+        fetchTask = Task { [weak self] in
+            guard let self else { return }
+            await self.fetchFeedItems()
+        }
+    }
+
+    private func fetchFeedItems() async {
+        guard !isLoading else { return }
         self.latestNews = self.latestNews.sorted(by: sortFeedItems(a:b:))
         NSLog("➡️ \(TAG): FetchingFeedItems_START")
         if self.latestNews.isEmpty {
@@ -204,7 +218,6 @@ final class CubanewsViewModel: ObservableObject {
                 self.latestNews = cachedItems.sorted(by: sortFeedItems(a:b:))
             }
         }
-        guard !isLoading else { return }
 
         isLoading = true
         defer { isLoading = false }
@@ -244,13 +257,20 @@ final class CubanewsViewModel: ObservableObject {
                     NSLog("➡️ \(TAG): UpdatingCachedFeedItems_END")
                     // Perform a single save for all operations
                     try? modelContext.save()
-                    
                 }
                 currentPage += 1
             }
             newItems.forEach { fetchImage(feedItem: $0) }
             NSLog("➡️ \(TAG): FetchingFeedItemsFromWeb_END")
+        } catch is CancellationError {
+            NSLog("➡️ \(TAG): Request was cancelled")
+            return
         } catch {
+            let nsError = error as NSError
+            if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled {
+                NSLog("➡️ \(TAG): URLSession task cancelled")
+                return
+            }
             print("❌ Failed to load feed:", error)
         }
     }

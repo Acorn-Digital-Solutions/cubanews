@@ -23,9 +23,7 @@ struct FeedView: View {
                         .padding(.horizontal)
                         .onAppear {
                             if item == viewModel.latestNews.last {
-                                Task {
-                                    await viewModel.fetchFeedItems()
-                                }
+                                viewModel.startFetch()
                             }
                         }
                 }
@@ -37,9 +35,7 @@ struct FeedView: View {
                         .padding(.horizontal)
                         .onAppear {
                             if item == viewModel.moreNews.last {
-                                Task {
-                                    await viewModel.fetchFeedItems()
-                                }
+                                viewModel.startFetch()
                             }
                         }
                 }
@@ -50,6 +46,9 @@ struct FeedView: View {
             }
             .padding(.top)
         }
+        .refreshable {
+            viewModel.startFetch(reset: true)
+        }
     }
 
     var body: some View {
@@ -57,7 +56,7 @@ struct FeedView: View {
             content
                 .background(Color(.systemBackground))
                 .task {
-                    await viewModel.fetchFeedItems()
+                    viewModel.startFetch()
                 }
         }.onAppear {
             NSLog("\(String(describing: type(of: self))) appeared")
