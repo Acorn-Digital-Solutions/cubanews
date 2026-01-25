@@ -52,13 +52,35 @@ export async function GET(
       );
     }
 
-    refreshFeed()
-      .then((data) => console.log(data))
-      .catch((error) => console.error(error));
+    const sourceParam = request.nextUrl.searchParams.get("source") ?? "ALL";
+
+    const isValidSource =
+      Object.values(NewsSourceName).includes(sourceParam as NewsSourceName) ||
+      sourceParam === "ALL";
+
+    if (!isValidSource) {
+      return NextResponse.json(
+        {
+          banter: "Invalid source parameter",
+        },
+        { status: 400, statusText: "Bad Request" },
+      );
+    }
+
+    const rssSource = sourceParam as NewsSourceName;
+    const res = await refreshFeed(rssSource).catch((error) => {
+      console.error(error);
+      return [];
+    });
 
     return NextResponse.json(
       {
         banter: "Refreshing cubanews feed",
+        content: {
+          timestamp: null,
+          feed: [],
+        },
+        refreshResult: res,
       },
       { status: 200 },
     );
@@ -140,9 +162,11 @@ async function getFeed(
   );
 }
 
-async function refreshFeed(): Promise<Array<RefreshFeedResult>> {
+async function refreshFeed(
+  source: NewsSourceName,
+): Promise<Array<RefreshFeedResult>> {
   const feedRefreshDate = new Date();
-  const ARTICLE_LIMIT = 10;
+  const ARTICLE_LIMIT = 5;
   const results: RefreshFeedResult[] = [];
 
   // Define all crawlers with their corresponding NewsSourceName
@@ -167,14 +191,17 @@ async function refreshFeed(): Promise<Array<RefreshFeedResult>> {
     },
     { crawler: new CubanetRSSCrawler(), source: NewsSourceName.CUBANET },
   ];
-
+  const filteredCrawlers = crawlers.filter(({ source: src }) =>
+    source === NewsSourceName.ALL ? true : src === source,
+  );
   // Process each crawler
-  for (const { crawler, source } of crawlers) {
+  for (const { crawler, source } of filteredCrawlers) {
     try {
       const articles = await crawler.getRSSContent(true, ARTICLE_LIMIT);
       const newsItems = articles.map((article) =>
         rssArticleToNewsItem(article, source),
       );
+      console.log(`Fetched ${newsItems.length} articles from ${source}`);
       const result = await insertArticlesToFeed(
         newsItems,
         feedRefreshDate,
@@ -220,7 +247,9 @@ async function insertArticlesToFeed(
   sourceName: NewsSourceName,
 ): Promise<RefreshFeedResult> {
   const validItems = newsItems.filter((newsItem) => isNewsItemValid(newsItem));
-
+  console.log(
+    `Inserting ${validItems.length} valid articles for source ${sourceName}`,
+  );
   if (validItems.length === 0) {
     return {
       datasetName: sourceName,
@@ -262,7 +291,7 @@ async function insertArticlesToFeed(
 
   return {
     datasetName: sourceName,
-    insertedRows: insertResult.numInsertedOrUpdatedRows?.valueOf() as bigint,
+    insertedRows: Number(insertResult.numInsertedOrUpdatedRows ?? 0n),
   };
 }
 

@@ -1,4 +1,5 @@
 import Parser from "rss-parser";
+import type { RefreshFeedResult } from "../api/feed/route";
 
 export type ResponseError = {
   message: string;
@@ -28,6 +29,7 @@ export type NewsFeed = {
 export type FeedResponseData = {
   banter: string;
   content?: NewsFeed;
+  refreshResult?: Array<RefreshFeedResult>;
 };
 
 export type ImageResponseData = {
@@ -57,6 +59,9 @@ export enum NewsSourceName {
   DIRECTORIO_CUBANO = "directoriocubano",
   MARTI_NOTICIAS = "martinoticias",
   CUBANOS_POR_EL_MUNDO = "cubanosporelmundo",
+  // Special value used only for filtering crawlers / selecting all sources.
+  // It is not expected to appear in NewsItem.source or getNewsSourceDisplayName.
+  ALL = "all",
 }
 
 export enum NewsSourceDisplayName {
