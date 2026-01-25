@@ -117,6 +117,8 @@ final class CubanewsViewModel: ObservableObject {
 
     private let modelContext: ModelContext
 
+    private var didRunStartupCleanup = false
+
     // Prevent external initialization
     private init() {
         // We're on the MainActor; safe to access the sharedModelContainer.mainContext here.
@@ -259,6 +261,9 @@ final class CubanewsViewModel: ObservableObject {
                     try? modelContext.save()
                 }
                 currentPage += 1
+                if currentPage == 2 { // first page just loaded successfully
+                    performStartupCleanupIfNeeded()
+                }
             }
             newItems.forEach { fetchImage(feedItem: $0) }
             NSLog("➡️ \(TAG): FetchingFeedItemsFromWeb_END")
@@ -273,6 +278,33 @@ final class CubanewsViewModel: ObservableObject {
             }
             print("❌ Failed to load feed:", error)
         }
+    }
+
+    private func performStartupCleanupIfNeeded() {
+        guard !didRunStartupCleanup else { return }
+        didRunStartupCleanup = true
+
+        let cutoff = Date().addingTimeInterval(-48 * 60 * 60)
+
+        // Remove old cached feed items based on FeedItem.isoDate
+        let isoFormatter = ISO8601DateFormatter()
+        let allCached = (try? modelContext.fetch(FetchDescriptor<CachedFeedItem>())) ?? []
+
+        for cached in allCached {
+            if let articleDate = isoFormatter.date(from: cached.feedItem.isoDate),
+               articleDate < cutoff {
+                modelContext.delete(cached)
+            }
+        }
+
+        try? modelContext.save()
+
+        // Clean image disk cache (48h)
+        Task.detached {
+            await ImageCache.shared.removeExpiredImages()
+        }
+
+        NSLog("➡️ \(TAG): Startup cache cleanup completed")
     }
 
     func fetchImage(feedItem: FeedItem) {
