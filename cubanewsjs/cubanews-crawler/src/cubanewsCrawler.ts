@@ -34,7 +34,10 @@ export abstract class CubanewsCrawler
   protected newsSource: NewsSource;
   protected enqueueLinkOptions: EnqueueLinksOptions = {};
 
-  constructor(newsSource: NewsSource, private storage?: FirebaseStorage) {
+  constructor(
+    newsSource: NewsSource,
+    private storage?: FirebaseStorage,
+  ) {
     super({
       requestHandler: (context) => {
         return this.requestHandlerX(context);
@@ -52,7 +55,7 @@ export abstract class CubanewsCrawler
       this.log.info(
         `Storage Bucket: ${
           this.storage.app.options.storageBucket?.toString() ?? "<ERROR>"
-        }`
+        }`,
       );
     }
   }
@@ -90,7 +93,7 @@ export abstract class CubanewsCrawler
     const response = await page.request.get(url);
     if (!response.ok()) {
       throw new Error(
-        `Failed to download image: ${response.status()} ${response.statusText()}`
+        `Failed to download image: ${response.status()} ${response.statusText()}`,
       );
     }
     const buffer = await response.body();
@@ -177,14 +180,14 @@ export abstract class CubanewsCrawler
             {
               title,
               url: request.loadedUrl,
-              updated: momentDate.unix(),
+              updated: momentDate.valueOf(),
               isoDate: momentDate.toISOString(),
               content: content,
               source: this.newsSource.name,
               image: imagePath,
             },
             this.datasetName,
-            process.env.NODE_ENV !== "dev"
+            process.env.NODE_ENV !== "dev",
           );
         }
       } else {
@@ -222,7 +225,7 @@ export abstract class CubanewsCrawler
   private async saveData(
     data: Dictionary,
     datasetName: string,
-    useActor: boolean = true
+    useActor: boolean = true,
   ): Promise<void> {
     if (useActor) {
       const dataset = await Actor.openDataset(datasetName);

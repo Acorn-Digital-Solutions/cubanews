@@ -3,6 +3,7 @@ import {
   Interaction,
   NewsItem,
   NewsSourceName,
+  RSSArticle,
 } from "../../interfaces";
 import { NextRequest, NextResponse } from "next/server";
 import { ApifyClient, Dataset } from "apify-client";
@@ -192,7 +193,10 @@ async function refreshFeed(): Promise<Array<RefreshFeedResult>> {
   return results;
 }
 
-function rssArticleToNewsItem(article: any, source: NewsSourceName): NewsItem {
+function rssArticleToNewsItem(
+  article: RSSArticle,
+  source: NewsSourceName,
+): NewsItem {
   return {
     id: 0, // Will be assigned by database
     title: article.title,
@@ -258,31 +262,6 @@ async function insertArticlesToFeed(
 
   return {
     datasetName: sourceName,
-    insertedRows: insertResult.numInsertedOrUpdatedRows?.valueOf() as bigint,
-  };
-}
-
-async function refreshFeedDataset(
-  dataset: Dataset,
-  feedRefreshDate: Date,
-): Promise<RefreshFeedResult> {
-  if (!dataset || !dataset.name) {
-    return { datasetName: "unknown", insertedRows: 0 };
-  }
-  const { items } = await client.dataset(dataset.id).listItems();
-  const newsItems = items
-    .map((item) => item as unknown)
-    .map((item) => item as NewsItem);
-  const values = newsItems
-    .filter((newsItem) => isNewsItemValid(newsItem))
-    .map((x) => newsItemToFeedTable(x, feedRefreshDate) as any);
-  const insertResult = await db
-    .insertInto("feed")
-    .values(values)
-    .executeTakeFirst();
-
-  return {
-    datasetName: dataset.name as string,
     insertedRows: insertResult.numInsertedOrUpdatedRows?.valueOf() as bigint,
   };
 }
