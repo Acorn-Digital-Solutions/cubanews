@@ -1,5 +1,5 @@
 import Parser from "rss-parser";
-import { RefreshFeedResult } from "../api/feed/route";
+import type { RefreshFeedResult } from "../api/feed/route";
 
 export type ResponseError = {
   message: string;
