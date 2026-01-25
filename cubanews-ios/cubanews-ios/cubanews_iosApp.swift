@@ -74,6 +74,8 @@ struct RootView: View {
         if remaining > 0 {
             try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
         }
+        NSLog("➡️: CUBANEWS_API \(Config.CUBANEWS_API)")
+        
 
         // If running under UI tests and a special flag is present, create a fake
         // UserPreferences object so the app behaves as if the user is already
