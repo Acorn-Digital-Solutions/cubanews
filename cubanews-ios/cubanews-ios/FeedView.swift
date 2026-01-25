@@ -39,15 +39,25 @@ struct FeedView: View {
                             }
                         }
                 }
-                if viewModel.isLoading {
-                    ProgressView()
-                        .padding()
-                }
             }
             .padding(.top)
         }
         .refreshable {
             viewModel.startFetch(reset: true)
+        }
+        .overlay {
+            if viewModel.isLoading {
+                VStack {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                        .scaleEffect(1.5)
+                        .padding(.top, 50)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .transition(.opacity)
+                .animation(.easeInOut, value: viewModel.isLoading)
+            }
         }
     }
 
