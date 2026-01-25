@@ -50,9 +50,12 @@ struct FeedView: View {
                 VStack {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .blue))
-                        .accessibilityLabel("Cargando noticias")
+                        .accessibilityLabel("Cargando")
                         .scaleEffect(1.5)
                         .padding(.top, 50)
+                    Text("Cargando")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                     Spacer()
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
