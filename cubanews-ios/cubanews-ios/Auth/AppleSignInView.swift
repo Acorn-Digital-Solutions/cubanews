@@ -135,8 +135,19 @@ struct AppleSignInView: View {
                         Auth.auth().signIn(with: firebaseCredential) { authResult, error in
                             if let error = error {
                                 NSLog("➡️ \(Self.TAG) Firebase sign-in failed: \(error.localizedDescription)")
+                                
+                                // Log failed Firebase authentication as a separate event
+                                AnalyticsService.shared.logEvent("firebase_auth_failed", parameters: [
+                                    "method": "apple",
+                                    "error": error.localizedDescription
+                                ])
+                                
                                 // Fallback: persist locally using whatever Apple provided
                                 persistPreferences(id: appleUserID, email: email, fullName: fullName, appleUserID: appleUserID)
+                                
+                                // Log successful login to analytics (Apple Sign In succeeded even though Firebase failed)
+                                AnalyticsService.shared.logLogin(method: "apple")
+                                AnalyticsService.shared.setUserId(appleUserID)
                                 return
                             }
 
