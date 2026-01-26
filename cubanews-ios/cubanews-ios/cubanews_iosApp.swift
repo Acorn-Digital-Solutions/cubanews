@@ -6,7 +6,12 @@
 import SwiftUI
 import FirebaseCore
 import FirebaseStorage
+import FirebaseAnalytics
 import SwiftData
+
+#if !DEBUG
+import LogRocket
+#endif
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     private static let TAG = "cubanews_iosApp"
@@ -19,8 +24,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     // Google Analytics is only active in Release builds
     Analytics.setAnalyticsCollectionEnabled(true)
     NSLog("📊 \(Self.TAG) Google Analytics enabled (Release build)")
+    
+    // Initialize LogRocket
+    // TODO: Replace with your actual LogRocket App ID from https://app.logrocket.com
+    AnalyticsService.shared.initializeLogRocket(appId: "nrgolf/calypso")
+    NSLog("📹 \(Self.TAG) LogRocket enabled (Release build)")
     #else
     print("🔍 \(Self.TAG) Google Analytics disabled (Debug build)")
+    print("🔍 \(Self.TAG) LogRocket disabled (Debug build)")
     #endif
     
     return true

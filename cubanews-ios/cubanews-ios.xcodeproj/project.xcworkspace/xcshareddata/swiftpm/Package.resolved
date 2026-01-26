@@ -1,5 +1,5 @@
 {
-  "originHash" : "35d22377e7a9d52df8f8f508657cba949a9e297284be1aac996fbdb837f62164",
+  "originHash" : "c51a746fd7ccb65420f5edbe4da4c919ce81229c335566494b44df83a291cb85",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -107,6 +107,15 @@
       "state" : {
         "revision" : "a0bc79961d7be727d258d33d5a6b2f1023270ba1",
         "version" : "1.22.5"
+      }
+    },
+    {
+      "identity" : "logrocket-ios-swift-package",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/LogRocket/logrocket-ios-swift-package",
+      "state" : {
+        "revision" : "8c4ecd0710bcaa7c852a4d7029cd8b8b51158d6a",
+        "version" : "1.60.0"
       }
     },
     {
