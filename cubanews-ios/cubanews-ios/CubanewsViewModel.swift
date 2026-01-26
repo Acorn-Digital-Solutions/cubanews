@@ -201,6 +201,8 @@ final class CubanewsViewModel: ObservableObject {
         // Prevent multiple simultaneous refreshes
         if reset {
             guard !refreshing else { return }
+            self.allItemsIds = []
+            self.moreNews = []
             currentPage = 1
             refreshing = true
         }
