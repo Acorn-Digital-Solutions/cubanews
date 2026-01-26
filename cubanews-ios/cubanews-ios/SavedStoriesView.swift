@@ -72,6 +72,9 @@ struct SavedStoriesView: View {
                     }
                 }
         }
+        .onAppear {
+            AnalyticsService.shared.logScreenView(screenName: "Saved Stories", screenClass: "SavedStoriesView")
+        }
     }
 }
 

@@ -75,6 +75,7 @@ struct FeedView: View {
         }.onAppear {
             NSLog("\(String(describing: type(of: self))) appeared")
             viewModel.loadPreferences()
+            AnalyticsService.shared.logScreenView(screenName: "Feed", screenClass: "FeedView")
         }.onChange(of: viewModel.selectedPublications) { oldValue, newValue in
             NSLog("\(String(describing: type(of: self))) selectedPublications changed - oldValue: \(Array(oldValue)), newValue: \(Array(newValue))")
             viewModel.loadPreferences()

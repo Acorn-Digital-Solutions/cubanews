@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1F120FB42F281A1E0013EBE5 /* LogRocket in Frameworks */ = {isa = PBXBuildFile; productRef = 1F120FB32F281A1E0013EBE5 /* LogRocket */; };
 		1FF5F5EC2EA40A7C001C9A75 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5EB2EA40A7C001C9A75 /* FirebaseAnalytics */; };
 		1FF5F5EE2EA40A7C001C9A75 /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5ED2EA40A7C001C9A75 /* FirebaseAnalyticsCore */; };
 		1FF5F5F02EA40A7C001C9A75 /* FirebaseAnalyticsIdentitySupport in Frameworks */ = {isa = PBXBuildFile; productRef = 1FF5F5EF2EA40A7C001C9A75 /* FirebaseAnalyticsIdentitySupport */; };
@@ -82,6 +83,7 @@
 				1FF5F5EC2EA40A7C001C9A75 /* FirebaseAnalytics in Frameworks */,
 				1FF5F5F42EA40A7C001C9A75 /* FirebaseCore in Frameworks */,
 				1FF5F5EE2EA40A7C001C9A75 /* FirebaseAnalyticsCore in Frameworks */,
+				1F120FB42F281A1E0013EBE5 /* LogRocket in Frameworks */,
 				1FF5F5F62EA40A7C001C9A75 /* FirebaseCrashlytics in Frameworks */,
 				1FF5F5F02EA40A7C001C9A75 /* FirebaseAnalyticsIdentitySupport in Frameworks */,
 				1FF5F5FA2EA40A7C001C9A75 /* FirebaseStorage in Frameworks */,
@@ -167,6 +169,7 @@
 				1FF5F5F72EA40A7C001C9A75 /* FirebaseFirestore */,
 				1FF5F5F92EA40A7C001C9A75 /* FirebaseStorage */,
 				1FF5F5FC2EA40A7D001C9A75 /* Cache */,
+				1F120FB32F281A1E0013EBE5 /* LogRocket */,
 			);
 			productName = "cubanews-ios";
 			productReference = 1FF5F5A72E9C245A001C9A75 /* cubanews-ios.app */;
@@ -253,6 +256,7 @@
 			packageReferences = (
 				1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				1FF5F5FD2EA40A7D001C9A75 /* XCRemoteSwiftPackageReference "Cache" */,
+				1F120FB22F281A1E0013EBE5 /* XCRemoteSwiftPackageReference "logrocket-ios-swift-package" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1FF5F5A82E9C245A001C9A75 /* Products */;
@@ -463,7 +467,7 @@
 				CODE_SIGN_ENTITLEMENTS = "cubanews-ios/cubanews-ios.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CUBANEWS_API = "http://localhost:3000/api";
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 2PUZ732K47;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -509,7 +513,7 @@
 				CODE_SIGN_ENTITLEMENTS = "cubanews-ios/cubanews-iosRelease.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CUBANEWS_API = "https://www.cubanews.icu/api";
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 2PUZ732K47;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -673,6 +677,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		1F120FB22F281A1E0013EBE5 /* XCRemoteSwiftPackageReference "logrocket-ios-swift-package" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/LogRocket/logrocket-ios-swift-package";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.60.0;
+			};
+		};
 		1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
@@ -692,6 +704,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1F120FB32F281A1E0013EBE5 /* LogRocket */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1F120FB22F281A1E0013EBE5 /* XCRemoteSwiftPackageReference "logrocket-ios-swift-package" */;
+			productName = LogRocket;
+		};
 		1FF5F5EB2EA40A7C001C9A75 /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 1FF5F5EA2EA40A7C001C9A75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
