@@ -147,6 +147,11 @@ struct AppleSignInView: View {
                             NSLog("➡️ \(Self.TAG) Firebase sign-in succeeded. uid: \(user?.uid ?? "<none>") email: \(firebaseEmail ?? "<none>")")
                             persistPreferences(id: user?.uid ?? appleUserID, email: firebaseEmail ?? email, fullName: displayName, appleUserID: appleUserID)
                             
+                            // Log successful login to analytics
+                            AnalyticsService.shared.logLogin(method: "apple")
+                            if let userId = user?.uid {
+                                AnalyticsService.shared.setUserId(userId)
+                            }
                         }
                     }
                 case .failure(let error):

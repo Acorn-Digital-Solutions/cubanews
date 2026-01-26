@@ -5,7 +5,6 @@
 //  Created by Sergio Navarrete on 12/10/2025.
 //
 
-
 import SwiftUI
 import UIKit
 import Combine
@@ -98,6 +97,10 @@ struct FeedItemView: View {
             // Title
             Button(action: {
                 if let url = URL(string: item.url) {
+                    AnalyticsService.shared.logArticleView(
+                        articleId: String(item.id),
+                        source: item.source.rawValue
+                    )
                     openURL(url)
                 }
             }) {
@@ -119,7 +122,14 @@ struct FeedItemView: View {
                 
                 // Save button
                 Button(action: {
+                    let wasSaved = cubanewsViewModel.isSaved(item.id)
                     cubanewsViewModel.toggleSaved(for: item.id)
+                    if !wasSaved {
+                        AnalyticsService.shared.logArticleSave(
+                            articleId: String(item.id),
+                            source: item.source.rawValue
+                        )
+                    }
                 }) {
                     Label("Guardar", systemImage: cubanewsViewModel.isSaved(item.id) ? "bookmark.fill" : "bookmark")
                         .labelStyle(.titleAndIcon)
@@ -128,6 +138,11 @@ struct FeedItemView: View {
                 }
                 // Share button
                 Button(action: {
+                    AnalyticsService.shared.logArticleShare(
+                        articleId: String(item.id),
+                        source: item.source.rawValue,
+                        method: "share_sheet"
+                    )
                     showingShareSheet = true
                 }) {
                     Label("Compartir", systemImage: "square.and.arrow.up")

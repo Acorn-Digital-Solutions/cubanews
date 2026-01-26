@@ -9,9 +9,20 @@ import FirebaseStorage
 import SwiftData
 
 class AppDelegate: NSObject, UIApplicationDelegate {
+    private static let TAG = "cubanews_iosApp"
+    
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
     FirebaseApp.configure()
+    
+    #if !DEBUG
+    // Google Analytics is only active in Release builds
+    Analytics.setAnalyticsCollectionEnabled(true)
+    NSLog("📊 \(Self.TAG) Google Analytics enabled (Release build)")
+    #else
+    print("🔍 \(Self.TAG) Google Analytics disabled (Debug build)")
+    #endif
+    
     return true
   }
 }
