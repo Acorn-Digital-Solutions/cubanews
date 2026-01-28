@@ -45,24 +45,6 @@ struct FeedView: View {
         .refreshable {
             viewModel.startFetch(reset: true)
         }
-        .overlay {
-            if viewModel.refreshing && viewModel.latestNews.isEmpty {
-                VStack {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .blue))
-                        .accessibilityLabel("Cargando")
-                        .scaleEffect(1.5)
-                        .padding(.top, 50)
-                    Text("Cargando")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .transition(.opacity)
-                .animation(.easeInOut, value: viewModel.refreshing)
-            }
-        }
     }
 
     var body: some View {
