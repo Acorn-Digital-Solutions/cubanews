@@ -194,13 +194,15 @@ final class CubanewsViewModel: ObservableObject {
     }
     
     private func shouldUpdateLatestNews(with itemIds: Set<Int64>) -> Bool {
-        // Update if latest news is empty or if new items contain IDs we don't have yet
+        // Always update if latest news is empty
         if self.latestNews.isEmpty {
             return true
         }
         let currentIds = Set(self.latestNews.map { $0.id })
-        // Check if there are any new IDs that we don't currently have
-        return !itemIds.isSubset(of: currentIds)
+        
+        // Update if there are new items we don't have, or if items have been removed from the server
+        // This ensures we stay in sync with the server's first page
+        return currentIds != itemIds
     }
     
     func sortFeedItems(a: FeedItem, b: FeedItem) -> Bool {
