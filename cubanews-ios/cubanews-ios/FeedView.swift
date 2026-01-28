@@ -46,7 +46,7 @@ struct FeedView: View {
             viewModel.startFetch(reset: true)
         }
         .overlay {
-            if viewModel.refreshing {
+            if viewModel.refreshing && viewModel.latestNews.isEmpty {
                 VStack {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .blue))
