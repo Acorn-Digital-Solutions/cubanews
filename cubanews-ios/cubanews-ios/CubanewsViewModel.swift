@@ -148,6 +148,13 @@ final class CubanewsViewModel: ObservableObject {
             NSLog("➡️ \(TAG) selectedPublications now contains: \(Array(selectedPublications))")
         }
     }
+    
+    func reloadPreferencesAndResort() {
+        loadPreferences()
+        // Re-sort the latestNews list with the updated preferences
+        self.latestNews = self.latestNews.sorted(by: sortFeedItems(a:b:))
+        NSLog("➡️ \(TAG) Re-sorted latestNews with updated preferences")
+    }
 
     private func loadSavedIds() {
         let items = (try? modelContext.fetch(FetchDescriptor<SavedItem>())) ?? []

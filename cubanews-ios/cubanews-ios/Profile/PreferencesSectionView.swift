@@ -14,6 +14,7 @@ struct PreferencesSectionView: View {
     @State private var selectedPublications: Set<String> = []
     @Environment(\.modelContext) private var modelContext
     @Query private var preferences: [UserPreferences]
+    @ObservedObject private var viewModel = CubanewsViewModel.shared
     
     private func togglePreference(_ publication: NewsSourceName) {
         let key = publication.rawValue
@@ -36,6 +37,8 @@ struct PreferencesSectionView: View {
             do {
                 try modelContext.save()
                 NSLog("  -> Saved successfully")
+                // Reload preferences and re-sort the feed immediately
+                viewModel.reloadPreferencesAndResort()
             } catch {
                 NSLog("  -> Error saving: \(error)")
             }
@@ -46,6 +49,8 @@ struct PreferencesSectionView: View {
             do {
                 try modelContext.save()
                 NSLog("  -> New preferences saved successfully")
+                // Reload preferences and re-sort the feed immediately
+                viewModel.reloadPreferencesAndResort()
             } catch {
                 NSLog("  -> Error saving new preferences: \(error)")
             }
