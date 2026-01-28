@@ -126,8 +126,18 @@ final class CubanewsViewModel: ObservableObject {
         self.modelContext = Self.sharedModelContainer.mainContext
         loadSavedIds()
         loadPreferences()
+        // Load cache immediately to show data fast on app launch
+        loadCachedItemsToLatestNews()
         Task.detached {
             await ImageCache.shared.removeExpiredImages()
+        }
+    }
+    
+    private func loadCachedItemsToLatestNews() {
+        let cachedItems = fetchItemsFromCache()
+        if !cachedItems.isEmpty {
+            NSLog("➡️ \(TAG): Loading \(cachedItems.count) items from cache on init")
+            self.latestNews = cachedItems.sorted(by: sortFeedItems(a:b:))
         }
     }
     
@@ -184,7 +194,15 @@ final class CubanewsViewModel: ObservableObject {
     }
     
     private func shouldUpdateLatestNews(with itemIds: Set<Int64>) -> Bool {
-        return self.latestNews.isEmpty || Set(self.latestNews.map { $0.id }).isDisjoint(with: itemIds)
+        // Always update if latest news is empty
+        if self.latestNews.isEmpty {
+            return true
+        }
+        let currentIds = Set(self.latestNews.map { $0.id })
+        
+        // Update if there are new items we don't have, or if items have been removed from the server
+        // This ensures we stay in sync with the server's first page
+        return currentIds != itemIds
     }
     
     func sortFeedItems(a: FeedItem, b: FeedItem) -> Bool {
@@ -201,8 +219,7 @@ final class CubanewsViewModel: ObservableObject {
         // Prevent multiple simultaneous refreshes
         if reset {
             guard !refreshing else { return }
-            self.allItemsIds = []
-            self.moreNews = []
+            // Don't clear allItemsIds or moreNews here - let the fetch handle updates
             currentPage = 1
             refreshing = true
         }
@@ -221,17 +238,14 @@ final class CubanewsViewModel: ObservableObject {
 
     private func fetchFeedItems() async {
         guard !isLoading else { return }
-        self.latestNews = self.latestNews.sorted(by: sortFeedItems(a:b:))
         NSLog("➡️ \(TAG): FetchingFeedItems_START")
-        if self.latestNews.isEmpty {
-            let cachedItems = fetchItemsFromCache()
-            NSLog("➡️ \(TAG): Cached items count: \(cachedItems.count)")
-            if cachedItems.count > 0 {
-                NSLog("➡️ \(TAG): Filling latest news from cache")
-                self.latestNews = cachedItems.sorted(by: sortFeedItems(a:b:))
-            }
+        
+        // If this is a reset (manual refresh), clear pagination state
+        if currentPage == 1 && refreshing {
+            self.allItemsIds = []
+            self.moreNews = []
         }
-
+        
         isLoading = true
         defer { isLoading = false }
         NSLog("➡️ \(TAG): FetchingFeedItemsFromWeb_START")
