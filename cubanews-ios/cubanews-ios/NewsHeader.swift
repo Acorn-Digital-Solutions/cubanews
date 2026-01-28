@@ -10,8 +10,8 @@ import SwiftUI
 public struct NewsHeader: View {
     var header: String
     var showDate: Bool = false
+    let todayLocalFormatted = Date().formatted(.dateTime.day().month(.wide).locale(Locale(identifier: "es_ES"))).capitalized(with: Locale(identifier: "es_ES"))
     
-    let todayLocalFormatted = Date().formatted(.dateTime.day().month(.wide))
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 12) {
