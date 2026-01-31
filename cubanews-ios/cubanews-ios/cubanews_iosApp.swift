@@ -69,11 +69,6 @@ struct RootView: View {
         return preferences.first
     }
     
-    private var isAuthenticated: Bool {
-        NSLog("➡️ \(Self.TAG) Checking authentication status")
-        return userPreferences?.appleUserID != nil && userPreferences?.appleUserID != UserPreferences.defaultID
-    }
-    
     var body: some View {
         Group {
             if isLoadingPreferences {
@@ -89,16 +84,7 @@ struct RootView: View {
     
     @MainActor
     private func launch() async {
-        let start = Date()
-        // Ensure the launch view is visible for at least 2 seconds
-        let elapsed = Date().timeIntervalSince(start)
-        let remaining = max(0, 1.0 - elapsed)
-        if remaining > 0 {
-            try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
-        }
         NSLog("➡️: CUBANEWS_API \(Config.CUBANEWS_API)")
-        
-
         // If running under UI tests and a special flag is present, create a fake
         // UserPreferences object so the app behaves as if the user is already
         // authenticated. This avoids tapping the real sign-in button in UI tests.
