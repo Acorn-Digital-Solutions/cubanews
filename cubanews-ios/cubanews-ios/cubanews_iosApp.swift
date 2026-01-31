@@ -53,6 +53,7 @@ struct RootView: View {
     @State private var isReady = false
     @State private var cubanewsViewModel: CubanewsViewModel?
     @Environment(\.modelContext) private var modelContext
+    let start = Date()
     
     var body: some View {
         Group {
@@ -70,9 +71,18 @@ struct RootView: View {
             // Perform lightweight initialization
             await viewModel.initialize()
             
+            
+            // Ensure the launch view is visible for at least 1 seconds
+            let elapsed = Date().timeIntervalSince(self.start)
+            let remaining = max(0, 1.0 - elapsed)
+            if remaining > 0 {
+                try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
+            }
             // Update state on main thread
             await MainActor.run {
                 self.cubanewsViewModel = viewModel
+                
+                NSLog("➡️: CUBANEWS_API \(Config.CUBANEWS_API)")
                 self.isReady = true
             }
             
