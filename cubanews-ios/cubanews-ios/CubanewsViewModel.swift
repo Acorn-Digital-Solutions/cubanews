@@ -90,20 +90,8 @@ struct FeedContent: Codable, Sendable {
 @available(iOS 17, *)
 @MainActor
 final class CubanewsViewModel: ObservableObject {
-    // Singleton shared instance
-    static let shared = CubanewsViewModel()
     let TAG = "CubanewsViewModel"
-    private static let sharedModelContainer: ModelContainer = {
-        do {
-            // ModelContainer initializer takes variadic model types; pass the type directly.
-            let schema = Schema([SavedItem.self, CachedFeedItem.self, UserPreferences.self])
-            return try ModelContainer(for: schema)
-        } catch {
-            let TAG = "CubanewsViewModel"
-            fatalError("➡️ \(TAG) Failed to create ModelContainer for SavedItem and CachedFeedItem: \(error)")
-        }
-    }()
-
+    
     private var currentPage: Int = 1
     private let pageSize: Int = 2
 
@@ -119,24 +107,32 @@ final class CubanewsViewModel: ObservableObject {
     private let modelContext: ModelContext
 
     private var didRunStartupCleanup = false
+    private var isInitialized = false
 
-    // Prevent external initialization
-    private init() {
-        // We're on the MainActor; safe to access the sharedModelContainer.mainContext here.
-        self.modelContext = Self.sharedModelContainer.mainContext
+    // Initialize with ModelContext from app level
+    init(modelContext: ModelContext) {
+        self.modelContext = modelContext
+    }
+    
+    // Call this after ViewModel is created to perform heavy initialization
+    func initialize() async {
+        guard !isInitialized else { return }
+        isInitialized = true
+        
         loadSavedIds()
         loadPreferences()
-        // Load cache immediately to show data fast on app launch
-        loadCachedItemsToLatestNews()
-        Task.detached {
+        await loadCachedItemsToLatestNews()
+        
+        // Defer image cache cleanup to background
+        Task.detached(priority: .background) {
             await ImageCache.shared.removeExpiredImages()
         }
     }
     
-    private func loadCachedItemsToLatestNews() {
-        let cachedItems = fetchItemsFromCache()
+    private func loadCachedItemsToLatestNews() async {
+        let cachedItems = await fetchItemsFromCache()
         if !cachedItems.isEmpty {
-            NSLog("➡️ \(TAG): Loading \(cachedItems.count) items from cache on init")
+            NSLog("➡️ \(TAG): Loading \(cachedItems.count) items from cache")
             self.latestNews = cachedItems.sorted(by: sortFeedItems(a:b:))
         }
     }
@@ -192,12 +188,16 @@ final class CubanewsViewModel: ObservableObject {
         return savedItemIds.contains(itemId)
     }
     
-    func fetchItemsFromCache() -> [FeedItem] {
+    private func fetchItemsFromCache() async -> [FeedItem] {
         NSLog("➡️ \(TAG): FetchingFeedItemsFromCache_START")
         let cachedItems = (try? modelContext.fetch(FetchDescriptor<CachedFeedItem>())) ?? []
-        cachedItems.forEach { fetchImage(feedItem: $0.feedItem) }
+        let items = cachedItems.map { $0.feedItem }
+        // Fetch images in background to avoid blocking
+        for item in items {
+            fetchImage(feedItem: item)
+        }
         NSLog("➡️ \(TAG): FetchingFeedItemsFromCache_END")
-        return cachedItems.map { $0.feedItem }
+        return items
     }
     
     private func shouldUpdateLatestNews(with itemIds: Set<Int64>) -> Bool {

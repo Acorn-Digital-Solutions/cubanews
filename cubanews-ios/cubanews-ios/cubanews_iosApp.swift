@@ -60,7 +60,7 @@ struct cubanews_iosApp: App {
 
 struct RootView: View {
     private static let TAG = "cubanews_iosApp"
-    @StateObject private var cubanewsViewModel = CubanewsViewModel.shared
+    @State private var cubanewsViewModel: CubanewsViewModel?
     @Query private var preferences: [UserPreferences]
     @State private var isLoadingPreferences: Bool = true
     @Environment(\.modelContext) private var modelContext
@@ -73,8 +73,8 @@ struct RootView: View {
         Group {
             if isLoadingPreferences {
                 AppLaunchView()
-            } else {
-                ContentView().environmentObject(cubanewsViewModel)
+            } else if let viewModel = cubanewsViewModel {
+                ContentView().environmentObject(viewModel)
             }
         }
         .task {
@@ -85,28 +85,39 @@ struct RootView: View {
     @MainActor
     private func launch() async {
         NSLog("➡️: CUBANEWS_API \(Config.CUBANEWS_API)")
-        // If running under UI tests and a special flag is present, create a fake
-        // UserPreferences object so the app behaves as if the user is already
-        // authenticated. This avoids tapping the real sign-in button in UI tests.
+        
+        // Initialize ViewModel with ModelContext
+        let viewModel = CubanewsViewModel(modelContext: modelContext)
+        self.cubanewsViewModel = viewModel
+        
+        // Perform async initialization
+        await viewModel.initialize()
+        
+        // Mark preferences as loaded
+        isLoadingPreferences = false
+        
+        // Handle test cleanup in background after app is visible
         if ProcessInfo.processInfo.environment["IS_RUNNING_UNIT_TESTS"] == "1" {
-            do {
-                try modelContext.fetch(FetchDescriptor<UserPreferences>())
-                    .forEach { modelContext.delete($0) }
-                
-                try modelContext.fetch(FetchDescriptor<SavedItem>())
-                    .forEach { modelContext.delete($0) }
-                
-                try modelContext.fetch(FetchDescriptor<CachedFeedItem>())
-                    .forEach { modelContext.delete($0) }
-                
-                try modelContext.save()
-                NSLog("✅ Local user data deleted")
-            } catch {
-                NSLog("❌ Failed to delete account: \(error)")
+            Task.detached(priority: .background) {
+                await MainActor.run {
+                    do {
+                        try modelContext.fetch(FetchDescriptor<UserPreferences>())
+                            .forEach { modelContext.delete($0) }
+                        
+                        try modelContext.fetch(FetchDescriptor<SavedItem>())
+                            .forEach { modelContext.delete($0) }
+                        
+                        try modelContext.fetch(FetchDescriptor<CachedFeedItem>())
+                            .forEach { modelContext.delete($0) }
+                        
+                        try modelContext.save()
+                        NSLog("✅ Local user data deleted")
+                    } catch {
+                        NSLog("❌ Failed to delete account: \(error)")
+                    }
+                }
             }
         }
-
-        isLoadingPreferences = false
     }
 
 }

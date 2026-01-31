@@ -11,7 +11,7 @@ import Combine
 
 @available(iOS 17, *)
 struct FeedView: View {
-    @ObservedObject private var viewModel = CubanewsViewModel.shared
+    @EnvironmentObject private var viewModel: CubanewsViewModel
         
     @available(iOS 17, *)
     private var content: some View {
