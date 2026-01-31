@@ -119,29 +119,30 @@ final class CubanewsViewModel: ObservableObject {
         guard !isInitialized else { return }
         isInitialized = true
         
-        loadSavedIds()
-        loadPreferences()
-        await loadCachedItemsToLatestNews()
+        // Load critical data first (lightweight, sync on main thread)
+        await MainActor.run {
+            loadSavedIds()
+            loadPreferences()
+        }
         
-        // Defer image cache cleanup to background
+        // Defer everything else - will load on first fetch
         Task.detached(priority: .background) {
             await ImageCache.shared.removeExpiredImages()
         }
     }
     
     private func loadCachedItemsToLatestNews() async {
-        let cachedItems = await fetchItemsFromCache()
+        let cachedItems = await fetchItemsFromCache(loadImages: false)
         if !cachedItems.isEmpty {
-            NSLog("➡️ \(TAG): Loading \(cachedItems.count) items from cache")
-            self.latestNews = cachedItems.sorted(by: sortFeedItems(a:b:))
+            await MainActor.run {
+                self.latestNews = cachedItems.sorted(by: sortFeedItems(a:b:))
+            }
         }
     }
     
     func loadPreferences() {
         if let userPrefs = ((try? modelContext.fetch(FetchDescriptor<UserPreferences>())) ?? []).first {
-            NSLog("➡️ \(TAG) Found preferences with \(userPrefs.preferredPublications.count) publications")
             selectedPublications = Set(userPrefs.preferredPublications)
-            NSLog("➡️ \(TAG) selectedPublications now contains: \(Array(selectedPublications))")
         }
     }
     
@@ -188,15 +189,15 @@ final class CubanewsViewModel: ObservableObject {
         return savedItemIds.contains(itemId)
     }
     
-    private func fetchItemsFromCache() async -> [FeedItem] {
-        NSLog("➡️ \(TAG): FetchingFeedItemsFromCache_START")
+    private func fetchItemsFromCache(loadImages: Bool = true) async -> [FeedItem] {
         let cachedItems = (try? modelContext.fetch(FetchDescriptor<CachedFeedItem>())) ?? []
         let items = cachedItems.map { $0.feedItem }
-        // Fetch images in background to avoid blocking
-        for item in items {
-            fetchImage(feedItem: item)
+        // Fetch images only if requested, defer for startup performance
+        if loadImages {
+            for item in items {
+                fetchImage(feedItem: item)
+            }
         }
-        NSLog("➡️ \(TAG): FetchingFeedItemsFromCache_END")
         return items
     }
     
@@ -245,7 +246,11 @@ final class CubanewsViewModel: ObservableObject {
 
     private func fetchFeedItems() async {
         guard !isLoading else { return }
-        NSLog("➡️ \(TAG): FetchingFeedItems_START")
+        
+        // Load cache on first fetch if latestNews is empty
+        if latestNews.isEmpty && currentPage == 1 {
+            await loadCachedItemsToLatestNews()
+        }
         
         // If this is a reset (manual refresh), clear pagination state
         if currentPage == 1 && refreshing {
@@ -255,7 +260,6 @@ final class CubanewsViewModel: ObservableObject {
         
         isLoading = true
         defer { isLoading = false }
-        NSLog("➡️ \(TAG): FetchingFeedItemsFromWeb_START")
         let urlString = "\(Config.CUBANEWS_API.trimmingCharacters(in: .whitespacesAndNewlines))/feed?page=\(currentPage)&pageSize=\(pageSize)"
         guard let url = URL(string: urlString) else { return }
 
@@ -276,19 +280,16 @@ final class CubanewsViewModel: ObservableObject {
                 if (currentPage > 1) {
                     self.moreNews.append(contentsOf: newItems)
                 } else if (shouldUpdateLatestNews(with: Set(newItems.map { $0.id }))) {
-                    NSLog("➡️ \(TAG): Updating Latest News")
                     self.latestNews = newItems.sorted(by: sortFeedItems(a:b:))
                     let existingCachedItems = (try? modelContext.fetch(FetchDescriptor<CachedFeedItem>())) ?? []
                     for item in existingCachedItems {
                         modelContext.delete(item)
                     }
                     // Insert new cached items
-                    NSLog("➡️ \(TAG): UpdatingCachedFeedItems_START")
                     for item in newItems {
                         let cachedItem = CachedFeedItem(feedItem: item)
                         modelContext.insert(cachedItem)
                     }
-                    NSLog("➡️ \(TAG): UpdatingCachedFeedItems_END")
                     // Perform a single save for all operations
                     try? modelContext.save()
                 }
@@ -298,7 +299,6 @@ final class CubanewsViewModel: ObservableObject {
                 }
             }
             newItems.forEach { fetchImage(feedItem: $0) }
-            NSLog("➡️ \(TAG): FetchingFeedItemsFromWeb_END")
         } catch is CancellationError {
             NSLog("➡️ \(TAG): Request was cancelled")
             return
