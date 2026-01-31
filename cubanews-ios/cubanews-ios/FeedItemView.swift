@@ -24,7 +24,7 @@ struct FeedItemView: View {
     let item: FeedItem
     @Environment(\.openURL) var openURL
     @State private var showingShareSheet = false
-    @ObservedObject private var cubanewsViewModel = CubanewsViewModel.shared
+    @EnvironmentObject private var cubanewsViewModel: CubanewsViewModel
 
     // Make the initializer explicit and internal so it's accessible from other views
     init(item: FeedItem) {

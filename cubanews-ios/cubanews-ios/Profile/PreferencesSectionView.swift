@@ -14,7 +14,7 @@ struct PreferencesSectionView: View {
     @State private var selectedPublications: Set<String> = []
     @Environment(\.modelContext) private var modelContext
     @Query private var preferences: [UserPreferences]
-    @ObservedObject private var viewModel = CubanewsViewModel.shared
+    @EnvironmentObject private var viewModel: CubanewsViewModel
     
     private func togglePreference(_ publication: NewsSourceName) {
         let key = publication.rawValue

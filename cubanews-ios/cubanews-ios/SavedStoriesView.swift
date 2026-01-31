@@ -8,32 +8,24 @@ import SwiftUI
 import Combine
 
 @available(iOS 17, *)
-@MainActor
-class SavedStoriesViewModel: ObservableObject {
-    @Published var items: [FeedItem] = []
-    @Published var isLoading: Bool = false
+struct SavedStoriesView: View {
+    @EnvironmentObject private var cubanewsViewModel: CubanewsViewModel
+    @State private var items: [FeedItem] = []
+    @State private var isLoading: Bool = false
     
-    private var cubanewsViewModel = CubanewsViewModel.shared
-
-    func loadSavedItems() -> Void {
+    private func loadSavedItems() {
         let allItems = cubanewsViewModel.getAllItems()
         let newItems = allItems.filter { cubanewsViewModel.savedItemIds.contains($0.id) }
         let newItemIds = newItems.map { $0.id }
         print("➡️ New Items ids: \(newItemIds)")
         items = allItems.filter { cubanewsViewModel.savedItemIds.contains($0.id) }
     }
-}
-
-@available(iOS 17, *)
-struct SavedStoriesView: View {
-    @StateObject private var viewModel = SavedStoriesViewModel()
-    @ObservedObject private var cubanewsViewModel = CubanewsViewModel.shared
 
     @ViewBuilder
     var content: some View {
-        if viewModel.items.isEmpty && viewModel.isLoading {
+        if items.isEmpty && isLoading {
             VStack { ProgressView().padding() }
-        } else if viewModel.items.isEmpty {
+        } else if items.isEmpty {
             VStack(spacing: 12) {
                 Image(systemName: "bookmark")
                     .font(.system(size: 40))
@@ -46,11 +38,11 @@ struct SavedStoriesView: View {
             ScrollView {
                 LazyVStack(spacing: 12) {
                     NewsHeader(header: "Guardados", showDate: false)
-                    ForEach(viewModel.items) { item in
+                    ForEach(items) { item in
                         FeedItemView(item: item)
                             .padding(.horizontal)
                     }
-                    if viewModel.isLoading {
+                    if isLoading {
                         ProgressView().padding()
                     }
                 }
@@ -64,11 +56,11 @@ struct SavedStoriesView: View {
             content
                 .background(Color(.systemBackground))
                 .task {
-                    viewModel.loadSavedItems()
+                    loadSavedItems()
                 }
                 .onChange(of: cubanewsViewModel.savedItemIds) { oldValue, newValue in
                     Task {
-                        viewModel.loadSavedItems()
+                        loadSavedItems()
                     }
                 }
         }

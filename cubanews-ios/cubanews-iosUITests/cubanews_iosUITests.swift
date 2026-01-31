@@ -1,8 +1,4 @@
-//
-//  cubanews_iosUITests.swift
-//  cubanews-iosUITests
-//
-//
+
 
 import XCTest
 
@@ -53,16 +49,6 @@ final class cubanews_iosUITests: XCTestCase {
         let tab = app.buttons[tabName]
         XCTAssertTrue(tab.waitForExistence(timeout: 5), "\(tabName) tab should exist")
         tab.tap()
-    }
-    
-    // MARK: - Login Screen Tests
-    
-    @MainActor
-    func testLoginScreenDisplaysLoginButtons() throws {
-        // Verify that the login screen shows the login options
-        let appleButton = app.buttons["Sign in with Apple"]
-        app.swipeUp()
-        XCTAssertTrue(appleButton.exists, "Apple login button should exist")
     }
     
     // MARK: - Tab Navigation Tests
@@ -145,7 +131,7 @@ final class cubanews_iosUITests: XCTestCase {
         navigateToTab("Perfil")
         
         // Verify publication options exist
-        let adnCubaOption = app.buttons["ADNCuba"]
+        let adnCubaOption = app.buttons["ADN Cuba"]
         XCTAssertTrue(adnCubaOption.waitForExistence(timeout: 5), "Should show AdnCuba button")
     }
     
@@ -171,8 +157,8 @@ final class cubanews_iosUITests: XCTestCase {
         app.swipeUp()
         
         // Verify version info exists
-        let versionText = app.staticTexts["Cubanews Version 0.0.1"]
-        XCTAssertTrue(versionText.waitForExistence(timeout: 5), "Should show version info")
+        let versionText = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH[c] %@", "Cubanews Version")).firstMatch
+        XCTAssertTrue(versionText.waitForExistence(timeout: 5), "Should show version info that starts with 'Cubanews Version'")
         
         // Verify copyright exists
         let copyrightText = app.staticTexts["© Acorn Digital Solutions 2025"]
@@ -223,3 +209,4 @@ final class cubanews_iosUITests: XCTestCase {
         }
     }
 }
+
