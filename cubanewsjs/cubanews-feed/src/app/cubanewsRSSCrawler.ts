@@ -453,3 +453,65 @@ export class AsereNoticiasRSSCrawler extends CubanewsRSSCrawler {
     return imageUrl;
   }
 }
+
+export class CubaNoticias360RSSCrawler extends CubanewsRSSCrawler {
+  constructor(storage?: FirebaseStorage) {
+    super(
+      {
+        name: NewsSourceName.CUBANOTICIAS360,
+        startUrls: new Set(["https://cubanoticias360.com"]),
+        rssFeed: "https://cubanoticias360.com/feed",
+        datasetName: NewsSourceName.CUBANOTICIAS360 + "-dataset",
+        parser: new Parser({
+          customFields: {
+            item: [
+              ["media:content", "media:content"],
+              ["media:thumbnail", "media:thumbnail"],
+              ["dc:creator", "creator"],
+              ["content:encoded", "content"],
+            ],
+          },
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            Accept: "application/rss+xml, application/xml, text/xml, */*",
+          },
+        }),
+      },
+      storage,
+    );
+  }
+
+  override tryGetMediaImage(item: any): string | null {
+    // Try to get image URL from RSS media fields or HTML content
+    let imageUrl: string | null = null;
+
+    // Try media:content first
+    const mediaContent = (item as any)["media:content"];
+    const mediaThumbnail = (item as any)["media:thumbnail"];
+
+    if (
+      mediaContent &&
+      typeof mediaContent === "object" &&
+      mediaContent.$?.url
+    ) {
+      imageUrl = mediaContent.$.url;
+    } else if (
+      mediaThumbnail &&
+      typeof mediaThumbnail === "object" &&
+      mediaThumbnail.$?.url
+    ) {
+      imageUrl = mediaThumbnail.$.url;
+    } else {
+      // Fallback: Try extracting from HTML description or content
+      const htmlContent = item.description || item.content || "";
+      const imgRegex = /<img[^>]+src=["']([^"']+)["']/i;
+      const match = htmlContent.match(imgRegex);
+      if (match && match[1]) {
+        imageUrl = match[1];
+      }
+    }
+
+    return imageUrl;
+  }
+}

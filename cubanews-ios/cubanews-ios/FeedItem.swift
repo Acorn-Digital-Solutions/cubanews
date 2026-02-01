@@ -18,6 +18,7 @@ enum NewsSourceName: String, Codable, CaseIterable {
     case HAVANATIMES
     case MARTINOTICIAS
     case PERIODICOCUBANO
+    case CUBANOTICIAS360
     case unknown
 
     init(from decoder: Decoder) throws {
@@ -47,6 +48,8 @@ enum NewsSourceName: String, Codable, CaseIterable {
             return "Martí Noticias"
         case .PERIODICOCUBANO:
             return "Periódico Cubano"
+        case .CUBANOTICIAS360:
+            return "CubaNoticias360"
         case .unknown: return "Unknown"
         }
     }
@@ -72,7 +75,9 @@ enum NewsSourceName: String, Codable, CaseIterable {
             return "martinoticias"
         case .PERIODICOCUBANO:
             return "periodicocubano"
-        case .unknown: 
+        case .CUBANOTICIAS360:
+            return "cubanoticias360"
+        case .unknown:
             return "cubanewsIdentity"
         }
     }
