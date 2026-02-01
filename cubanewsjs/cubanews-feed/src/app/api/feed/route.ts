@@ -13,6 +13,7 @@ import { newsItemToFeedTable } from "@/local/localFeedLib";
 import cubanewsApp from "@/app/cubanewsApp";
 import {
   AdnCubaRSSCrawler,
+  AsereNoticiasRSSCrawler,
   CatorceYMedioRSSCrawler,
   CibercubaRSSCrawler,
   CubanetRSSCrawler,
@@ -190,6 +191,10 @@ async function refreshFeed(
       source: NewsSourceName.CUBANOS_POR_EL_MUNDO,
     },
     { crawler: new CubanetRSSCrawler(), source: NewsSourceName.CUBANET },
+    {
+      crawler: new AsereNoticiasRSSCrawler(),
+      source: NewsSourceName.ASERE_NOTICIAS,
+    },
   ];
   const filteredCrawlers = crawlers.filter(({ source: src }) =>
     source === NewsSourceName.ALL ? true : src === source,

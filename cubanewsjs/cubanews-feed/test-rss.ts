@@ -1,5 +1,6 @@
 import {
   AdnCubaRSSCrawler,
+  AsereNoticiasRSSCrawler,
   CatorceYMedioRSSCrawler,
   CibercubaRSSCrawler,
   CubanetRSSCrawler,
@@ -84,6 +85,7 @@ async function testAllCrawlers(): Promise<void> {
       name: "Cubanos por el Mundo",
     },
     { instance: new CubanetRSSCrawler(), name: "Cubanet" },
+    { instance: new AsereNoticiasRSSCrawler(), name: "Asere Noticias" },
   ];
 
   for (const { instance, name } of crawlers) {
@@ -132,6 +134,10 @@ async function testRSS() {
           crawler = new CubanetRSSCrawler();
           name = "Cubanet";
           break;
+        case "asere":
+          crawler = new AsereNoticiasRSSCrawler();
+          name = "Asere Noticias";
+          break;
         default:
           throw new Error(
             `Unknown crawler: ${CRAWLER_TO_TEST}. Use: catorce, cibercuba, directorio, adncuba, marti, cubanos, cubanet, or all`,
@@ -140,7 +146,6 @@ async function testRSS() {
 
       await testSingleCrawler(crawler, name);
     }
-
     console.log("\n✅ All tests completed successfully!");
   } catch (error) {
     console.error("\n❌ Test suite failed!");
