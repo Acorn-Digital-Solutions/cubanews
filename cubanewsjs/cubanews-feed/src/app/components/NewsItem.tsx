@@ -49,6 +49,8 @@ function getImageLogoSrc(newsSourceName: NewsSourceName): string {
       return "/source_logos/martinoticias.png";
     case NewsSourceName.PERIODICO_CUBANO:
       return "/source_logos/periodicocubano.png";
+    case NewsSourceName.ASERE_NOTICIAS:
+      return "/source_logos/aserenoticias.jpeg";
     case NewsSourceName.ALL:
       return "";
   }
