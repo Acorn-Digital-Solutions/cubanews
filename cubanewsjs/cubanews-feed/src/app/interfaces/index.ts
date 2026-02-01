@@ -60,6 +60,7 @@ export enum NewsSourceName {
   MARTI_NOTICIAS = "martinoticias",
   CUBANOS_POR_EL_MUNDO = "cubanosporelmundo",
   ASERE_NOTICIAS = "aserenoticias",
+  CUBANOTICIAS360 = "cubanoticias360",
   // Special value used only for filtering crawlers / selecting all sources.
   // It is not expected to appear in NewsItem.source or getNewsSourceDisplayName.
   ALL = "all",
@@ -77,6 +78,7 @@ export enum NewsSourceDisplayName {
   MARTI_NOTICIAS = "Martí Noticias",
   CUBANOS_POR_EL_MUNDO = "Cubanos por el Mundo",
   ASERE_NOTICIAS = "Asere Noticias",
+  CUBANOTICIAS360 = "Cuba Noticias 360",
   EMPTY = "",
 }
 
@@ -118,6 +120,8 @@ export function getNewsSourceDisplayName(
       return NewsSourceDisplayName.CUBANOS_POR_EL_MUNDO;
     case NewsSourceName.ASERE_NOTICIAS:
       return NewsSourceDisplayName.ASERE_NOTICIAS;
+    case NewsSourceName.CUBANOTICIAS360:
+      return NewsSourceDisplayName.CUBANOTICIAS360;
     default:
       return NewsSourceDisplayName.EMPTY;
   }

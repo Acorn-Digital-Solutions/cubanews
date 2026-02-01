@@ -24,7 +24,7 @@ export class CubanewsApp {
   constructor() {
     console.log(
       "Initialising Cubanews App for environment, ",
-      process.env.LOCAL_ENV
+      process.env.LOCAL_ENV,
     );
     if (process.env.LOCAL_ENV === "development") {
       console.log("Using local database");

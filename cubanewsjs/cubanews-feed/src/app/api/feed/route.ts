@@ -6,7 +6,7 @@ import {
   RSSArticle,
 } from "../../interfaces";
 import { NextRequest, NextResponse } from "next/server";
-import { ApifyClient, Dataset } from "apify-client";
+import { ApifyClient } from "apify-client";
 import { sql } from "kysely";
 import { xOfEachSource } from "./feedStrategies";
 import { newsItemToFeedTable } from "@/local/localFeedLib";
@@ -18,6 +18,7 @@ import {
   CibercubaRSSCrawler,
   CubanetRSSCrawler,
   CubanosPorElMundoRSSCrawler,
+  CubaNoticias360RSSCrawler,
   DirectorioCubanoRSSCrawler,
   MartiNoticiasRSSCrawler,
 } from "@/app/cubanewsRSSCrawler";
@@ -194,6 +195,10 @@ async function refreshFeed(
     {
       crawler: new AsereNoticiasRSSCrawler(),
       source: NewsSourceName.ASERE_NOTICIAS,
+    },
+    {
+      crawler: new CubaNoticias360RSSCrawler(),
+      source: NewsSourceName.CUBANOTICIAS360,
     },
   ];
   const filteredCrawlers = crawlers.filter(({ source: src }) =>

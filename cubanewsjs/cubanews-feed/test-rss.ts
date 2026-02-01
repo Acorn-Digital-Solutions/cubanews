@@ -5,6 +5,7 @@ import {
   CibercubaRSSCrawler,
   CubanetRSSCrawler,
   CubanosPorElMundoRSSCrawler,
+  CubaNoticias360RSSCrawler,
   DirectorioCubanoRSSCrawler,
   MartiNoticiasRSSCrawler,
 } from "@/app/cubanewsRSSCrawler";
@@ -86,6 +87,7 @@ async function testAllCrawlers(): Promise<void> {
     },
     { instance: new CubanetRSSCrawler(), name: "Cubanet" },
     { instance: new AsereNoticiasRSSCrawler(), name: "Asere Noticias" },
+    { instance: new CubaNoticias360RSSCrawler(), name: "Cuba Noticias 360" },
   ];
 
   for (const { instance, name } of crawlers) {
@@ -137,6 +139,10 @@ async function testRSS() {
         case "asere":
           crawler = new AsereNoticiasRSSCrawler();
           name = "Asere Noticias";
+          break;
+        case "cubanoticias360":
+          crawler = new CubaNoticias360RSSCrawler();
+          name = "Cuba Noticias 360";
           break;
         default:
           throw new Error(
