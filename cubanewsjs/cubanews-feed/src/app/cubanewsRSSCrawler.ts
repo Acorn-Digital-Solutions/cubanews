@@ -485,6 +485,10 @@ export class CubaNoticias360RSSCrawler extends CubanewsRSSCrawler {
             "Upgrade-Insecure-Requests": "1",
           },
           timeout: 30000,
+          requestOptions: {
+            rejectUnauthorized: false,
+          },
+          timeout: 30000,
         }),
       },
       storage,
