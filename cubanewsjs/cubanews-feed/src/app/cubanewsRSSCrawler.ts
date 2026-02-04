@@ -54,7 +54,34 @@ abstract class CubanewsRSSCrawler {
       const parser = this.newsSource.parser;
       const articles: RSSArticle[] = [];
 
-      const feed = await parser.parseURL(this.newsSource.rssFeed);
+      // First, fetch the RSS feed to check what we're getting
+      const response = await fetch(this.newsSource.rssFeed);
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch RSS feed from ${this.newsSource.name}: ${response.status} ${response.statusText}`,
+        );
+      }
+
+      const contentType = response.headers.get("content-type");
+      const responseText = await response.text();
+
+      // Check if the response looks like XML
+      if (
+        !responseText.trim().startsWith("<?xml") &&
+        !responseText.trim().startsWith("<rss") &&
+        !responseText.trim().startsWith("<feed")
+      ) {
+        console.error(
+          `Invalid RSS feed response from ${this.newsSource.name}. Content-Type: ${contentType}. First 200 chars:`,
+          responseText.substring(0, 200),
+        );
+        throw new Error(
+          `RSS feed from ${this.newsSource.name} returned non-XML content. This might be a blocked request or the feed URL has changed.`,
+        );
+      }
+
+      const feed = await parser.parseString(responseText);
       // Get the latest 50 articles (or all if there are fewer than 50)
       const feedItems = feed.items.slice(0, limit);
 
