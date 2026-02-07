@@ -18,7 +18,7 @@ abstract class CubanewsRSSCrawler {
 
   constructor(
     newsSource: NewsSource,
-    private storage?: FirebaseStorage,
+    protected storage?: FirebaseStorage,
   ) {
     this.newsSource = newsSource;
     if (!storage) {
@@ -37,7 +37,7 @@ abstract class CubanewsRSSCrawler {
 
   protected abstract tryGetMediaImage(item: any): string | null;
 
-  private stripHtmlTags(html: string): string {
+  protected stripHtmlTags(html: string): string {
     if (!html) return "";
     // Remove HTML tags
     // Use cheerio to parse HTML and extract text content
