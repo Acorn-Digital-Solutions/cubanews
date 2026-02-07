@@ -220,6 +220,12 @@ async function refreshFeed(
       results.push(result);
     } catch (error) {
       console.error(`Error processing ${source}:`, error);
+      // Log more details about the error
+      if (error instanceof Error) {
+        console.error(`  Error name: ${error.name}`);
+        console.error(`  Error message: ${error.message}`);
+        console.error(`  Stack trace: ${error.stack}`);
+      }
       results.push({
         datasetName: source,
         insertedRows: 0,
