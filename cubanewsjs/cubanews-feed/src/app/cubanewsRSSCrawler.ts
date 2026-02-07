@@ -54,34 +54,7 @@ abstract class CubanewsRSSCrawler {
       const parser = this.newsSource.parser;
       const articles: RSSArticle[] = [];
 
-      // First, fetch the RSS feed to check what we're getting
-      const response = await fetch(this.newsSource.rssFeed);
-
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch RSS feed from ${this.newsSource.name}: ${response.status} ${response.statusText}`,
-        );
-      }
-
-      const contentType = response.headers.get("content-type");
-      const responseText = await response.text();
-
-      // Check if the response looks like XML
-      if (
-        !responseText.trim().startsWith("<?xml") &&
-        !responseText.trim().startsWith("<rss") &&
-        !responseText.trim().startsWith("<feed")
-      ) {
-        console.error(
-          `Invalid RSS feed response from ${this.newsSource.name}. Content-Type: ${contentType}. First 200 chars:`,
-          responseText.substring(0, 200),
-        );
-        throw new Error(
-          `RSS feed from ${this.newsSource.name} returned non-XML content. This might be a blocked request or the feed URL has changed.`,
-        );
-      }
-
-      const feed = await parser.parseString(responseText);
+      const feed = await parser.parseURL(this.newsSource.rssFeed);
       // Get the latest 50 articles (or all if there are fewer than 50)
       const feedItems = feed.items.slice(0, limit);
 
@@ -142,7 +115,13 @@ abstract class CubanewsRSSCrawler {
       console.log(JSON.stringify(articles, null, 2));
       return articles;
     } catch (error: any) {
-      console.error("Error fetching RSS feed:", error);
+      console.error(
+        `Error fetching RSS feed from ${this.newsSource.name}:`,
+        error,
+      );
+      if (error.message) {
+        console.error(`  Message: ${error.message}`);
+      }
       throw error;
     }
   }
@@ -516,6 +495,100 @@ export class CubaNoticias360RSSCrawler extends CubanewsRSSCrawler {
       },
       storage,
     );
+  }
+
+  override async getRSSContent(
+    uploadImages: boolean = true,
+    limit: number = 50,
+  ): Promise<RSSArticle[]> {
+    try {
+      const parser = this.newsSource.parser;
+      const articles: RSSArticle[] = [];
+
+      // Use fetch for CubaNoticias360 as it requires it
+      const response = await fetch(this.newsSource.rssFeed, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+          Accept: "application/rss+xml, application/xml, text/xml, */*",
+          "Accept-Language": "en-US,en;q=0.9,es;q=0.8",
+          Referer: "https://cubanoticias360.com/",
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch RSS feed: ${response.status} ${response.statusText}`,
+        );
+      }
+
+      const responseText = await response.text();
+      const feed = await parser.parseString(responseText);
+      const feedItems = feed.items.slice(0, limit);
+
+      // Process each article
+      for (const item of feedItems) {
+        if (!item.link) {
+          continue;
+        }
+        console.log("Processing Article:", item.link);
+        let imageUrl = this.tryGetMediaImage(item);
+
+        let imagePath: string | null = null;
+        if (imageUrl) {
+          try {
+            const imageName = Math.floor(Math.random() * 1000000) + 1;
+            console.info("Image URL from RSS:", imageUrl);
+
+            const imgResponse = await fetch(imageUrl);
+            if (!imgResponse.ok) {
+              throw new Error(
+                `Failed to download image: ${imgResponse.status} ${imgResponse.statusText}`,
+              );
+            }
+            const buffer = Buffer.from(await imgResponse.arrayBuffer());
+            const storagePath = `${imageStorageFolder}/${this.newsSource.name}/${imageName}`;
+            if (!this.storage) {
+              throw new Error("Firebase storage is not initialized.");
+            }
+            const storageRef = ref(this.storage, storagePath);
+            if (uploadImages) {
+              const uploadResult = await uploadBytes(storageRef, buffer);
+              console.info(`Image uploaded to ${uploadResult.ref.fullPath}`);
+            }
+            imagePath = `gs://cubanews-fbaad.firebasestorage.app/${storagePath}`;
+          } catch (error: any) {
+            console.error(`Error processing image for ${item.link}:`, error);
+          }
+        }
+
+        articles.push({
+          title: item.title || "",
+          link: item.link || "",
+          pubDate: item.pubDate || "",
+          author: item.creator || "",
+          categories: item.categories || [],
+          contentSnippet: this.stripHtmlTags(item.contentSnippet || ""),
+          content: this.stripHtmlTags(item.content || ""),
+          guid: item.guid || "",
+          isoDate: item.isoDate || "",
+          image: imagePath,
+        });
+      }
+      console.log(JSON.stringify(articles, null, 2));
+      return articles;
+    } catch (error: any) {
+      console.error(
+        `Error fetching RSS feed from ${this.newsSource.name}:`,
+        error,
+      );
+      if (error.message) {
+        console.error(`  Message: ${error.message}`);
+      }
+      throw error;
+    }
   }
 
   override tryGetMediaImage(item: any): string | null {
