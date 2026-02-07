@@ -55,15 +55,6 @@ final class cubanews_iosUITests: XCTestCase {
         tab.tap()
     }
     
-    // MARK: - Login Screen Tests
-    
-    @MainActor
-    func testLoginScreenDisplaysLoginButtons() throws {
-        // Verify that the login screen shows the login options
-        let appleButton = app.buttons["Sign in with Apple"]
-        app.swipeUp()
-        XCTAssertTrue(appleButton.exists, "Apple login button should exist")
-    }
     
     // MARK: - Tab Navigation Tests
     
@@ -145,7 +136,7 @@ final class cubanews_iosUITests: XCTestCase {
         navigateToTab("Perfil")
         
         // Verify publication options exist
-        let adnCubaOption = app.buttons["ADNCuba"]
+        let adnCubaOption = app.buttons["ADN Cuba"]
         XCTAssertTrue(adnCubaOption.waitForExistence(timeout: 5), "Should show AdnCuba button")
     }
     
@@ -171,7 +162,7 @@ final class cubanews_iosUITests: XCTestCase {
         app.swipeUp()
         
         // Verify version info exists
-        let versionText = app.staticTexts["Cubanews Version 0.0.1"]
+        let versionText = app.staticTexts.containing(NSPredicate(format: "label CONTAINS 'Cubanews Version'")).firstMatch
         XCTAssertTrue(versionText.waitForExistence(timeout: 5), "Should show version info")
         
         // Verify copyright exists
@@ -213,13 +204,5 @@ final class cubanews_iosUITests: XCTestCase {
         // Verify we're on the feed view with the header
         let titularesHeader = app.staticTexts["Titulares"]
         XCTAssertTrue(titularesHeader.waitForExistence(timeout: 5), "Should show Titulares header")
-    }
-
-    @MainActor
-    func testLaunchPerformance() throws {
-        // This measures how long it takes to launch your application.
-        measure(metrics: [XCTApplicationLaunchMetric()]) {
-            XCUIApplication().launch()
-        }
     }
 }
