@@ -90,20 +90,8 @@ struct FeedContent: Codable, Sendable {
 @available(iOS 17, *)
 @MainActor
 final class CubanewsViewModel: ObservableObject {
-    // Singleton shared instance
-    static let shared = CubanewsViewModel()
     let TAG = "CubanewsViewModel"
-    private static let sharedModelContainer: ModelContainer = {
-        do {
-            // ModelContainer initializer takes variadic model types; pass the type directly.
-            let schema = Schema([SavedItem.self, CachedFeedItem.self, UserPreferences.self])
-            return try ModelContainer(for: schema)
-        } catch {
-            let TAG = "CubanewsViewModel"
-            fatalError("➡️ \(TAG) Failed to create ModelContainer for SavedItem and CachedFeedItem: \(error)")
-        }
-    }()
-
+    
     private var currentPage: Int = 1
     private let pageSize: Int = 2
 
@@ -119,33 +107,42 @@ final class CubanewsViewModel: ObservableObject {
     private let modelContext: ModelContext
 
     private var didRunStartupCleanup = false
+    private var isInitialized = false
 
-    // Prevent external initialization
-    private init() {
-        // We're on the MainActor; safe to access the sharedModelContainer.mainContext here.
-        self.modelContext = Self.sharedModelContainer.mainContext
-        loadSavedIds()
-        loadPreferences()
-        // Load cache immediately to show data fast on app launch
-        loadCachedItemsToLatestNews()
-        Task.detached {
+    // Initialize with ModelContext from app level
+    init(modelContext: ModelContext) {
+        self.modelContext = modelContext
+    }
+    
+    // Call this after ViewModel is created to perform heavy initialization
+    func initialize() async {
+        guard !isInitialized else { return }
+        isInitialized = true
+        
+        // Load critical data first (lightweight, sync on main thread)
+        await MainActor.run {
+            loadSavedIds()
+            loadPreferences()
+        }
+        
+        // Defer everything else - will load on first fetch
+        Task.detached(priority: .background) {
             await ImageCache.shared.removeExpiredImages()
         }
     }
     
-    private func loadCachedItemsToLatestNews() {
-        let cachedItems = fetchItemsFromCache()
+    private func loadCachedItemsToLatestNews() async {
+        let cachedItems = await fetchItemsFromCache(loadImages: false)
         if !cachedItems.isEmpty {
-            NSLog("➡️ \(TAG): Loading \(cachedItems.count) items from cache on init")
-            self.latestNews = cachedItems.sorted(by: sortFeedItems(a:b:))
+            await MainActor.run {
+                self.latestNews = cachedItems.sorted(by: sortFeedItems(a:b:))
+            }
         }
     }
     
     func loadPreferences() {
         if let userPrefs = ((try? modelContext.fetch(FetchDescriptor<UserPreferences>())) ?? []).first {
-            NSLog("➡️ \(TAG) Found preferences with \(userPrefs.preferredPublications.count) publications")
             selectedPublications = Set(userPrefs.preferredPublications)
-            NSLog("➡️ \(TAG) selectedPublications now contains: \(Array(selectedPublications))")
         }
     }
     
@@ -192,12 +189,16 @@ final class CubanewsViewModel: ObservableObject {
         return savedItemIds.contains(itemId)
     }
     
-    func fetchItemsFromCache() -> [FeedItem] {
-        NSLog("➡️ \(TAG): FetchingFeedItemsFromCache_START")
+    private func fetchItemsFromCache(loadImages: Bool = true) async -> [FeedItem] {
         let cachedItems = (try? modelContext.fetch(FetchDescriptor<CachedFeedItem>())) ?? []
-        cachedItems.forEach { fetchImage(feedItem: $0.feedItem) }
-        NSLog("➡️ \(TAG): FetchingFeedItemsFromCache_END")
-        return cachedItems.map { $0.feedItem }
+        let items = cachedItems.map { $0.feedItem }
+        // Fetch images only if requested, defer for startup performance
+        if loadImages {
+            for item in items {
+                fetchImage(feedItem: item)
+            }
+        }
+        return items
     }
     
     private func shouldUpdateLatestNews(with itemIds: Set<Int64>) -> Bool {
@@ -245,7 +246,11 @@ final class CubanewsViewModel: ObservableObject {
 
     private func fetchFeedItems() async {
         guard !isLoading else { return }
-        NSLog("➡️ \(TAG): FetchingFeedItems_START")
+        
+        // Load cache on first fetch if latestNews is empty
+        if latestNews.isEmpty && currentPage == 1 {
+            await loadCachedItemsToLatestNews()
+        }
         
         // If this is a reset (manual refresh), clear pagination state
         if currentPage == 1 && refreshing {
@@ -255,7 +260,6 @@ final class CubanewsViewModel: ObservableObject {
         
         isLoading = true
         defer { isLoading = false }
-        NSLog("➡️ \(TAG): FetchingFeedItemsFromWeb_START")
         let urlString = "\(Config.CUBANEWS_API.trimmingCharacters(in: .whitespacesAndNewlines))/feed?page=\(currentPage)&pageSize=\(pageSize)"
         guard let url = URL(string: urlString) else { return }
 
@@ -276,19 +280,16 @@ final class CubanewsViewModel: ObservableObject {
                 if (currentPage > 1) {
                     self.moreNews.append(contentsOf: newItems)
                 } else if (shouldUpdateLatestNews(with: Set(newItems.map { $0.id }))) {
-                    NSLog("➡️ \(TAG): Updating Latest News")
                     self.latestNews = newItems.sorted(by: sortFeedItems(a:b:))
                     let existingCachedItems = (try? modelContext.fetch(FetchDescriptor<CachedFeedItem>())) ?? []
                     for item in existingCachedItems {
                         modelContext.delete(item)
                     }
                     // Insert new cached items
-                    NSLog("➡️ \(TAG): UpdatingCachedFeedItems_START")
                     for item in newItems {
                         let cachedItem = CachedFeedItem(feedItem: item)
                         modelContext.insert(cachedItem)
                     }
-                    NSLog("➡️ \(TAG): UpdatingCachedFeedItems_END")
                     // Perform a single save for all operations
                     try? modelContext.save()
                 }
@@ -298,7 +299,6 @@ final class CubanewsViewModel: ObservableObject {
                 }
             }
             newItems.forEach { fetchImage(feedItem: $0) }
-            NSLog("➡️ \(TAG): FetchingFeedItemsFromWeb_END")
         } catch is CancellationError {
             NSLog("➡️ \(TAG): Request was cancelled")
             return

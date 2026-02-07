@@ -165,6 +165,7 @@ struct PreferencePillButton: View {
             )
         }
         .buttonStyle(PlainButtonStyle())
+        .accessibilityIdentifier(publication.displayName)
     }
 }
 

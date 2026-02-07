@@ -11,7 +11,7 @@ import Combine
 
 @available(iOS 17, *)
 struct FeedView: View {
-    @ObservedObject private var viewModel = CubanewsViewModel.shared
+    @EnvironmentObject private var viewModel: CubanewsViewModel
         
     @available(iOS 17, *)
     private var content: some View {
@@ -22,6 +22,9 @@ struct FeedView: View {
                     FeedItemView(item: item)
                         .padding(.horizontal)
                         .onAppear {
+                            // Load image when item appears
+                            viewModel.fetchImage(feedItem: item)
+                            // Trigger pagination
                             if item == viewModel.latestNews.last {
                                 viewModel.startFetch()
                             }
@@ -51,16 +54,10 @@ struct FeedView: View {
         NavigationView {
             content
                 .background(Color(.systemBackground))
-                .task {
-                    viewModel.startFetch()
-                }
         }.onAppear {
-            NSLog("\(String(describing: type(of: self))) appeared")
-            viewModel.loadPreferences()
             AnalyticsService.shared.logScreenView(screenName: "Feed", screenClass: "FeedView")
-        }.onChange(of: viewModel.selectedPublications) { oldValue, newValue in
-            NSLog("\(String(describing: type(of: self))) selectedPublications changed - oldValue: \(Array(oldValue)), newValue: \(Array(newValue))")
-            viewModel.loadPreferences()
+            // Trigger initial fetch when view appears
+            viewModel.startFetch()
         }
     }
 }
