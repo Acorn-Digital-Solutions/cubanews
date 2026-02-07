@@ -26,7 +26,7 @@ export default function About() {
       .then((res) => {
         console.log(res);
         alert(
-          "Estamos borrando todos tus datos.\nWe are deleting all your data."
+          "Estamos borrando todos tus datos.\nWe are deleting all your data.",
         );
         setEmail("");
       })
@@ -148,7 +148,7 @@ export default function About() {
           Privacy
         </Typography>
         <Typography level="body-lg" sx={{ mb: 1 }}>
-          Cubanews keeps your personal data safe and it won't be shared third
+          Cubanews keeps your personal data safe and it will not be shared third
           parties. Read our full{" "}
           <a href="https://www.freeprivacypolicy.com/live/38c1b534-4ac4-4b6d-8c68-71f89805459f">
             privacy policy

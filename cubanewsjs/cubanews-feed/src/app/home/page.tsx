@@ -28,7 +28,7 @@ export default function Home() {
         localStorage.getItem("showSubscription") === null ||
           localStorage.getItem("showSubscription") === "true"
           ? true
-          : false
+          : false,
       );
       loadMoreData();
       return res.json();
@@ -41,7 +41,7 @@ export default function Home() {
 
   const { data, error, isLoading } = useSWR<FeedResponseData>(
     "/api/feed",
-    fetcher
+    fetcher,
   );
 
   const loadMoreData = () => {
@@ -61,7 +61,7 @@ export default function Home() {
     console.log(
       "scroll",
       Math.floor(window.innerHeight + document.documentElement.scrollTop),
-      Math.floor(document.documentElement.offsetHeight)
+      Math.floor(document.documentElement.offsetHeight),
     );
     if (
       Math.floor(window.innerHeight + document.documentElement.scrollTop) +
@@ -96,7 +96,7 @@ export default function Home() {
   if (!data) return null;
 
   function resolveNewsletterSubscription(
-    data: ResolveNewsletterSubscriptionData
+    data: ResolveNewsletterSubscriptionData,
   ) {
     const operation = data.operation;
     if (operation === "close") {
