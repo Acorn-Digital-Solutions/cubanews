@@ -10,6 +10,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,6 +42,10 @@ import com.acorn.cubanews.ui.theme.CubanewsTheme
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
 import com.acorn.cubanews.profile.ProfileComposable
+import com.acorn.cubanews.saved.SavedItemsComposable
+import com.acorn.cubanews.saved.SavedItemsViewModel
+import com.acorn.cubanews.services.ServicesComposable
+import com.acorn.cubanews.services.ServicesViewModel
 import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
@@ -55,12 +62,16 @@ class MainActivity : ComponentActivity() {
 }
 
 sealed class Screen(val route: String, val icon: ImageVector, val label: String) {
-    object Home : Screen("home", Icons.Filled.Home, "Home")
-    object Profile : Screen("profile", Icons.Filled.Person, "Profile")
+    object Home : Screen("home", Icons.Filled.Home, "Titulares")
+    object Saved : Screen("saved", Icons.Filled.Bookmark, "Guardados")
+    object Services : Screen("services", Icons.Filled.GridOn, "Servicios")
+    object Profile : Screen("profile", Icons.Filled.Person, "Perfil")
 }
 
 val bottomNavItems = listOf(
     Screen.Home,
+    Screen.Saved,
+    Screen.Services,
     Screen.Profile
 )
 
@@ -122,6 +133,8 @@ fun Material3BottomNavApp() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) { HomeScreen() }
+            composable(Screen.Saved.route) { SavedScreen() }
+            composable(Screen.Services.route) { ServicesScreen() }
             composable(Screen.Profile.route) { ProfileScreen() }
         }
     }
@@ -131,6 +144,27 @@ fun Material3BottomNavApp() {
 fun HomeScreen() {
     Surface(modifier = Modifier.fillMaxSize()) {
         FeedComposable(viewModel(FeedViewModel::class))
+    }
+}
+
+@Composable
+fun SavedScreen() {
+    val context = LocalContext.current
+    val feedViewModel: FeedViewModel = viewModel()
+    Surface(modifier = Modifier.fillMaxSize()) {
+        SavedItemsComposable(
+            viewModel = SavedItemsViewModel(
+                context = context,
+                feedViewModel = feedViewModel
+            )
+        )
+    }
+}
+
+@Composable
+fun ServicesScreen() {
+    Surface(modifier = Modifier.fillMaxSize()) {
+        ServicesComposable(viewModel = viewModel())
     }
 }
 
