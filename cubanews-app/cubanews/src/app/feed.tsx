@@ -2,11 +2,10 @@ import { AnimatedIcon } from "@/components/animated-icon";
 import { HintRow } from "@/components/hint-row";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { WebBadge } from "@/components/web-badge";
 import { styles } from "@/styles/cubanews-styles";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function NewsFeed() {
+export default function Feed() {
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
@@ -24,7 +23,7 @@ export default function NewsFeed() {
         <ThemedView type="backgroundElement" style={styles.stepContainer}>
           <HintRow
             title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
+            hint={<ThemedText type="code">src/app/feed.tsx</ThemedText>}
           />
         </ThemedView>
       </SafeAreaView>
