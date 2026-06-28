@@ -1,8 +1,8 @@
 import { FeedItem } from "@/models/feed-model";
 import { ScrollView, View } from "react-native";
 import { useEffect, useState } from "react";
-import { ThemedText } from "./themed-text";
 import { FeedService } from "@/services/feed-service";
+import FeedItemCard from "./feed-item-card";
 
 export default function InfinityColumn() {
   const [feedItems, setFeedItems] = useState([] as FeedItem[]);
@@ -43,8 +43,8 @@ export default function InfinityColumn() {
   return (
     <ScrollView>
       <View style={{ gap: 8 }}>
-        {feedItems.map((item, index) => (
-          <ThemedText key={index}>{item.title}</ThemedText>
+        {feedItems.map((item) => (
+          <FeedItemCard key={item.id} item={item} />
         ))}
       </View>
     </ScrollView>
