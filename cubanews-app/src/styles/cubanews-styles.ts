@@ -18,7 +18,8 @@ export const styles = StyleSheet.create({
   heroSection: {
     alignItems: "center",
     justifyContent: "center",
-    flex: 1,
+    alignSelf: "stretch",
+    paddingVertical: Spacing.three,
     paddingHorizontal: Spacing.four,
     gap: Spacing.four,
   },
