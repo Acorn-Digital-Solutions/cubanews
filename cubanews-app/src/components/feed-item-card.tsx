@@ -12,66 +12,112 @@ import {
   View,
   ActivityIndicator,
   Image,
+  type ImageSourcePropType,
 } from "react-native";
 import { useMemo, useState } from "react";
 import { ThemedText } from "./themed-text";
+import { getLocales } from "expo-localization";
+import moment from "moment";
+
+require("moment/locale/es");
 
 type FeedItemCardProps = {
   item: FeedItem;
 };
 
-const SOURCE_LABELS: Record<NewsSourceName, string> = {
-  adncuba: "ADN Cuba",
-  catorceymedio: "14ymedio",
-  diariodecuba: "Diario de Cuba",
-  cibercuba: "CiberCuba",
-  eltoque: "elTOQUE",
-  cubanet: "CubaNet",
-};
+function getSourceInfo(source: NewsSourceName): {
+  sourceLabel: string;
+  sourceImage?: ImageSourcePropType;
+} {
+  switch (source) {
+    case "adncuba":
+      return {
+        sourceLabel: "ADN Cuba",
+        sourceImage: require("../../assets/images/sources/adncuba.jpg"),
+      };
+    case "aserenoticias":
+      return {
+        sourceLabel: "Asere Noticias",
+        sourceImage: require("../../assets/images/sources/aserenoticias.jpeg"),
+      };
+    case "catorceymedio":
+      return {
+        sourceLabel: "14yMedio",
+        sourceImage: require("../../assets/images/sources/catorceymedio.jpg"),
+      };
+    case "cibercuba":
+      return {
+        sourceLabel: "CiberCuba",
+        sourceImage: require("../../assets/images/sources/cibercuba.png"),
+      };
+    case "cubanet":
+      return {
+        sourceLabel: "CubaNet",
+        sourceImage: require("../../assets/images/sources/cubanet.png"),
+      };
+    case "cubanosporelmundo":
+      return {
+        sourceLabel: "Cubanos por el Mundo",
+        sourceImage: require("../../assets/images/sources/cubanosporelmundo.jpg"),
+      };
+    case "diariodecuba":
+      return {
+        sourceLabel: "Diario de Cuba",
+        sourceImage: require("../../assets/images/sources/ddc.jpg"),
+      };
+    case "eltoque":
+      return {
+        sourceLabel: "elTOQUE",
+        sourceImage: require("../../assets/images/sources/eltoque.png"),
+      };
+    case "cubanoticias360":
+      return {
+        sourceLabel: "Cuba Noticias 360",
+        sourceImage: require("../../assets/images/sources/cubanoticias360.jpeg"),
+      };
+    case "directoriocubano":
+      return {
+        sourceLabel: "Directorio Cubano",
+        sourceImage: require("../../assets/images/sources/directoriocubano.png"),
+      };
+    case "havanatimes":
+      return {
+        sourceLabel: "Havana Times",
+        sourceImage: require("../../assets/images/sources/havanatimes.jpeg"),
+      };
+    case "martinoticias":
+      return {
+        sourceLabel: "Marti Noticias",
+        sourceImage: require("../../assets/images/sources/martinoticias.png"),
+      };
+    case "periodicocubano":
+      return {
+        sourceLabel: "Periodico Cubano",
+        sourceImage: require("../../assets/images/sources/periodicocubano.png"),
+      };
+    default:
+      return { sourceLabel: source };
+  }
+}
 
-function getRelativeTimeLabel(isoDate: string): string {
-  const parsed = new Date(isoDate);
-
-  if (Number.isNaN(parsed.getTime())) {
+function getRelativeTimeLabel(isoDate: string, locale: string): string {
+  const parsed = moment(isoDate);
+  if (!parsed.isValid()) {
     return "ahora";
   }
-
-  const diffMs = parsed.getTime() - Date.now();
-  const minuteMs = 60 * 1000;
-  const hourMs = 60 * minuteMs;
-  const dayMs = 24 * hourMs;
-
-  if (Math.abs(diffMs) < minuteMs) {
-    return "ahora";
-  }
-
-  if (Math.abs(diffMs) < hourMs) {
-    const minutes = Math.round(Math.abs(diffMs) / minuteMs);
-    const unit = minutes === 1 ? "minuto" : "minutos";
-    return diffMs < 0 ? `hace ${minutes} ${unit}` : `en ${minutes} ${unit}`;
-  }
-
-  if (Math.abs(diffMs) < dayMs) {
-    const hours = Math.round(Math.abs(diffMs) / hourMs);
-    const unit = hours === 1 ? "hora" : "horas";
-    return diffMs < 0 ? `hace ${hours} ${unit}` : `en ${hours} ${unit}`;
-  }
-
-  const days = Math.round(Math.abs(diffMs) / dayMs);
-  const unit = days === 1 ? "dia" : "dias";
-  return diffMs < 0 ? `hace ${days} ${unit}` : `en ${days} ${unit}`;
+  return parsed.locale(locale).fromNow();
 }
 
 export default function FeedItemCard({ item }: FeedItemCardProps) {
   const theme = useTheme();
   const [isSaved, setIsSaved] = useState(false);
+  const deviceLanguage = getLocales()[0].languageCode ?? "es";
+  const { sourceLabel, sourceImage } = getSourceInfo(item.source);
 
   const relativeTime = useMemo(
-    () => getRelativeTimeLabel(item.isoDate),
-    [item.isoDate],
+    () => getRelativeTimeLabel(item.isoDate, deviceLanguage),
+    [item.isoDate, deviceLanguage],
   );
-  const sourceLabel = SOURCE_LABELS[item.source] ?? item.source;
-  const sourceBadgeText = sourceLabel.slice(0, 2).toUpperCase();
   const hasImage = Boolean(item.image && item.image.length > 0);
 
   const openArticle = async () => {
@@ -105,7 +151,9 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
               { backgroundColor: theme.backgroundSelected },
             ]}
           >
-            <ThemedText type="smallBold">{sourceBadgeText}</ThemedText>
+            {sourceImage ? (
+              <Image source={sourceImage} style={{ width: 20, height: 20 }} />
+            ) : null}
           </View>
           <ThemedText type="smallBold" themeColor="textSecondary">
             {sourceLabel}
@@ -173,6 +221,7 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
     shadowOffset: { width: 0, height: 1 },
     elevation: 2,
+    height: 280,
   },
   headerRow: {
     alignItems: "center",
@@ -194,7 +243,7 @@ const styles = StyleSheet.create({
   imagePlaceholder: {
     alignItems: "center",
     borderRadius: 8,
-    height: 120,
+    height: 100,
     justifyContent: "center",
   },
   imageContainer: {

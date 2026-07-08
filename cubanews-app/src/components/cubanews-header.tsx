@@ -1,10 +1,12 @@
 import { styles } from "@/styles/cubanews-styles";
 import moment from "moment";
 import { Image } from "react-native";
-import { ThemedView } from "../themed-view";
-import { ThemedText } from "../themed-text";
+import { ThemedView } from "./themed-view";
+import { ThemedText } from "./themed-text";
+import { getLocales } from "expo-localization";
 
 export function CubanewsHeader() {
+  const deviceLanguage = getLocales()[0].languageCode ?? "es";
   return (
     <ThemedView>
       <ThemedView
@@ -21,7 +23,9 @@ export function CubanewsHeader() {
           Titulares
         </ThemedText>
       </ThemedView>
-      <ThemedText type="subtitle">{moment().format("D MMMM")}</ThemedText>
+      <ThemedText type="subtitle">
+        {moment().locale(deviceLanguage).format("dddd, D MMMM")}
+      </ThemedText>
     </ThemedView>
   );
 }

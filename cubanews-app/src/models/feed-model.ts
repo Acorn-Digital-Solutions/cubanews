@@ -1,10 +1,17 @@
 export enum NewsSourceName {
   ADNCUBA = "adncuba",
+  ASERENOTICIAS = "aserenoticias",
   CATORCEYMEDIO = "catorceymedio",
-  DIARIODECUBA = "diariodecuba",
   CIBERCUBA = "cibercuba",
-  ELTOQUE = "eltoque",
   CUBANET = "cubanet",
+  CUBANOSPORELMUNDO = "cubanosporelmundo",
+  CUBANOTICIAS360 = "cubanoticias360",
+  DIARIODECUBA = "diariodecuba",
+  directoriocubano = "directoriocubano",
+  ELTOQUE = "eltoque",
+  HAVANATIMES = "havanatimes",
+  MARTINOTICIAS = "martinoticias",
+  PERIODICOCUBANO = "periodicocubano",
 }
 
 export interface InteractionData {

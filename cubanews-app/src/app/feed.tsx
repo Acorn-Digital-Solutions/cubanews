@@ -1,6 +1,6 @@
 import FeedItemCard from "@/components/feed-item-card";
 import { ThemedView } from "@/components/themed-view";
-import { CubanewsHeader } from "@/components/ui/cubanews-header";
+import { CubanewsHeader } from "@/components/cubanews-header";
 import { WebBadge } from "@/components/web-badge";
 import { FeedItem } from "@/models/feed-model";
 import { FeedService } from "@/services/feed-service";
