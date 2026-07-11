@@ -8,54 +8,20 @@ import { styles } from "@/styles/cubanews-styles";
 import { useState, useEffect } from "react";
 import { Platform, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ThemedText } from "@/components/themed-text";
 
-export default function Feed() {
-  const [feedItems, setFeedItems] = useState([] as FeedItem[]);
-  const [refreshFeed, setRefreshFeed] = useState(true);
-
-  useEffect(() => {
-    if (!refreshFeed) {
-      return;
-    }
-
-    let isMounted = true;
-
-    const loadFeed = async () => {
-      try {
-        const feedService: FeedService = new FeedService();
-        const result = await feedService.fetchFeedItems({
-          page: 1,
-          pageSize: 10,
-        });
-
-        if (isMounted) {
-          setFeedItems(result.items);
-        }
-      } finally {
-        if (isMounted) {
-          setRefreshFeed(false);
-        }
-      }
-    };
-
-    loadFeed();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [refreshFeed]);
+export default function Profile() {
+  useEffect(() => {});
 
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         {Platform.OS === "web" && <WebBadge />}
         <ThemedView style={{ flex: 1, alignSelf: "stretch" }}>
-          <CubanewsHeader />
+          <CubanewsHeader text="Perfil" showDate={false} />
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ gap: 8 }}>
             <View style={{ gap: 8 }}>
-              {feedItems.map((item) => (
-                <FeedItemCard key={item.id} item={item} />
-              ))}
+              <ThemedText>Perfil</ThemedText>
             </View>
           </ScrollView>
         </ThemedView>

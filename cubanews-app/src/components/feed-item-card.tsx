@@ -4,6 +4,7 @@ import {
   type NewsSourceName,
 } from "@/models/feed-model";
 import { useTheme } from "@/hooks/use-theme";
+
 import {
   Linking,
   Pressable,
@@ -194,6 +195,7 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
       <View style={styles.actionRow}>
         <View style={styles.actionSpacer} />
         <Pressable onPress={() => setIsSaved((prev) => !prev)}>
+          
           <ThemedText
             type="small"
             themeColor={isSaved ? "text" : "textSecondary"}
@@ -243,7 +245,7 @@ const styles = StyleSheet.create({
   imagePlaceholder: {
     alignItems: "center",
     borderRadius: 8,
-    height: 100,
+    height: 120,
     justifyContent: "center",
   },
   imageContainer: {

@@ -1,98 +1,65 @@
-import * as Device from "expo-device";
-import { Platform, StyleSheet } from "react-native";
+import FeedItemCard from "@/components/feed-item-card";
+import { ThemedView } from "@/components/themed-view";
+import { CubanewsHeader } from "@/components/cubanews-header";
+import { WebBadge } from "@/components/web-badge";
+import { FeedItem } from "@/models/feed-model";
+import { FeedService } from "@/services/feed-service";
+import { styles } from "@/styles/cubanews-styles";
+import { useState, useEffect } from "react";
+import { Platform, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AnimatedIcon } from "@/components/animated-icon";
-import { HintRow } from "@/components/hint-row";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { WebBadge } from "@/components/web-badge";
-import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
+export default function Feed() {
+  const [feedItems, setFeedItems] = useState([] as FeedItem[]);
+  const [refreshFeed, setRefreshFeed] = useState(true);
 
-function getDevMenuHint() {
-  if (Platform.OS === "web") {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === "android" ? "cmd+m (or ctrl+m)" : "cmd+d";
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+  useEffect(() => {
+    if (!refreshFeed) {
+      return;
+    }
 
-export default function HomeScreen() {
+    let isMounted = true;
+
+    const loadFeed = async () => {
+      try {
+        const feedService: FeedService = new FeedService();
+        const result = await feedService.fetchFeedItems({
+          page: 1,
+          pageSize: 10,
+        });
+
+        if (isMounted) {
+          setFeedItems(result.items);
+        }
+      } finally {
+        if (isMounted) {
+          setRefreshFeed(false);
+        }
+      }
+    };
+
+    loadFeed();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [refreshFeed]);
+
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp; Cubanews
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
         {Platform.OS === "web" && <WebBadge />}
+        <ThemedView style={{ flex: 1, alignSelf: "stretch" }}>
+          <CubanewsHeader text="Titulares" />
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ gap: 8 }}>
+            <View style={{ gap: 8 }}>
+              {feedItems.map((item) => (
+                <FeedItemCard key={item.id} item={item} />
+              ))}
+            </View>
+          </ScrollView>
+        </ThemedView>
       </SafeAreaView>
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    flexDirection: "row",
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: "center",
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: "center",
-    justifyContent: "center",
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: "center",
-  },
-  code: {
-    textTransform: "uppercase",
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: "stretch",
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
-});

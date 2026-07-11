@@ -5,7 +5,12 @@ import { ThemedView } from "./themed-view";
 import { ThemedText } from "./themed-text";
 import { getLocales } from "expo-localization";
 
-export function CubanewsHeader() {
+type CubanewsHeaderProp = {
+  text: string;
+  showDate?: boolean;
+};
+
+export function CubanewsHeader({ text, showDate = true }: CubanewsHeaderProp) {
   const deviceLanguage = getLocales()[0].languageCode ?? "es";
   return (
     <ThemedView>
@@ -20,12 +25,16 @@ export function CubanewsHeader() {
           style={{ width: 60, height: 60, borderRadius: 6 }}
         />
         <ThemedText type="title" style={styles.title}>
-          Titulares
+          {text}
         </ThemedText>
       </ThemedView>
-      <ThemedText type="subtitle">
-        {moment().locale(deviceLanguage).format("dddd, D MMMM")}
-      </ThemedText>
+      {showDate ? (
+        <ThemedText type="subtitle">
+          {moment().locale(deviceLanguage).format("dddd, D MMMM")}
+        </ThemedText>
+      ) : (
+        <></>
+      )}
     </ThemedView>
   );
 }
