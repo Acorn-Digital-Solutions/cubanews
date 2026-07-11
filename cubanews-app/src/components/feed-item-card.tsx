@@ -224,14 +224,14 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
         <ThemedText style={styles.title}>{item.title}</ThemedText>
       </Pressable>
 
-      <View
+      {/* <View
         style={[
           styles.separator,
           { backgroundColor: theme.backgroundSelected },
         ]}
-      />
+      /> */}
 
-      <View style={styles.actionRow}>
+      {/* <View style={styles.actionRow}>
         <View style={styles.actionSpacer} />
         <Pressable onPress={() => setIsSaved((prev) => !prev)}>
           <ThemedText
@@ -246,7 +246,7 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
             Compartir
           </ThemedText>
         </Pressable>
-      </View>
+      </View> */}
     </View>
   );
 }
@@ -261,7 +261,6 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
     shadowOffset: { width: 0, height: 1 },
     elevation: 2,
-    height: 280,
   },
   headerRow: {
     alignItems: "center",

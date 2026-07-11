@@ -50,13 +50,11 @@ export default function Feed() {
       <SafeAreaView style={styles.safeArea}>
         {Platform.OS === "web" && <WebBadge />}
         <ThemedView style={{ flex: 1, alignSelf: "stretch" }}>
-          <CubanewsHeader text="Titulares" />
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ gap: 8 }}>
-            <View style={{ gap: 8 }}>
-              {feedItems.map((item) => (
-                <FeedItemCard key={item.id} item={item} />
-              ))}
-            </View>
+            <CubanewsHeader text="Titulares" />
+            {feedItems.map((item) => (
+              <FeedItemCard key={item.id} item={item} />
+            ))}
           </ScrollView>
         </ThemedView>
       </SafeAreaView>
