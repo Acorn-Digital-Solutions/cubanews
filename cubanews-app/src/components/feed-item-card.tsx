@@ -15,7 +15,7 @@ import {
   Image,
   type ImageSourcePropType,
 } from "react-native";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ThemedText } from "./themed-text";
 import { getLocales } from "expo-localization";
 import moment from "moment";
@@ -109,11 +109,18 @@ function getRelativeTimeLabel(isoDate: string, locale: string): string {
   return parsed.locale(locale).fromNow();
 }
 
+function loadImage(item: FeedItem) {
+  console.log(item.image);
+}
+
 export default function FeedItemCard({ item }: FeedItemCardProps) {
   const theme = useTheme();
   const [isSaved, setIsSaved] = useState(false);
   const deviceLanguage = getLocales()[0].languageCode ?? "es";
   const { sourceLabel, sourceImage } = getSourceInfo(item.source);
+  const [imageLoadingState, setImageLoadingState] = useState(
+    item.imageLoadingState,
+  );
 
   const relativeTime = useMemo(
     () => getRelativeTimeLabel(item.isoDate, deviceLanguage),
@@ -142,6 +149,11 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
     });
   };
 
+  useEffect(() => {
+    loadImage(item);
+    setImageLoadingState(ImageLoadingState.LOADED);
+  });
+
   return (
     <View style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
       <View style={styles.headerRow}>
@@ -165,16 +177,18 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
         </ThemedText>
       </View>
 
-      {hasImage && item.imageLoadingState === ImageLoadingState.LOADING ? (
+      {hasImage && imageLoadingState === ImageLoadingState.LOADING ? (
         <View style={styles.imagePlaceholder}>
           <ActivityIndicator />
         </View>
       ) : null}
 
-      {hasImage && item.imageLoadingState !== ImageLoadingState.LOADING ? (
+      {hasImage && imageLoadingState !== ImageLoadingState.LOADING ? (
         <Pressable onPress={openArticle} style={styles.imageContainer}>
           <Image
-            source={{ uri: item.image ?? undefined }}
+            source={{
+              uri: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==",
+            }}
             resizeMode="cover"
             style={styles.image}
           />
@@ -195,7 +209,6 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
       <View style={styles.actionRow}>
         <View style={styles.actionSpacer} />
         <Pressable onPress={() => setIsSaved((prev) => !prev)}>
-          
           <ThemedText
             type="small"
             themeColor={isSaved ? "text" : "textSecondary"}

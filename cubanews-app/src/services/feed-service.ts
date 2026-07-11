@@ -4,6 +4,8 @@ import {
   NewsSourceName,
 } from "@/models/feed-model";
 
+import { getStorage, ref } from "@react-native-firebase/storage";
+
 type ApiFeedItem = {
   id?: number;
   title?: string;
@@ -63,7 +65,6 @@ export class FeedService {
     existingIds = new Set<number>(),
     signal,
   }: FetchFeedItemsParams): Promise<FetchFeedItemsResult> {
-
     const url = `${this.apiBaseUrl}/feed?page=${page}&pageSize=${pageSize}`;
     const response = await fetch(url, { method: "GET", redirect: "follow" });
 
@@ -86,6 +87,10 @@ export class FeedService {
       allIds,
       hasNewItems: newItems.length > 0,
     };
+  }
+
+  async fetchImage(item: FeedItem): Promise<string> {
+    return "base64-image-data";
   }
 
   private toFeedItem(rawItem: ApiFeedItem): FeedItem {

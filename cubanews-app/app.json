@@ -2,15 +2,19 @@
   "expo": {
     "name": "cubanews",
     "slug": "cubanews",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "cubanews",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "bundleIdentifier": "com.acorn.cubanews",
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
+      "package": "com.acorn.cubanews",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -35,7 +39,30 @@
           }
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-firebase/crashlytics",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "forceStaticLinking": [
+              "RNFBAnalytics",
+              "RNFBApp",
+              "RNFBAppCheck",
+              "RNFBAuth",
+              "RNFBCrashlytics",
+              "RNFBFirestore",
+              "RNFBMessaging",
+              "RNFBRemoteConfig",
+              "RNFBStorage",
+              "RNFBSomeOtherRNFBModuleYouAreUsing"
+            ]
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
