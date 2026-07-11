@@ -19,6 +19,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ThemedText } from "./themed-text";
 import { getLocales } from "expo-localization";
 import moment from "moment";
+import { FeedService } from "@/services/feed-service";
 
 require("moment/locale/es");
 
@@ -109,8 +110,10 @@ function getRelativeTimeLabel(isoDate: string, locale: string): string {
   return parsed.locale(locale).fromNow();
 }
 
-function loadImage(item: FeedItem) {
+async function loadImage(item: FeedItem): Promise<string> {
+  const feedSevice = new FeedService();
   console.log(item.image);
+  return feedSevice.fetchImage(item);
 }
 
 export default function FeedItemCard({ item }: FeedItemCardProps) {
@@ -121,6 +124,7 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
   const [imageLoadingState, setImageLoadingState] = useState(
     item.imageLoadingState,
   );
+  const [mainImage, setMainImage] = useState("");
 
   const relativeTime = useMemo(
     () => getRelativeTimeLabel(item.isoDate, deviceLanguage),
@@ -150,8 +154,19 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
   };
 
   useEffect(() => {
-    loadImage(item);
-    setImageLoadingState(ImageLoadingState.LOADED);
+    loadImage(item)
+      .then((imageBase64) => {
+        if (imageBase64) {
+          setImageLoadingState(ImageLoadingState.LOADED);
+          setMainImage(imageBase64);
+        } else {
+          setImageLoadingState(ImageLoadingState.FAILED);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setImageLoadingState(ImageLoadingState.FAILED);
+      });
   });
 
   return (

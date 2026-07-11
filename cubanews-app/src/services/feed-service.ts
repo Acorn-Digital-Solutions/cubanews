@@ -4,7 +4,15 @@ import {
   NewsSourceName,
 } from "@/models/feed-model";
 
-import { getStorage, ref } from "@react-native-firebase/storage";
+import base64 from "react-native-base64";
+import {
+  FirebaseApp,
+  FirebaseOptions,
+  getApp,
+  getApps,
+  initializeApp,
+} from "firebase/app";
+import { getBytes, getStorage, ref } from "firebase/storage";
 
 type ApiFeedItem = {
   id?: number;
@@ -51,12 +59,14 @@ type FetchFeedItemsResult = {
 
 export class FeedService {
   private readonly apiBaseUrl: string;
+  private readonly firebaseApp: FirebaseApp | null;
 
   constructor(
     apiBaseUrl: string = process.env.EXPO_PUBLIC_CUBANEWS_API ??
       "https://www.cubanews.icu/api",
   ) {
     this.apiBaseUrl = apiBaseUrl.trim().replace(/\/+$/, "");
+    this.firebaseApp = this.createFirebaseApp();
   }
 
   async fetchFeedItems({
@@ -90,7 +100,55 @@ export class FeedService {
   }
 
   async fetchImage(item: FeedItem): Promise<string> {
-    return "base64-image-data";
+    if (!item.image || !this.firebaseApp) {
+      return "";
+    }
+
+    return "";
+  }
+
+  private createFirebaseApp(): FirebaseApp | null {
+    const config = this.getFirebaseConfig();
+    if (!config) {
+      return null;
+    }
+
+    if (getApps().length > 0) {
+      return getApp();
+    }
+
+    return initializeApp(config);
+  }
+
+  private getFirebaseConfig(): FirebaseOptions | null {
+    const {
+      EXPO_PUBLIC_FIREBASE_API_KEY,
+      EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+      EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+      EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+      EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+      EXPO_PUBLIC_FIREBASE_APP_ID,
+    } = process.env;
+
+    if (
+      !EXPO_PUBLIC_FIREBASE_API_KEY ||
+      !EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN ||
+      !EXPO_PUBLIC_FIREBASE_PROJECT_ID ||
+      !EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+      !EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ||
+      !EXPO_PUBLIC_FIREBASE_APP_ID
+    ) {
+      return null;
+    }
+
+    return {
+      apiKey: EXPO_PUBLIC_FIREBASE_API_KEY,
+      authDomain: EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+      projectId: EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+      storageBucket: EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+      appId: EXPO_PUBLIC_FIREBASE_APP_ID,
+    };
   }
 
   private toFeedItem(rawItem: ApiFeedItem): FeedItem {
