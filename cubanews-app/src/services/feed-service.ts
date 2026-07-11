@@ -99,14 +99,6 @@ export class FeedService {
     };
   }
 
-  async fetchImage(item: FeedItem): Promise<string> {
-    if (!item.image || !this.firebaseApp) {
-      return "";
-    }
-
-    return "";
-  }
-
   private createFirebaseApp(): FirebaseApp | null {
     const config = this.getFirebaseConfig();
     if (!config) {

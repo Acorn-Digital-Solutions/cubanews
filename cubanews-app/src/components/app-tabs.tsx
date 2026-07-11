@@ -1,5 +1,6 @@
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { useColorScheme } from "react-native";
+import { getApps, initializeApp } from "firebase/app";
 
 import { Colors } from "@/constants/theme";
 

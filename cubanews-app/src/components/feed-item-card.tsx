@@ -4,6 +4,8 @@ import {
   type NewsSourceName,
 } from "@/models/feed-model";
 import { useTheme } from "@/hooks/use-theme";
+import { app } from "@/constants/firebaseConfig";
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 import {
   Linking,
@@ -19,7 +21,6 @@ import { useEffect, useMemo, useState } from "react";
 import { ThemedText } from "./themed-text";
 import { getLocales } from "expo-localization";
 import moment from "moment";
-import { FeedService } from "@/services/feed-service";
 
 require("moment/locale/es");
 
@@ -110,10 +111,19 @@ function getRelativeTimeLabel(isoDate: string, locale: string): string {
   return parsed.locale(locale).fromNow();
 }
 
+// Resolves the image as a URL that can be rendered by React Native Image.
 async function loadImage(item: FeedItem): Promise<string> {
-  const feedSevice = new FeedService();
-  console.log(item.image);
-  return feedSevice.fetchImage(item);
+  if (!item.image) {
+    return "";
+  }
+
+  try {
+    const imagePathOrUrl = item.image.trim();
+    return await getDownloadURL(ref(getStorage(app), imagePathOrUrl));
+  } catch (error) {
+    console.error(error);
+    return "";
+  }
 }
 
 export default function FeedItemCard({ item }: FeedItemCardProps) {
@@ -155,10 +165,10 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
 
   useEffect(() => {
     loadImage(item)
-      .then((imageBase64) => {
-        if (imageBase64) {
+      .then((imageUrl) => {
+        if (imageUrl) {
           setImageLoadingState(ImageLoadingState.LOADED);
-          setMainImage(imageBase64);
+          setMainImage(imageUrl);
         } else {
           setImageLoadingState(ImageLoadingState.FAILED);
         }
@@ -202,7 +212,7 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
         <Pressable onPress={openArticle} style={styles.imageContainer}>
           <Image
             source={{
-              uri: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==",
+              uri: mainImage,
             }}
             resizeMode="cover"
             style={styles.image}
