@@ -13,26 +13,28 @@ import { ThemedText } from "@/components/themed-text";
 const PAGE_SIZE = 2;
 
 export default function Feed() {
-  const [feedItems, setFeedItems] = useState([] as FeedItem[]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [headlineItems, setHeadlineItems] = useState([] as FeedItem[]);
+  const [moreStories, setMoreStories] = useState([] as FeedItem[]);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMoreData, setHasMoreData] = useState(true);
   const allIdsRef = useRef(new Set<number>());
   const feedServiceRef = useRef(new FeedService());
-  const pageRef = useRef(1);
-  const isLoadingRef = useRef(false);
+  const nextMoreStoriesPageRef = useRef(2);
+  const isLoadingMoreRef = useRef(false);
   const hasMoreDataRef = useRef(true);
 
-  const loadNextPage = useCallback(async () => {
-    if (isLoadingRef.current || !hasMoreDataRef.current) {
+  const loadMoreStories = useCallback(async () => {
+    if (isLoadingMoreRef.current || !hasMoreDataRef.current) {
       return;
     }
 
-    isLoadingRef.current = true;
-    setIsLoading(true);
+    isLoadingMoreRef.current = true;
+    setIsLoadingMore(true);
 
     try {
       const result = await feedServiceRef.current.fetchFeedItems({
-        page: pageRef.current,
+        page: nextMoreStoriesPageRef.current,
         pageSize: PAGE_SIZE,
         existingIds: allIdsRef.current,
       });
@@ -45,24 +47,53 @@ export default function Feed() {
         return;
       }
 
-      setFeedItems((previousItems) => [...previousItems, ...result.items]);
-      pageRef.current += 1;
+      setMoreStories((previousItems) => [...previousItems, ...result.items]);
+      nextMoreStoriesPageRef.current += 1;
     } finally {
-      isLoadingRef.current = false;
-      setIsLoading(false);
+      isLoadingMoreRef.current = false;
+      setIsLoadingMore(false);
     }
   }, []);
 
   useEffect(() => {
-    loadNextPage();
+    let isMounted = true;
+
+    const initializeFeed = async () => {
+      try {
+        const headlineResult = await feedServiceRef.current.fetchFeedItems({
+          page: 1,
+          pageSize: PAGE_SIZE,
+          existingIds: allIdsRef.current,
+        });
+
+        if (!isMounted) {
+          return;
+        }
+
+        allIdsRef.current = headlineResult.allIds;
+        setHeadlineItems(headlineResult.items);
+
+        await loadMoreStories();
+      } finally {
+        if (isMounted) {
+          setIsInitializing(false);
+        }
+      }
+    };
+
+    initializeFeed();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const renderFooter = () => {
-    if (isLoading && feedItems.length > 0) {
+    if (isLoadingMore && moreStories.length > 0) {
       return <ActivityIndicator style={{ marginVertical: 12 }} />;
     }
 
-    if (!hasMoreData && feedItems.length > 0) {
+    if (!hasMoreData && moreStories.length > 0) {
       return (
         <ThemedText style={{ textAlign: "center", marginVertical: 12 }}>
           No hay mas historias
@@ -73,23 +104,35 @@ export default function Feed() {
     return null;
   };
 
+  const renderHeader = () => {
+    return (
+      <View style={{ gap: 8 }}>
+        <CubanewsHeader text="Titulares" />
+        {headlineItems.map((item) => (
+          <FeedItemCard key={item.id} item={item} />
+        ))}
+        <ThemedText type="subtitle">Mas Historias</ThemedText>
+      </View>
+    );
+  };
+
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         {Platform.OS === "web" && <WebBadge />}
         <ThemedView style={{ flex: 1, alignSelf: "stretch" }}>
           <FlatList
-            data={feedItems}
+            data={moreStories}
             keyExtractor={(item) => String(item.id)}
             contentContainerStyle={{ gap: 8 }}
             renderItem={({ item }) => <FeedItemCard item={item} />}
-            ListHeaderComponent={<CubanewsHeader text="Titulares" />}
+            ListHeaderComponent={renderHeader}
             ListFooterComponent={renderFooter}
-            onEndReached={loadNextPage}
+            onEndReached={loadMoreStories}
             onEndReachedThreshold={0.4}
             showsVerticalScrollIndicator={false}
           />
-          {isLoading && feedItems.length === 0 ? (
+          {isInitializing ? (
             <View style={{ marginTop: 16 }}>
               <ActivityIndicator />
             </View>
