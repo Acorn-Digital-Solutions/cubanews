@@ -20,6 +20,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { ThemedText } from "./themed-text";
 import { getLocales } from "expo-localization";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
 import moment from "moment";
 
 require("moment/locale/es");
@@ -167,6 +168,10 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
     console.log("Like Article");
   };
 
+  const comment = async () => {
+    console.log("Comment");
+  };
+
   useEffect(() => {
     loadImage(item)
       .then((imageUrl) => {
@@ -236,22 +241,27 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
       />
 
       <View style={styles.actionRow}>
-        <View style={styles.actionSpacer} />
-        {/* <Pressable onPress={() => setIsSaved((prev) => !prev)}>
-          <ThemedText
-            type="small"
-            themeColor={isSaved ? "text" : "textSecondary"}
-          >
-            {isSaved ? "Guardar ✓" : "Guardar"}
-          </ThemedText>
-        </Pressable> */}
-        <Pressable>
-          <ThemedText onPress={likeArticle}>Interesante</ThemedText>
+        <Pressable onPress={likeArticle}>
+          <MaterialDesignIcons
+            name="thumb-up-outline"
+            size={20}
+            color={theme.textSecondary}
+          />
         </Pressable>
+        <Pressable onPress={comment}>
+          <MaterialDesignIcons
+            name="comment-outline"
+            size={20}
+            color={theme.textSecondary}
+          />
+        </Pressable>
+        <View style={styles.actionSpacer} />
         <Pressable onPress={shareArticle}>
-          <ThemedText type="small" themeColor="textSecondary">
-            Compartir
-          </ThemedText>
+          <MaterialDesignIcons
+            name="share-variant"
+            size={20}
+            color={theme.textSecondary}
+          />
         </Pressable>
       </View>
     </View>
