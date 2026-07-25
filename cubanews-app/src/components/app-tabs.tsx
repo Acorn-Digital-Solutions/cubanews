@@ -14,7 +14,7 @@ export default function AppTabs() {
       indicatorColor={colors.backgroundElement}
       labelStyle={{ selected: { color: colors.text } }}
     >
-      <NativeTabs.Trigger name="index">
+      <NativeTabs.Trigger name="index" disableAutomaticContentInsets>
         <NativeTabs.Trigger.Label>Titulares</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           src={require("@/assets/images/tabIcons/home.png")}
@@ -22,7 +22,7 @@ export default function AppTabs() {
         />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="profile">
+      <NativeTabs.Trigger name="profile" disableAutomaticContentInsets>
         <NativeTabs.Trigger.Label>Perfil</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           src={require("@/assets/images/tabIcons/home.png")}

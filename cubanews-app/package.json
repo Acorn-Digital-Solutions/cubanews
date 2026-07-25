@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@expo/ui": "~56.0.21",
+    "@react-native-vector-icons/material-design-icons": "^13.1.2",
     "expo": "~56.0.15",
     "expo-build-properties": "~56.0.22",
     "expo-constants": "~56.0.20",

@@ -118,7 +118,7 @@ export default function Feed() {
 
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
         {Platform.OS === "web" && <WebBadge />}
         <ThemedView style={{ flex: 1, alignSelf: "stretch" }}>
           <FlatList

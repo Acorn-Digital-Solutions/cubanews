@@ -163,6 +163,10 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
     });
   };
 
+  const likeArticle = async () => {
+    console.log("Like Article");
+  };
+
   useEffect(() => {
     loadImage(item)
       .then((imageUrl) => {
@@ -224,29 +228,32 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
         <ThemedText style={styles.title}>{item.title}</ThemedText>
       </Pressable>
 
-      {/* <View
+      <View
         style={[
           styles.separator,
           { backgroundColor: theme.backgroundSelected },
         ]}
-      /> */}
+      />
 
-      {/* <View style={styles.actionRow}>
+      <View style={styles.actionRow}>
         <View style={styles.actionSpacer} />
-        <Pressable onPress={() => setIsSaved((prev) => !prev)}>
+        {/* <Pressable onPress={() => setIsSaved((prev) => !prev)}>
           <ThemedText
             type="small"
             themeColor={isSaved ? "text" : "textSecondary"}
           >
             {isSaved ? "Guardar ✓" : "Guardar"}
           </ThemedText>
+        </Pressable> */}
+        <Pressable>
+          <ThemedText onPress={likeArticle}>Interesante</ThemedText>
         </Pressable>
         <Pressable onPress={shareArticle}>
           <ThemedText type="small" themeColor="textSecondary">
             Compartir
           </ThemedText>
         </Pressable>
-      </View> */}
+      </View>
     </View>
   );
 }

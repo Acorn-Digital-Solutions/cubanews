@@ -1,4 +1,4 @@
-import { Spacing, BottomTabInset, MaxContentWidth } from "@/constants/theme";
+import { Spacing, MaxContentWidth } from "@/constants/theme";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
@@ -12,16 +12,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: Spacing.four,
     alignItems: "center",
     gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
     maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "stretch",
-    paddingVertical: Spacing.three,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
   },
   title: {
     textAlign: "center",
