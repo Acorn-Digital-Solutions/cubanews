@@ -26,6 +26,17 @@ export default function AppTabs() {
           }
         />
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="social" disableAutomaticContentInsets>
+        <NativeTabs.Trigger.Label>Social</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          src={
+            <NativeTabs.Trigger.VectorIcon
+              family={MaterialDesignIcons}
+              name="account-group"
+            />
+          }
+        />
+      </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="profile" disableAutomaticContentInsets>
         <NativeTabs.Trigger.Label>Perfil</NativeTabs.Trigger.Label>
