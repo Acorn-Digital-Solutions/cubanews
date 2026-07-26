@@ -12,7 +12,7 @@ export default function AppTabs() {
     <NativeTabs
       backgroundColor={colors.background}
       indicatorColor={colors.backgroundElement}
-      iconColor={{ default: "#000000", selected: "#000000" }}
+      iconColor={{ default: colors.textSecondary, selected: colors.text }}
       labelStyle={{ selected: { color: colors.text } }}
     >
       <NativeTabs.Trigger name="index" disableAutomaticContentInsets>
