@@ -96,7 +96,7 @@ export default function Feed() {
     if (!hasMoreData && moreStories.length > 0) {
       return (
         <ThemedText style={{ textAlign: "center", marginVertical: 12 }}>
-          No hay mas historias
+          No hay más historias
         </ThemedText>
       );
     }
