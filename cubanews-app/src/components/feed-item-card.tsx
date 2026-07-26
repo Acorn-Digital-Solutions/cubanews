@@ -9,7 +9,9 @@ import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 import {
   Linking,
+  Modal,
   Pressable,
+  ScrollView,
   Share,
   StyleSheet,
   View,
@@ -130,6 +132,7 @@ async function loadImage(item: FeedItem): Promise<string> {
 export default function FeedItemCard({ item }: FeedItemCardProps) {
   const theme = useTheme();
   const [isSaved, setIsSaved] = useState(false);
+  const [isCommentsSheetOpen, setIsCommentsSheetOpen] = useState(false);
   const deviceLanguage = getLocales()[0].languageCode ?? "es";
   const { sourceLabel, sourceImage } = getSourceInfo(item.source);
   const [imageLoadingState, setImageLoadingState] = useState(
@@ -168,8 +171,30 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
     console.log("Like Article");
   };
 
-  const comment = async () => {
-    console.log("Comment");
+  const comments = useMemo(
+    () => [
+      {
+        id: `${item.id}-1`,
+        author: "Cubanews",
+        text: "Comparte tu opinion sobre esta noticia.",
+        time: "ahora",
+      },
+      {
+        id: `${item.id}-2`,
+        author: "Lector",
+        text: "Este titular esta dando mucho de que hablar.",
+        time: "hace 5 min",
+      },
+    ],
+    [item.id],
+  );
+
+  const openCommentsSheet = () => {
+    setIsCommentsSheetOpen(true);
+  };
+
+  const closeCommentsSheet = () => {
+    setIsCommentsSheetOpen(false);
   };
 
   useEffect(() => {
@@ -248,7 +273,7 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
             color={theme.textSecondary}
           />
         </Pressable>
-        <Pressable onPress={comment}>
+        <Pressable onPress={openCommentsSheet}>
           <MaterialDesignIcons
             name="comment-outline"
             size={20}
@@ -264,6 +289,72 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
           />
         </Pressable>
       </View>
+
+      <Modal
+        visible={isCommentsSheetOpen}
+        transparent
+        animationType="slide"
+        onRequestClose={closeCommentsSheet}
+      >
+        <View style={styles.sheetOverlay}>
+          <Pressable
+            style={styles.sheetBackdrop}
+            onPress={closeCommentsSheet}
+          />
+
+          <View
+            style={[
+              styles.sheetContainer,
+              {
+                backgroundColor: theme.background,
+                borderTopColor: theme.backgroundSelected,
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.sheetHandle,
+                { backgroundColor: theme.backgroundSelected },
+              ]}
+            />
+
+            <View style={styles.sheetHeaderRow}>
+              <ThemedText type="subtitle">Comentarios</ThemedText>
+              <Pressable onPress={closeCommentsSheet}>
+                <MaterialDesignIcons
+                  name="close"
+                  size={22}
+                  color={theme.textSecondary}
+                />
+              </Pressable>
+            </View>
+
+            <ScrollView
+              style={styles.sheetScrollView}
+              contentContainerStyle={styles.sheetContentContainer}
+              showsVerticalScrollIndicator={false}
+            >
+              {comments.map((comment) => (
+                <View
+                  key={comment.id}
+                  style={[
+                    styles.commentRow,
+                    { borderBottomColor: theme.backgroundSelected },
+                  ]}
+                >
+                  <View style={styles.commentMetaRow}>
+                    <ThemedText type="smallBold">{comment.author}</ThemedText>
+                    <ThemedText type="small" themeColor="textSecondary">
+                      {comment.time}
+                    </ThemedText>
+                  </View>
+                  <ThemedText>{comment.text}</ThemedText>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -326,5 +417,56 @@ const styles = StyleSheet.create({
   },
   actionSpacer: {
     flex: 1,
+  },
+  sheetOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  sheetBackdrop: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+  },
+  sheetContainer: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderTopWidth: 1,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 20,
+    maxHeight: "60%",
+  },
+  sheetHandle: {
+    width: 44,
+    height: 4,
+    borderRadius: 4,
+    alignSelf: "center",
+    marginBottom: 12,
+  },
+  sheetHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  sheetScrollView: {
+    flexGrow: 0,
+  },
+  sheetContentContainer: {
+    paddingBottom: 8,
+  },
+  commentRow: {
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: 6,
+  },
+  commentMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
   },
 });
