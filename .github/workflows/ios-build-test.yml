@@ -3,7 +3,7 @@ name: iOS Build and Test
 on:
   push:
     branches:
-      - '**'
+      - "**"
 
 permissions:
   contents: read
@@ -33,7 +33,7 @@ jobs:
           xcodebuild build \
             -project cubanews-ios.xcodeproj \
             -scheme cubanews-ios \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO
 
