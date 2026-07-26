@@ -1,6 +1,6 @@
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { useColorScheme } from "react-native";
-import { getApps, initializeApp } from "firebase/app";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
 
 import { Colors } from "@/constants/theme";
 
@@ -12,21 +12,41 @@ export default function AppTabs() {
     <NativeTabs
       backgroundColor={colors.background}
       indicatorColor={colors.backgroundElement}
+      iconColor={{ default: colors.textSecondary, selected: colors.text }}
       labelStyle={{ selected: { color: colors.text } }}
     >
-      <NativeTabs.Trigger name="index">
+      <NativeTabs.Trigger name="index" disableAutomaticContentInsets>
         <NativeTabs.Trigger.Label>Titulares</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require("@/assets/images/tabIcons/home.png")}
-          renderingMode="template"
+          src={
+            <NativeTabs.Trigger.VectorIcon
+              family={MaterialDesignIcons}
+              name="newspaper-variant"
+            />
+          }
+        />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="social" disableAutomaticContentInsets>
+        <NativeTabs.Trigger.Label>Social</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          src={
+            <NativeTabs.Trigger.VectorIcon
+              family={MaterialDesignIcons}
+              name="account-group"
+            />
+          }
         />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="profile">
+      <NativeTabs.Trigger name="profile" disableAutomaticContentInsets>
         <NativeTabs.Trigger.Label>Perfil</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require("@/assets/images/tabIcons/home.png")}
-          renderingMode="template"
+          src={
+            <NativeTabs.Trigger.VectorIcon
+              family={MaterialDesignIcons}
+              name="account"
+            />
+          }
         />
       </NativeTabs.Trigger>
     </NativeTabs>

@@ -20,6 +20,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { ThemedText } from "./themed-text";
 import { getLocales } from "expo-localization";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
 import moment from "moment";
 
 require("moment/locale/es");
@@ -163,6 +164,14 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
     });
   };
 
+  const likeArticle = async () => {
+    console.log("Like Article");
+  };
+
+  const comment = async () => {
+    console.log("Comment");
+  };
+
   useEffect(() => {
     loadImage(item)
       .then((imageUrl) => {
@@ -224,29 +233,37 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
         <ThemedText style={styles.title}>{item.title}</ThemedText>
       </Pressable>
 
-      {/* <View
+      <View
         style={[
           styles.separator,
           { backgroundColor: theme.backgroundSelected },
         ]}
-      /> */}
+      />
 
-      {/* <View style={styles.actionRow}>
+      <View style={styles.actionRow}>
+        <Pressable onPress={likeArticle}>
+          <MaterialDesignIcons
+            name="thumb-up-outline"
+            size={20}
+            color={theme.textSecondary}
+          />
+        </Pressable>
+        <Pressable onPress={comment}>
+          <MaterialDesignIcons
+            name="comment-outline"
+            size={20}
+            color={theme.textSecondary}
+          />
+        </Pressable>
         <View style={styles.actionSpacer} />
-        <Pressable onPress={() => setIsSaved((prev) => !prev)}>
-          <ThemedText
-            type="small"
-            themeColor={isSaved ? "text" : "textSecondary"}
-          >
-            {isSaved ? "Guardar ✓" : "Guardar"}
-          </ThemedText>
-        </Pressable>
         <Pressable onPress={shareArticle}>
-          <ThemedText type="small" themeColor="textSecondary">
-            Compartir
-          </ThemedText>
+          <MaterialDesignIcons
+            name="share-variant"
+            size={20}
+            color={theme.textSecondary}
+          />
         </Pressable>
-      </View> */}
+      </View>
     </View>
   );
 }

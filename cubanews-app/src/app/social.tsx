@@ -7,7 +7,7 @@ import { Platform, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 
-export default function Profile() {
+export default function Social() {
   useEffect(() => {});
 
   return (
@@ -15,10 +15,10 @@ export default function Profile() {
       <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
         {Platform.OS === "web" && <WebBadge />}
         <ThemedView style={{ flex: 1, alignSelf: "stretch" }}>
-          <CubanewsHeader text="Perfil" showDate={false} />
+          <CubanewsHeader text="Social" showDate={false} />
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ gap: 8 }}>
             <View style={{ gap: 8 }}>
-              <ThemedText>Perfil</ThemedText>
+              <ThemedText>Social</ThemedText>
             </View>
           </ScrollView>
         </ThemedView>
