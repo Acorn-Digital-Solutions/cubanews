@@ -23,7 +23,9 @@ import { useEffect, useMemo, useState } from "react";
 import { ThemedText } from "./themed-text";
 import { getLocales } from "expo-localization";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
-import moment from "moment";
+import moment, { duration } from "moment";
+import CommentsSheet from "./comments-sheet";
+import { CNComment } from "@/services/comments-service";
 
 require("moment/locale/es");
 
@@ -175,16 +177,18 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
     () => [
       {
         id: `${item.id}-1`,
+        feedItemId: 0,
         author: "Cubanews",
-        text: "Comparte tu opinion sobre esta noticia.",
-        time: "ahora",
-      },
+        content: "Comparte tu opinion sobre esta noticia.",
+        createdAt: 0,
+      } as CNComment,
       {
         id: `${item.id}-2`,
+        feedItemId: 0,
         author: "Lector",
-        text: "Este titular esta dando mucho de que hablar.",
-        time: "hace 5 min",
-      },
+        content: "Este titular esta dando mucho de que hablar.",
+        createdAt: 0,
+      } as CNComment,
     ],
     [item.id],
   );
@@ -280,10 +284,9 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
             color={theme.textSecondary}
           />
         </Pressable>
-        <View style={styles.actionSpacer} />
         <Pressable onPress={shareArticle}>
           <MaterialDesignIcons
-            name="share-variant"
+            name="share-outline"
             size={20}
             color={theme.textSecondary}
           />
@@ -296,64 +299,17 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
         animationType="slide"
         onRequestClose={closeCommentsSheet}
       >
-        <View style={styles.sheetOverlay}>
-          <Pressable
-            style={styles.sheetBackdrop}
-            onPress={closeCommentsSheet}
-          />
-
-          <View
-            style={[
-              styles.sheetContainer,
-              {
-                backgroundColor: theme.background,
-                borderTopColor: theme.backgroundSelected,
-              },
-            ]}
-          >
-            <View
-              style={[
-                styles.sheetHandle,
-                { backgroundColor: theme.backgroundSelected },
-              ]}
-            />
-
-            <View style={styles.sheetHeaderRow}>
-              <ThemedText type="subtitle">Comentarios</ThemedText>
-              <Pressable onPress={closeCommentsSheet}>
-                <MaterialDesignIcons
-                  name="close"
-                  size={22}
-                  color={theme.textSecondary}
-                />
-              </Pressable>
-            </View>
-
-            <ScrollView
-              style={styles.sheetScrollView}
-              contentContainerStyle={styles.sheetContentContainer}
-              showsVerticalScrollIndicator={false}
-            >
-              {comments.map((comment) => (
-                <View
-                  key={comment.id}
-                  style={[
-                    styles.commentRow,
-                    { borderBottomColor: theme.backgroundSelected },
-                  ]}
-                >
-                  <View style={styles.commentMetaRow}>
-                    <ThemedText type="smallBold">{comment.author}</ThemedText>
-                    <ThemedText type="small" themeColor="textSecondary">
-                      {comment.time}
-                    </ThemedText>
-                  </View>
-                  <ThemedText>{comment.text}</ThemedText>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
-        </View>
+        <CommentsSheet
+          closeCommentsSheet={closeCommentsSheet}
+          saveComment={function (): {} {
+            throw new Error("Function not implemented.");
+          }}
+          deleteComment={function (id: string): {} {
+            throw new Error("Function not implemented.");
+          }}
+          comments={comments}
+          feedItemId={item.id}
+        />
       </Modal>
     </View>
   );
@@ -437,7 +393,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 20,
-    maxHeight: "60%",
+    height: "80%",
   },
   sheetHandle: {
     width: 44,
@@ -453,7 +409,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sheetScrollView: {
-    flexGrow: 0,
+    flex: 1,
   },
   sheetContentContainer: {
     paddingBottom: 8,
