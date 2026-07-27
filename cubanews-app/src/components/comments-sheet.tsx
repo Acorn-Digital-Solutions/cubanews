@@ -124,7 +124,7 @@ export default function CommentsSheet({
                     id: String(Date.now()),
                     feedItemId,
                     content: commentText,
-                    author: "sergionava",
+                    author: "Autor",
                     createdAt: Date.now(),
                   } as CNComment,
                 ];
