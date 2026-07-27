@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Pressable,
   ScrollView,
@@ -93,14 +94,16 @@ export default function CommentsSheet({
             ]}
           >
             <View style={styles.commentComposerPill}>
-              <TextInput
-                style={styles.commentTextInput}
-                onChangeText={() => {}}
-                placeholder="Comment as Sergio Nava"
-                placeholderTextColor="#65676B"
-                onSubmitEditing={() => {}}
-                multiline
-              />
+              <View style={styles.commentInputWrapper}>
+                <TextInput
+                  style={styles.commentTextInput}
+                  onChangeText={() => {}}
+                  placeholder="Comment as Sergio Nava"
+                  placeholderTextColor="#65676B"
+                  onSubmitEditing={() => {}}
+                  multiline
+                />
+              </View>
             </View>
             <Pressable
               style={styles.inputActionIcon}
@@ -192,7 +195,7 @@ const styles = StyleSheet.create({
   },
   commentInputSection: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     justifyContent: "space-between",
     borderTopWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: 12,
@@ -200,8 +203,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   commentComposerPill: {
-    width: "90%",
+    flex: 1,
     minHeight: 52,
+    maxHeight: 140,
     borderRadius: 26,
     backgroundColor: "#EDEFF3",
     flexDirection: "row",
@@ -210,13 +214,19 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     gap: 10,
   },
-  commentTextInput: {
+  commentInputWrapper: {
     flex: 1,
+  },
+  commentTextInput: {
+    flexGrow: 1,
+    flexShrink: 1,
+    minHeight: 22,
     color: "#1C1E21",
     fontSize: 16,
     lineHeight: 22,
     paddingVertical: 0,
     textAlignVertical: "top",
+    includeFontPadding: false,
   },
   inputActionIcon: {
     alignItems: "center",
