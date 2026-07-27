@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Pressable,
   ScrollView,
@@ -26,7 +26,9 @@ export default function CommentsSheet({
   feedItemId: number;
 }) {
   const insets = useSafeAreaInsets();
-  const hasComments = comments.length > 0;
+  const [_comments, _setComments] = useState(comments);
+  const [commentText, setCommentText] = useState("");
+  const hasComments = _comments.length > 0;
 
   return (
     <View style={styles.sheetOverlay}>
@@ -52,7 +54,7 @@ export default function CommentsSheet({
             showsVerticalScrollIndicator={false}
           >
             {hasComments ? (
-              comments.map((comment) => (
+              _comments.map((comment) => (
                 <View
                   key={comment.id}
                   style={[styles.commentRow, { borderBottomColor: "#E4E6EB" }]}
@@ -99,6 +101,8 @@ export default function CommentsSheet({
                 style={[styles.commentTextInput]}
                 placeholder="Comment as @username"
                 placeholderTextColor="#65676B"
+                value={commentText}
+                onChangeText={setCommentText}
                 onContentSizeChange={(
                   event: TextInputContentSizeChangeEvent,
                 ) => {
@@ -113,7 +117,20 @@ export default function CommentsSheet({
             </View>
             <Pressable
               style={styles.inputActionIcon}
-              onPress={() => {}}
+              onPress={() => {
+                const nextComments = [
+                  ..._comments,
+                  {
+                    id: String(Date.now()),
+                    feedItemId,
+                    content: commentText,
+                    author: "sergionava",
+                    createdAt: Date.now(),
+                  } as CNComment,
+                ];
+                _setComments(nextComments);
+                setCommentText("");
+              }}
               hitSlop={10}
             >
               <MaterialDesignIcons name="send" size={28} />
