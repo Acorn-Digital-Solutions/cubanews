@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   TextInput,
+  TextInputContentSizeChangeEvent,
   View,
 } from "react-native";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
@@ -94,23 +95,28 @@ export default function CommentsSheet({
             ]}
           >
             <View style={styles.commentComposerPill}>
-              <View style={styles.commentInputWrapper}>
-                <TextInput
-                  style={styles.commentTextInput}
-                  onChangeText={() => {}}
-                  placeholder="Comment as Sergio Nava"
-                  placeholderTextColor="#65676B"
-                  onSubmitEditing={() => {}}
-                  multiline
-                />
-              </View>
+              <TextInput
+                style={[styles.commentTextInput]}
+                placeholder="Comment as @username"
+                placeholderTextColor="#65676B"
+                onContentSizeChange={(
+                  event: TextInputContentSizeChangeEvent,
+                ) => {
+                  console.log(
+                    "Height change ",
+                    event.nativeEvent.contentSize.height,
+                  );
+                }}
+                multiline
+                scrollEnabled={false}
+              />
             </View>
             <Pressable
               style={styles.inputActionIcon}
               onPress={() => {}}
               hitSlop={10}
             >
-              <MaterialDesignIcons name="send" size={28} color="#1877F2" />
+              <MaterialDesignIcons name="send" size={28} />
             </Pressable>
           </View>
         </View>
@@ -204,7 +210,6 @@ const styles = StyleSheet.create({
   },
   commentComposerPill: {
     flex: 1,
-    minHeight: 52,
     maxHeight: 140,
     borderRadius: 26,
     backgroundColor: "#EDEFF3",
@@ -212,7 +217,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     paddingHorizontal: 16,
     paddingVertical: 14,
-    gap: 10,
   },
   commentInputWrapper: {
     flex: 1,
@@ -229,6 +233,8 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
   },
   inputActionIcon: {
+    paddingLeft: 5,
+    paddingBottom: 10,
     alignItems: "center",
     justifyContent: "center",
   },
