@@ -1,6 +1,13 @@
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "./themed-text";
-import { useTheme } from "@/hooks/use-theme";
 import { CNComment } from "@/services/comments-service";
 
 export default function CommentsSheet({
@@ -16,7 +23,9 @@ export default function CommentsSheet({
   comments: Array<CNComment>;
   feedItemId: number;
 }) {
-  const theme = useTheme();
+  const insets = useSafeAreaInsets();
+  const hasComments = comments.length > 0;
+
   return (
     <View style={styles.sheetOverlay}>
       <Pressable style={styles.sheetBackdrop} onPress={closeCommentsSheet} />
@@ -24,105 +33,90 @@ export default function CommentsSheet({
         style={[
           styles.sheetContainer,
           {
-            backgroundColor: theme.background,
-            borderTopColor: theme.backgroundSelected,
+            backgroundColor: "#FFFFFF",
+            borderTopColor: "#E4E6EB",
           },
         ]}
       >
-        <View
-          style={[
-            styles.sheetHandle,
-            { backgroundColor: theme.backgroundSelected },
-          ]}
-        />
+        <View style={[styles.sheetHandle, { backgroundColor: "#BCC0C4" }]} />
 
-        <ScrollView
-          style={styles.sheetScrollView}
-          contentContainerStyle={styles.sheetContentContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          {comments.map((comment) => (
-            <View
-              key={comment.id}
-              style={[
-                styles.commentRow,
-                { borderBottomColor: theme.backgroundSelected },
-              ]}
-            >
-              <View style={styles.commentMetaRow}>
-                <ThemedText type="smallBold">{comment.author}</ThemedText>
-                <ThemedText type="small" themeColor="textSecondary">
-                  {comment.createdAt}
-                </ThemedText>
+        <View style={styles.sheetBody}>
+          <ScrollView
+            style={styles.sheetScrollView}
+            contentContainerStyle={[
+              styles.sheetContentContainer,
+              !hasComments && styles.emptyContentContainer,
+            ]}
+            showsVerticalScrollIndicator={false}
+          >
+            {hasComments ? (
+              comments.map((comment) => (
+                <View
+                  key={comment.id}
+                  style={[styles.commentRow, { borderBottomColor: "#E4E6EB" }]}
+                >
+                  <View style={styles.commentMetaRow}>
+                    <ThemedText type="smallBold">{comment.author}</ThemedText>
+                    <ThemedText type="small" themeColor="textSecondary">
+                      {comment.createdAt}
+                    </ThemedText>
+                  </View>
+                  <ThemedText>{comment.content}</ThemedText>
+                </View>
+              ))
+            ) : (
+              <View style={styles.emptyStateWrapper}>
+                <MaterialDesignIcons
+                  name="comment-outline"
+                  size={72}
+                  color="#DADDE1"
+                />
+                <View style={styles.emptyStateTextWrapper}>
+                  <ThemedText style={styles.emptyTitle}>
+                    No comments yet
+                  </ThemedText>
+                  <ThemedText style={styles.emptySubtitle}>
+                    Be the first to comment.
+                  </ThemedText>
+                </View>
               </View>
-              <ThemedText>{comment.content}</ThemedText>
+            )}
+          </ScrollView>
+
+          <View
+            style={[
+              styles.commentInputSection,
+              {
+                borderTopColor: "#E4E6EB",
+                paddingBottom: Math.max(insets.bottom, 8),
+              },
+            ]}
+          >
+            <View style={styles.commentComposerPill}>
+              <TextInput
+                style={styles.commentTextInput}
+                onChangeText={() => {}}
+                placeholder="Comment as Sergio Nava"
+                placeholderTextColor="#65676B"
+                onSubmitEditing={() => {}}
+                multiline
+              />
             </View>
-          ))}
-        </ScrollView>
+            <Pressable
+              style={styles.inputActionIcon}
+              onPress={() => {}}
+              hitSlop={10}
+            >
+              <MaterialDesignIcons name="send" size={28} color="#1877F2" />
+            </Pressable>
+          </View>
+        </View>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    borderRadius: 12,
-    padding: 12,
-    gap: 8,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 2,
-  },
-  headerRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  sourceRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 8,
-  },
-  sourceBadge: {
-    alignItems: "center",
-    borderRadius: 4,
-    height: 16,
-    justifyContent: "center",
-    width: 20,
-  },
-  imagePlaceholder: {
-    alignItems: "center",
-    borderRadius: 8,
-    height: 120,
-    justifyContent: "center",
-  },
-  imageContainer: {
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  image: {
-    height: 120,
-    width: "100%",
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    lineHeight: 22,
-  },
-  separator: {
-    height: 1,
-    marginVertical: 4,
-  },
-  actionRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 20,
-  },
-  actionSpacer: {
-    flex: 1,
-  },
   sheetOverlay: {
     flex: 1,
     justifyContent: "flex-end",
@@ -133,35 +127,35 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    backgroundColor: "rgba(0, 0, 0, 0.24)",
   },
   sheetContainer: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     borderTopWidth: 1,
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 20,
-    height: "80%",
+    height: "82%",
+    overflow: "hidden",
   },
   sheetHandle: {
-    width: 44,
-    height: 4,
-    borderRadius: 4,
+    width: 52,
+    height: 5,
+    borderRadius: 999,
     alignSelf: "center",
+    marginTop: 10,
     marginBottom: 12,
   },
-  sheetHeaderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 12,
+  sheetBody: {
+    flex: 1,
   },
   sheetScrollView: {
     flex: 1,
   },
   sheetContentContainer: {
-    paddingBottom: 8,
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+  },
+  emptyContentContainer: {
+    flexGrow: 1,
   },
   commentRow: {
     paddingVertical: 12,
@@ -173,5 +167,59 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     gap: 8,
+  },
+  emptyStateWrapper: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingBottom: 80,
+    gap: 12,
+  },
+  emptyStateTextWrapper: {
+    alignItems: "center",
+  },
+  emptyTitle: {
+    color: "#606770",
+    fontSize: 22,
+    lineHeight: 30,
+    fontWeight: "700",
+  },
+  emptySubtitle: {
+    color: "#606770",
+    fontSize: 18,
+    lineHeight: 26,
+    fontWeight: "500",
+  },
+  commentInputSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    backgroundColor: "#FFFFFF",
+  },
+  commentComposerPill: {
+    width: "90%",
+    minHeight: 52,
+    borderRadius: 26,
+    backgroundColor: "#EDEFF3",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 10,
+  },
+  commentTextInput: {
+    flex: 1,
+    color: "#1C1E21",
+    fontSize: 16,
+    lineHeight: 22,
+    paddingVertical: 0,
+    textAlignVertical: "top",
+  },
+  inputActionIcon: {
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
