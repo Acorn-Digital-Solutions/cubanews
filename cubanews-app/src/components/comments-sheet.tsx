@@ -104,13 +104,8 @@ export default function CommentsSheet({
                 value={commentText}
                 onChangeText={setCommentText}
                 onContentSizeChange={(
-                  event: TextInputContentSizeChangeEvent,
-                ) => {
-                  console.log(
-                    "Height change ",
-                    event.nativeEvent.contentSize.height,
-                  );
-                }}
+                  _event: TextInputContentSizeChangeEvent,
+                ) => {}}
                 multiline
                 scrollEnabled={false}
               />
