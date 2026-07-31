@@ -177,10 +177,10 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
     () => [
       {
         id: `${item.id}-1`,
-        feedItemId: 0,
+        feedItemId: item.id,
         author: "Cubanews",
         content: "Comparte tu opinion sobre esta noticia.",
-        createdAt: 0,
+        createdAt: Date.now(),
       } as CNComment,
       {
         id: `${item.id}-2`,
