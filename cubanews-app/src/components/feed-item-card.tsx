@@ -9,7 +9,9 @@ import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 import {
   Linking,
+  Modal,
   Pressable,
+  ScrollView,
   Share,
   StyleSheet,
   View,
@@ -21,7 +23,9 @@ import { useEffect, useMemo, useState } from "react";
 import { ThemedText } from "./themed-text";
 import { getLocales } from "expo-localization";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
-import moment from "moment";
+import moment, { duration } from "moment";
+import CommentsSheet from "./comments-sheet";
+import { CNComment } from "@/services/comments-service";
 
 require("moment/locale/es");
 
@@ -130,6 +134,7 @@ async function loadImage(item: FeedItem): Promise<string> {
 export default function FeedItemCard({ item }: FeedItemCardProps) {
   const theme = useTheme();
   const [isSaved, setIsSaved] = useState(false);
+  const [isCommentsSheetOpen, setIsCommentsSheetOpen] = useState(false);
   const deviceLanguage = getLocales()[0].languageCode ?? "es";
   const { sourceLabel, sourceImage } = getSourceInfo(item.source);
   const [imageLoadingState, setImageLoadingState] = useState(
@@ -168,8 +173,32 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
     console.log("Like Article");
   };
 
-  const comment = async () => {
-    console.log("Comment");
+  const comments = useMemo(
+    () => [
+      {
+        id: `${item.id}-1`,
+        feedItemId: item.id,
+        author: "Cubanews",
+        content: "Comparte tu opinion sobre esta noticia.",
+        createdAt: Date.now(),
+      } as CNComment,
+      {
+        id: `${item.id}-2`,
+        feedItemId: 0,
+        author: "Lector",
+        content: "Este titular esta dando mucho de que hablar.",
+        createdAt: 0,
+      } as CNComment,
+    ],
+    [item.id],
+  );
+
+  const openCommentsSheet = () => {
+    setIsCommentsSheetOpen(true);
+  };
+
+  const closeCommentsSheet = () => {
+    setIsCommentsSheetOpen(false);
   };
 
   useEffect(() => {
@@ -248,22 +277,36 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
             color={theme.textSecondary}
           />
         </Pressable>
-        <Pressable onPress={comment}>
+        <Pressable onPress={openCommentsSheet}>
           <MaterialDesignIcons
             name="comment-outline"
             size={20}
             color={theme.textSecondary}
           />
         </Pressable>
-        <View style={styles.actionSpacer} />
         <Pressable onPress={shareArticle}>
           <MaterialDesignIcons
-            name="share-variant"
+            name="share-outline"
             size={20}
             color={theme.textSecondary}
           />
         </Pressable>
       </View>
+
+      <Modal
+        visible={isCommentsSheetOpen}
+        transparent
+        animationType="slide"
+        onRequestClose={closeCommentsSheet}
+      >
+        <CommentsSheet
+          closeCommentsSheet={closeCommentsSheet}
+          saveComment={() => {}}
+          deleteComment={(_id: string) => {}}
+          comments={comments}
+          feedItemId={item.id}
+        />
+      </Modal>
     </View>
   );
 }
@@ -326,5 +369,56 @@ const styles = StyleSheet.create({
   },
   actionSpacer: {
     flex: 1,
+  },
+  sheetOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  sheetBackdrop: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+  },
+  sheetContainer: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderTopWidth: 1,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 20,
+    height: "80%",
+  },
+  sheetHandle: {
+    width: 44,
+    height: 4,
+    borderRadius: 4,
+    alignSelf: "center",
+    marginBottom: 12,
+  },
+  sheetHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  sheetScrollView: {
+    flex: 1,
+  },
+  sheetContentContainer: {
+    paddingBottom: 8,
+  },
+  commentRow: {
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: 6,
+  },
+  commentMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
   },
 });
