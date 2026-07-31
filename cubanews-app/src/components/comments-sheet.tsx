@@ -118,12 +118,17 @@ export default function CommentsSheet({
             <Pressable
               style={styles.inputActionIcon}
               onPress={() => {
+                const normalizedText = commentText.trim();
+                if (!normalizedText) {
+                  return;
+                }
+
                 const nextComments = [
                   ..._comments,
                   {
                     id: String(Date.now()),
                     feedItemId,
-                    content: commentText,
+                    content: normalizedText,
                     author: "Autor",
                     createdAt: Date.now(),
                   } as CNComment,
