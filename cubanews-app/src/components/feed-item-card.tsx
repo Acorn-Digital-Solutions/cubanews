@@ -301,12 +301,8 @@ export default function FeedItemCard({ item }: FeedItemCardProps) {
       >
         <CommentsSheet
           closeCommentsSheet={closeCommentsSheet}
-          saveComment={function (): {} {
-            throw new Error("Function not implemented.");
-          }}
-          deleteComment={function (id: string): {} {
-            throw new Error("Function not implemented.");
-          }}
+          saveComment={() => {}}
+          deleteComment={(_id: string) => {}}
           comments={comments}
           feedItemId={item.id}
         />
