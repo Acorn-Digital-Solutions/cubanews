@@ -235,9 +235,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
-  commentInputWrapper: {
-    flex: 1,
-  },
   commentTextInput: {
     flexGrow: 1,
     flexShrink: 1,
