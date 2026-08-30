@@ -1,25 +1,14 @@
 import { useTheme } from "@/hooks/use-theme";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
 import { Alert, Linking, Pressable, StyleSheet, View } from "react-native";
+import type { Service, ServiceStatus } from "@/services/services-service";
 import { ThemedText } from "./themed-text";
 
-export type ServiceStatus = "inReview" | "approved" | "rejected" | "expired";
-
-export type ServiceContactInfo = {
-  emailAddress?: string;
-  phoneNumber?: string;
-  websiteURL?: string;
-  facebook?: string;
-  instagram?: string;
-};
-
-export type Service = {
-  id: string;
-  businessName: string;
-  description: string;
-  contactInfo: ServiceContactInfo;
-  status: ServiceStatus;
-};
+export type {
+  Service,
+  ServiceContactInfo,
+  ServiceStatus,
+} from "@/services/services-service";
 
 type ServiceCardProps = {
   service: Service;
