@@ -8,6 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 
 export default function Services() {
+  const [services, setServices] = useState([]);
   useEffect(() => {});
 
   return (
