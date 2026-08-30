@@ -32,18 +32,6 @@ export type Service = {
   lastUpdatedAt: number;
 };
 
-type FirestoreService = Partial<{
-  id: string;
-  description: string;
-  businessName: string;
-  contactInfo: Partial<ServiceContactInfo>;
-  ownerID: string;
-  status: string;
-  expirationDate: number;
-  createdAt: number;
-  lastUpdatedAt: number;
-}>;
-
 const defaultContactInfo: ServiceContactInfo = {
   emailAddress: "",
   phoneNumber: "",
@@ -126,7 +114,7 @@ export class ServicesService {
     // const snapshot = await getDocs(servicesQuery);
     //
     // return snapshot.docs.map((document) => {
-    //   const data = document.data() as FirestoreService;
+    //   const data = document.data() as Service;
     //   return {
     //     id: document.id,
     //     description: data.description ?? "",
