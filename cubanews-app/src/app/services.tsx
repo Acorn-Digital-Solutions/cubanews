@@ -1,7 +1,7 @@
 import { ThemedView } from "@/components/themed-view";
 import { CubanewsHeader } from "@/components/cubanews-header";
 import { WebBadge } from "@/components/web-badge";
-import ServiceCard, { type Service } from "@/components/service-card.";
+import ServiceCard, { type Service } from "@/components/service-card";
 import { servicesService } from "@/services/services-service";
 import { styles } from "@/styles/cubanews-styles";
 import { useState, useEffect } from "react";
