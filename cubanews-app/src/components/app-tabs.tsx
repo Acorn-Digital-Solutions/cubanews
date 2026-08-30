@@ -38,6 +38,18 @@ export default function AppTabs() {
         />
       </NativeTabs.Trigger>
 
+      <NativeTabs.Trigger name="services" disableAutomaticContentInsets>
+        <NativeTabs.Trigger.Label>Servicios</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          src={
+            <NativeTabs.Trigger.VectorIcon
+              family={MaterialDesignIcons}
+              name="briefcase"
+            />
+          }
+        />
+      </NativeTabs.Trigger>
+
       <NativeTabs.Trigger name="profile" disableAutomaticContentInsets>
         <NativeTabs.Trigger.Label>Perfil</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
