@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +47,10 @@ import java.time.format.FormatStyle
 fun FeedComposable(feedViewModel: FeedViewModel) {
     val feedItems by remember { feedViewModel.uiState }.collectAsState()
     val listState = rememberLazyListState()
+    val context = LocalContext.current
+    val savedItemsManager = remember { com.acorn.cubanews.saved.SavedItemsManager(context) }
+    val savedItemIds by savedItemsManager.savedItemIds.collectAsState(initial = emptySet())
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
@@ -58,13 +64,31 @@ fun FeedComposable(feedViewModel: FeedViewModel) {
     LazyColumn(state = listState) {
         // Trigger fetching the first batch when this composable is first composed
         items(feedItems) { item ->
-            FeedItemView(item, likeCallback = { feedViewModel.like(item) } )
+            FeedItemView(
+                item = item, 
+                likeCallback = { feedViewModel.like(item) },
+                onBookmarkClick = { feedItem ->
+                    coroutineScope.launch {
+                        if (savedItemIds.contains(feedItem.id.toString())) {
+                            savedItemsManager.unsaveItem(feedItem.id)
+                        } else {
+                            savedItemsManager.saveItem(feedItem.id)
+                        }
+                    }
+                },
+                isBookmarked = savedItemIds.contains(item.id.toString())
+            )
         }
     }
 }
 
 @Composable
-fun FeedItemView(item: FeedItem, likeCallback: (item: FeedItem) -> Unit) {
+fun FeedItemView(
+    item: FeedItem, 
+    likeCallback: (item: FeedItem) -> Unit,
+    onBookmarkClick: ((item: FeedItem) -> Unit)? = null,
+    isBookmarked: Boolean = false
+) {
     val context = LocalContext.current
     Card(
         modifier = Modifier
@@ -168,6 +192,20 @@ fun FeedItemView(item: FeedItem, likeCallback: (item: FeedItem) -> Unit) {
 //                        )
 //                    }
 //                }
+
+                // Bookmark button (if callback provided)
+                if (onBookmarkClick != null) {
+                    IconButton(
+                        modifier = Modifier.width(30.dp).height(25.dp),
+                        onClick = { onBookmarkClick(item) }
+                    ) {
+                        Icon(
+                            imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                            contentDescription = if (isBookmarked) "Guardado" else "Guardar",
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                }
 
                 IconButton(
                     modifier = Modifier.width(30.dp).height(25.dp),
